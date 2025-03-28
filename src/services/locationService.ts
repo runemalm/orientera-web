@@ -1,4 +1,3 @@
-
 import { debounce } from "@/lib/utils";
 
 // Interface for city suggestion
@@ -27,14 +26,22 @@ export const fetchCitySuggestions = async (query: string): Promise<CitySuggestio
       // Map all features to CitySuggestion objects
       const results = data.features.map((feature: any) => {
         const name = feature.properties.name;
-        const state = feature.properties.county || feature.properties.state || "";
-        const country = feature.properties.country || "Sverige";
         
+        // For hamlets and villages, use city property if available
+        let locationContext = "";
+        
+        if (feature.properties.city) {
+          // If it's a hamlet with a city, show "Name, City"
+          locationContext = feature.properties.city;
+        } else if (feature.properties.county) {
+          // Otherwise show county
+          locationContext = feature.properties.county;
+        }
+        
+        // Create a cleaner display without "Sweden" (since all results are Swedish)
         let display = name;
-        if (state) {
-          display = `${name}, ${state}, ${country}`;
-        } else {
-          display = `${name}, ${country}`;
+        if (locationContext) {
+          display = `${name}, ${locationContext}`;
         }
         
         return {
@@ -65,10 +72,21 @@ export const fetchCitySuggestions = async (query: string): Promise<CitySuggestio
       const nominatimData = await nominatimResponse.json();
       
       if (nominatimData && nominatimData.length > 0) {
-        return nominatimData.map((item: any) => ({
-          name: item.name || item.display_name.split(',')[0].trim(),
-          display: item.display_name
-        }));
+        // Process Nominatim results to match our format and remove "Sweden" mentions
+        return nominatimData.map((item: any) => {
+          const name = item.name || item.display_name.split(',')[0].trim();
+          // Clean up display_name to remove "Sweden" parts
+          const displayParts = item.display_name.split(',');
+          // Filter out Sweden parts and take first 2-3 parts
+          const cleanParts = displayParts
+            .filter(part => !part.toLowerCase().includes('sweden') && !part.toLowerCase().includes('sverige'))
+            .slice(0, 3);
+          
+          return {
+            name: name,
+            display: cleanParts.join(', ')
+          };
+        });
       }
     }
   } catch (error) {
