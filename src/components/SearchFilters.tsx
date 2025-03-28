@@ -73,11 +73,11 @@ const SearchFiltersComponent = ({
   };
 
   const handleDetectLocation = () => {
+    // This is the handler for the auto detection button
+    // We need to properly trigger the useGeolocation hook's detectLocation method
     onFilterChange({
       ...filters,
-      isManualLocation: false,
-      userLocation: undefined,
-      locationCity: undefined
+      isManualLocation: false
     });
   };
 

@@ -45,10 +45,19 @@ export const useGeolocation = (autoDetect = true) => {
   };
 
   const detectLocation = () => {
-    if (state.loading || state.coords) return;
+    // Reset the state completely before requesting a new location
+    setState({
+      coords: undefined,
+      detectedLocationInfo: undefined,
+      loading: true,
+      error: null
+    });
+    setIsManualLocation(false);
+    
+    console.log("Requesting geolocation...");
     
     if (!navigator.geolocation) {
-      setState(prev => ({ ...prev, error: "Geolocation is not supported by your browser" }));
+      setState(prev => ({ ...prev, loading: false, error: "Geolocation is not supported by your browser" }));
       toast({
         title: "Geolokalisering stöds inte",
         description: "Din webbläsare stöder inte geolokalisering. Prova att ange din position manuellt.",
@@ -58,9 +67,6 @@ export const useGeolocation = (autoDetect = true) => {
     }
 
     try {
-      console.log("Requesting geolocation...");
-      setState(prev => ({ ...prev, loading: true, error: null }));
-      
       // Create a local copy to avoid any potential issues with it being overridden
       const nativeGeolocation = navigator.geolocation;
       
@@ -170,8 +176,8 @@ export const useGeolocation = (autoDetect = true) => {
           }
         },
         {
-          enableHighAccuracy: false,
-          timeout: 30000,
+          enableHighAccuracy: true, // Changed to true for better accuracy
+          timeout: 10000, // Reduced from 30000 to 10000 for faster response
           maximumAge: 0
         }
       );
@@ -228,7 +234,7 @@ export const useGeolocation = (autoDetect = true) => {
     if (autoDetect && !state.coords && !isManualLocation && !state.loading) {
       detectLocation();
     }
-  }, [autoDetect, state.coords, isManualLocation, state.loading]);
+  }, [autoDetect]); // Only depend on autoDetect to prevent re-runs when state changes
 
   return {
     ...state,

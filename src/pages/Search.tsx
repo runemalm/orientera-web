@@ -56,8 +56,8 @@ const Search = () => {
   const handleFilterChange = (newFilters: SearchFiltersType) => {
     // Handle special cases for location changes
     if (newFilters.isManualLocation !== filters.isManualLocation) {
-      if (newFilters.isManualLocation === false) {
-        // User wants to switch to auto detection
+      if (newFilters.isManualLocation === false && filters.isManualLocation === true) {
+        // User wants to switch from manual to auto detection
         clearLocation();
         detectLocation();
       }
