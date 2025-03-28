@@ -150,7 +150,7 @@ const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: Search
                   <div className="text-sm">
                     {filters.userLocation ? (
                       <span className="text-sm text-muted-foreground">
-                        {filters.isManualLocation ? "Manuellt vald position" : "Detektion automatisk position"}
+                        {filters.isManualLocation ? "Manuellt vald position" : "Detekterad position"}
                       </span>
                     ) : (
                       <span className="text-sm text-destructive font-medium">
@@ -214,23 +214,24 @@ const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: Search
                   </div>
                 </div>
                 
-                <div className="flex flex-wrap gap-2">
+                {/* Fix the distance buttons UI */}
+                <div className="grid grid-cols-3 gap-2">
                   <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className={filters.distance === undefined ? "bg-primary text-primary-foreground" : ""}
+                    variant={filters.distance === undefined ? "default" : "outline"}
+                    size="sm"
                     onClick={() => handleDistanceChange(null)}
+                    className="w-full"
                   >
                     Alla
                   </Button>
                   {distances.map(distance => (
                     <Button 
                       key={distance}
-                      variant="outline" 
+                      variant={filters.distance === distance ? "default" : "outline"}
                       size="sm"
                       disabled={!filters.userLocation}
-                      className={filters.distance === distance ? "bg-primary text-primary-foreground" : ""}
                       onClick={() => handleDistanceChange(distance)}
+                      className="w-full"
                     >
                       {distance} km
                     </Button>
