@@ -13,31 +13,29 @@ export const fetchCitySuggestions = async (query: string): Promise<CitySuggestio
     return [];
   }
   
-  // First try with the exact query
+  // First try with the exact query (without appending Sweden)
   let response = await fetch(
-    `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}, Sweden&countrycodes=se&limit=5`
+    `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=se&limit=5`
   );
   
   let data = await response.json();
   
   // If no results and query is at least 3 characters, try with a wildcard approach
-  // by appending an asterisk to trigger partial matching
   if (data.length === 0 && query.length >= 3) {
     try {
       // Add wildcard to improve partial matching
       const wildcardQuery = `${query}*`;
       response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(wildcardQuery)}, Sweden&countrycodes=se&limit=5`
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(wildcardQuery)}&countrycodes=se&limit=5`
       );
       
       data = await response.json();
       
-      // If still no results, try a more aggressive approach with partial word
+      // If still no results, try one more approach by removing any filters
       if (data.length === 0) {
-        // Use a more general search approach
-        const generalQuery = query;
+        // Use a more general search approach but still limit to Sweden
         response = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(generalQuery)}&countrycodes=se&limit=5`
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=se&limit=5`
         );
         
         data = await response.json();
@@ -61,7 +59,7 @@ export const fetchCitySuggestions = async (query: string): Promise<CitySuggestio
 export const geocodeCity = async (cityName: string): Promise<boolean> => {
   try {
     const response = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cityName)}, Sweden&countrycodes=se&limit=1`
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cityName)}&countrycodes=se&limit=1`
     );
     
     const data = await response.json();
