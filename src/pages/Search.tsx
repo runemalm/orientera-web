@@ -4,10 +4,9 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CompetitionCard from "@/components/CompetitionCard";
 import SearchFilters from "@/components/SearchFilters";
-import SearchAutocomplete from "@/components/search/SearchAutocomplete";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
-import { SearchFilters as SearchFiltersType, Competition } from "@/types";
+import { SearchFilters as SearchFiltersType } from "@/types";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { Search as SearchIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -38,7 +37,6 @@ const Search = () => {
   });
 
   const [searchInputValue, setSearchInputValue] = useState("");
-  const [isAutocompleteOpen, setIsAutocompleteOpen] = useState(false);
   const searchContainerRef = useRef<HTMLDivElement>(null);
 
   // Update filters when geolocation changes
@@ -50,20 +48,6 @@ const Search = () => {
       isManualLocation
     }));
   }, [userLocation, detectedLocationInfo, isManualLocation]);
-
-  // Close autocomplete when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
-        setIsAutocompleteOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
 
   const filteredCompetitions = filterCompetitions(competitions, filters);
 
@@ -82,34 +66,16 @@ const Search = () => {
 
   const handleSearchChange = (value: string) => {
     setSearchInputValue(value);
-    setIsAutocompleteOpen(value.length >= 2);
     
     // Immediately update filters for real-time search
-    if (value.length >= 2 || value === "") {
-      setFilters({
-        ...filters,
-        searchQuery: value
-      });
-    }
-  };
-
-  const handleCompetitionSelect = (competition: Competition) => {
-    // When a competition is selected from autocomplete, update search query
-    setSearchInputValue(competition.name);
     setFilters({
       ...filters,
-      searchQuery: competition.name
+      searchQuery: value
     });
-    setIsAutocompleteOpen(false);
   };
 
   const handleManualSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    setFilters({
-      ...filters,
-      searchQuery: searchInputValue
-    });
-    setIsAutocompleteOpen(false);
   };
 
   return (
@@ -123,29 +89,17 @@ const Search = () => {
           <div className="md:col-span-1">
             <div className="rounded-lg border bg-card mb-4">
               <div className="p-4" ref={searchContainerRef}>
-                <Command className="rounded-lg border-none w-full" shouldFilter={false}>
-                  <form onSubmit={handleManualSearch} className="flex gap-2">
-                    <div className="relative flex-1">
-                      <Input
-                        placeholder="Sök efter tävlingsnamn eller plats..."
-                        value={searchInputValue}
-                        onChange={(e) => handleSearchChange(e.target.value)}
-                        onFocus={() => setIsAutocompleteOpen(searchInputValue.length >= 2)}
-                        className="w-full"
-                      />
-                      <SearchAutocomplete
-                        competitions={competitions}
-                        searchQuery={searchInputValue}
-                        onSearchChange={handleSearchChange}
-                        onCompetitionSelect={handleCompetitionSelect}
-                        isOpen={isAutocompleteOpen}
-                      />
-                    </div>
-                    <Button type="submit" size="icon">
-                      <SearchIcon className="h-4 w-4" />
-                    </Button>
-                  </form>
-                </Command>
+                <form onSubmit={handleManualSearch} className="flex gap-2">
+                  <Input
+                    placeholder="Sök efter tävlingsnamn eller plats..."
+                    value={searchInputValue}
+                    onChange={(e) => handleSearchChange(e.target.value)}
+                    className="w-full"
+                  />
+                  <Button type="submit" size="icon">
+                    <SearchIcon className="h-4 w-4" />
+                  </Button>
+                </form>
               </div>
             </div>
             
@@ -153,7 +107,7 @@ const Search = () => {
               filters={filters} 
               onFilterChange={handleFilterChange} 
               hasLocation={!!filters.userLocation}
-              hideSearchInput={true} // Add this prop to hide the search input in SearchFilters
+              hideSearchInput={true}
             />
           </div>
           
