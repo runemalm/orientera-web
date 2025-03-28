@@ -14,9 +14,9 @@ export const fetchCitySuggestions = async (query: string): Promise<CitySuggestio
   }
   
   try {
-    // Use Photon API which has better partial matching support
+    // Use Photon API with Swedish language parameter and wider search
     const response = await fetch(
-      `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&lang=en&limit=5&osm_tag=place:city&osm_tag=place:town&osm_tag=place:village&bbox=10.5,55.3,24.2,69.1`
+      `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&lang=sv&limit=5&bbox=10.5,55.3,24.2,69.1`
     );
     
     const data = await response.json();
@@ -35,9 +35,9 @@ export const fetchCitySuggestions = async (query: string): Promise<CitySuggestio
         
         let display = name;
         if (state) {
-          display = `${name}, ${state}, Sweden`;
+          display = `${name}, ${state}, Sverige`;
         } else {
-          display = `${name}, Sweden`;
+          display = `${name}, Sverige`;
         }
         
         return {
@@ -46,8 +46,24 @@ export const fetchCitySuggestions = async (query: string): Promise<CitySuggestio
         };
       });
     }
+    
+    // If no results found with Photon, try with Nominatim as backup
+    if (!data || !data.features || data.features.length === 0) {
+      const nominatimResponse = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=se&limit=5`
+      );
+      
+      const nominatimData = await nominatimResponse.json();
+      
+      if (nominatimData && nominatimData.length > 0) {
+        return nominatimData.map((item: any) => ({
+          name: item.name || item.display_name.split(',')[0].trim(),
+          display: item.display_name
+        }));
+      }
+    }
   } catch (error) {
-    console.error("Error fetching from Photon API:", error);
+    console.error("Error fetching city suggestions:", error);
   }
   
   return [];
@@ -56,9 +72,9 @@ export const fetchCitySuggestions = async (query: string): Promise<CitySuggestio
 // Geocode a city name to coordinates
 export const geocodeCity = async (cityName: string): Promise<boolean> => {
   try {
-    // Use Photon API for geocoding
+    // First try with Photon API for geocoding
     const response = await fetch(
-      `https://photon.komoot.io/api/?q=${encodeURIComponent(cityName)}&lang=en&limit=1&osm_tag=place:city&osm_tag=place:town&osm_tag=place:village&bbox=10.5,55.3,24.2,69.1`
+      `https://photon.komoot.io/api/?q=${encodeURIComponent(cityName)}&lang=sv&limit=1&bbox=10.5,55.3,24.2,69.1`
     );
     
     const data = await response.json();
@@ -69,9 +85,16 @@ export const geocodeCity = async (cityName: string): Promise<boolean> => {
       return country === "Sweden" || country === "Sverige";
     }
     
-    return false;
+    // If no results found with Photon, try with Nominatim as backup
+    const nominatimResponse = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cityName)}&countrycodes=se&limit=1`
+    );
+    
+    const nominatimData = await nominatimResponse.json();
+    
+    return nominatimData && nominatimData.length > 0;
   } catch (error) {
-    console.error("Error geocoding city with Photon:", error);
+    console.error("Error geocoding city:", error);
     return false;
   }
 };
