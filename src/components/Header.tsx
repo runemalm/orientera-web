@@ -1,9 +1,17 @@
 
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Compass } from "lucide-react";
+import WaitlistDialog from "./WaitlistDialog";
 
 const Header = () => {
+  const [waitlistOpen, setWaitlistOpen] = useState(false);
+  
+  const showWaitlist = () => {
+    setWaitlistOpen(true);
+  };
+
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur">
       <div className="container flex h-16 items-center justify-between">
@@ -26,14 +34,16 @@ const Header = () => {
           </Link>
         </nav>
         <div className="flex items-center space-x-2">
-          <Button asChild variant="ghost">
-            <Link to="/login">Logga in</Link>
+          <Button variant="ghost" onClick={showWaitlist}>
+            Logga in
           </Button>
-          <Button asChild>
-            <Link to="/register">Skapa konto</Link>
+          <Button onClick={showWaitlist}>
+            Skapa konto
           </Button>
         </div>
       </div>
+      
+      <WaitlistDialog open={waitlistOpen} setOpen={setWaitlistOpen} />
     </header>
   );
 };
