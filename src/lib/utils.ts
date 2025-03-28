@@ -1,4 +1,3 @@
-
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { Competition, SearchFilters } from "@/types";
@@ -103,9 +102,6 @@ export function formatDistance(distanceInMeters: number): string {
     console.error('Invalid distance provided to formatDistance:', distanceInMeters);
     return "Okänt avstånd";
   }
-  
-  // Log the actual distance value for debugging
-  console.log('Formatting distance in meters:', distanceInMeters);
   
   if (distanceInMeters < 1000) {
     return `${Math.round(distanceInMeters)} m`;

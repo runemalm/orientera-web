@@ -64,7 +64,7 @@ const Search = () => {
     return competitions.map(competition => {
       if (!competition.coordinates) return competition;
       
-      // Calculate distance in meters - ensure we're getting an actual number
+      // Calculate distance in meters
       const distance = getDistance(
         userLocation.lat,
         userLocation.lng,
@@ -72,12 +72,28 @@ const Search = () => {
         competition.coordinates.lng
       );
       
-      console.log(`Distance for ${competition.name}: ${distance}m (${distance/1000}km)`);
-      
-      // Add calculated distance to competition object (ensure it's a valid number)
+      // Add calculated distance to competition object
       return { ...competition, distance };
     });
   }, [userLocation]); // Only recalculate when userLocation changes
+
+  // Additional debugging of distance calculations
+  useEffect(() => {
+    if (userLocation && competitionsWithDistance.length > 0) {
+      const example = competitionsWithDistance[0];
+      if (example.coordinates) {
+        console.log("Example distance calculation:");
+        console.log("User location:", userLocation);
+        console.log("Competition coordinates:", example.coordinates);
+        console.log("Raw calculated distance:", getDistance(
+          userLocation.lat,
+          userLocation.lng,
+          example.coordinates.lat,
+          example.coordinates.lng
+        ));
+      }
+    }
+  }, [userLocation, competitionsWithDistance]);
 
   const filteredCompetitions = filterCompetitions(competitionsWithDistance, filters);
 
