@@ -45,20 +45,22 @@ export const geocodeCity = async (cityName: string): Promise<boolean> => {
   }
 };
 
-// Create a debounced version of the fetch function that properly handles the callback
+// Create a properly debounced version of the fetch suggestions function
+// This is a singleton instance of the debounced function to avoid recreating it on each render
+const debouncedFetchFn = debounce(async (query: string, callback: (results: CitySuggestion[]) => void) => {
+  try {
+    const results = await fetchCitySuggestions(query);
+    callback(results);
+  } catch (error) {
+    console.error("Error in debounced fetch:", error);
+    callback([]);
+  }
+}, 500); // Increased to 500ms for better performance
+
+// This function uses the singleton debounced function
 export const debouncedFetchSuggestions = (
   query: string, 
   callback: (results: CitySuggestion[]) => void
 ) => {
-  const debouncedFn = debounce(async () => {
-    try {
-      const results = await fetchCitySuggestions(query);
-      callback(results);
-    } catch (error) {
-      console.error("Error in debounced fetch:", error);
-      callback([]);
-    }
-  }, 300);
-  
-  debouncedFn();
+  debouncedFetchFn(query, callback);
 };

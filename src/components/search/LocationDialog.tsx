@@ -52,35 +52,28 @@ const LocationDialog = ({ open, onOpenChange, onCitySelect }: LocationDialogProp
     }
   }, [open]);
 
-  const fetchSuggestions = useCallback(async (query: string) => {
-    if (query.length < 2) {
+  // This effect runs when the search value changes
+  useEffect(() => {
+    if (citySearchValue.length < 2) {
       setCitySuggestions([]);
+      setIsLoadingSuggestions(false);
+      if (citySearchValue.length > 0) {
+        setHasSearched(true);
+      } else {
+        setHasSearched(false);
+      }
       return;
     }
     
     setIsLoadingSuggestions(true);
     setHasSearched(true);
     
-    try {
-      debouncedFetchSuggestions(query, (suggestions) => {
-        setCitySuggestions(suggestions);
-        setIsLoadingSuggestions(false);
-      });
-    } catch (error) {
-      console.error("Error fetching city suggestions:", error);
-      setCitySuggestions([]);
+    // Use the debounced fetch function
+    debouncedFetchSuggestions(citySearchValue, (suggestions) => {
+      setCitySuggestions(suggestions);
       setIsLoadingSuggestions(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (citySearchValue) {
-      fetchSuggestions(citySearchValue);
-    } else {
-      setCitySuggestions([]);
-      setHasSearched(false);
-    }
-  }, [citySearchValue, fetchSuggestions]);
+    });
+  }, [citySearchValue]);
 
   const handleSelectCity = async (cityName: string, displayName?: string) => {
     const success = await onCitySelect(cityName);
