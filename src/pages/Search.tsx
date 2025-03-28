@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CompetitionCard from "@/components/CompetitionCard";
@@ -33,7 +33,7 @@ const Search = () => {
   });
 
   // Update filters when geolocation changes
-  React.useEffect(() => {
+  useEffect(() => {
     setFilters(prevFilters => ({
       ...prevFilters,
       userLocation,

@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { MapPinOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -18,7 +18,6 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { useCallback } from "react";
 import { debounce } from "@/lib/utils";
 
 interface LocationDialogProps {
