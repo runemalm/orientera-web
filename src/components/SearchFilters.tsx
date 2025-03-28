@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { FilterIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -94,6 +95,7 @@ const SearchFiltersComponent = ({
           lng: parseFloat(lon) 
         };
         
+        // Update filters with the new location data
         onFilterChange({
           ...filters,
           userLocation: newLocation,
@@ -116,7 +118,7 @@ const SearchFiltersComponent = ({
       districts: [],
       disciplines: [],
       levels: [],
-      searchQuery: "", // Make sure searchQuery is cleared
+      searchQuery: "",
       distance: undefined,
       userLocation: filters.userLocation,
       isManualLocation: filters.isManualLocation,

@@ -23,7 +23,7 @@ const CompetitionCard = ({ competition, featured = false }: CompetitionCardProps
           </div>
         )}
         <CardTitle className="text-lg">{competition.name}</CardTitle>
-        <CardDescription className="flex items-center mt-1">
+        <div className="flex items-center mt-1">
           <MapPin className="h-4 w-4 mr-1 text-muted-foreground" />
           <span className="mr-2">{competition.location}</span>
           {competition.distance !== undefined && (
@@ -32,7 +32,7 @@ const CompetitionCard = ({ competition, featured = false }: CompetitionCardProps
               {formatDistance(competition.distance)}
             </Badge>
           )}
-        </CardDescription>
+        </div>
       </CardHeader>
       <CardContent className="p-4 pt-0 pb-2">
         <div className="grid grid-cols-2 gap-2 mt-2 text-sm">
@@ -64,4 +64,3 @@ const CompetitionCard = ({ competition, featured = false }: CompetitionCardProps
 };
 
 export default CompetitionCard;
-

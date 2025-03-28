@@ -38,7 +38,7 @@ export const fetchCitySuggestions = async (query: string): Promise<CitySuggestio
           locationContext = feature.properties.county;
         }
         
-        // Create a cleaner display without "Sweden" (since all results are Swedish)
+        // Create a cleaner display 
         let display = name;
         if (locationContext) {
           display = `${name}, ${locationContext}`;
@@ -52,8 +52,7 @@ export const fetchCitySuggestions = async (query: string): Promise<CitySuggestio
       
       console.log("Mapped results:", results);
       
-      // Since we're already filtering by only searching in Sweden (appending "Sverige" to the query),
-      // and only using Swedish APIs with countrycodes=se parameter, we can return all results
+      // Return all results - removed filtering that was causing Fröseke to be filtered out
       return results;
     }
     
@@ -67,19 +66,15 @@ export const fetchCitySuggestions = async (query: string): Promise<CitySuggestio
       const nominatimData = await nominatimResponse.json();
       
       if (nominatimData && nominatimData.length > 0) {
-        // Process Nominatim results to match our format and remove "Sweden" mentions
+        // Process Nominatim results to match our format
         return nominatimData.map((item: any) => {
           const name = item.name || item.display_name.split(',')[0].trim();
-          // Clean up display_name to remove "Sweden" parts
-          const displayParts = item.display_name.split(',');
-          // Filter out Sweden parts and take first 2-3 parts
-          const cleanParts = displayParts
-            .filter(part => !part.toLowerCase().includes('sweden') && !part.toLowerCase().includes('sverige'))
-            .slice(0, 3);
+          // Clean up display_name but don't filter out Sweden parts
+          const displayParts = item.display_name.split(',').slice(0, 3);
           
           return {
             name: name,
-            display: cleanParts.join(', ')
+            display: displayParts.join(', ')
           };
         });
       }
