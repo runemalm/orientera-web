@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 import CompetitionCard from "@/components/CompetitionCard";
 import SearchFilters from "@/components/SearchFilters";
 import { competitions } from "@/data/competitions";
-import { filterCompetitions } from "@/lib/utils";
+import { filterCompetitions, getDistance } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { Search as SearchIcon, X } from "lucide-react";
@@ -13,7 +13,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Command } from "@/components/ui/command";
 import { useToast } from "@/hooks/use-toast";
-import { getDistance } from "@/lib/utils";
 
 const Search = () => {
   const {
@@ -55,6 +54,8 @@ const Search = () => {
   // Calculate distances for each competition if user location is available
   const competitionsWithDistance = userLocation 
     ? competitions.map(competition => {
+        if (!competition.coordinates) return competition;
+        
         const distance = getDistance(
           userLocation.lat,
           userLocation.lng,

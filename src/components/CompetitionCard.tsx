@@ -27,10 +27,10 @@ const CompetitionCard = ({ competition, featured = false }: CompetitionCardProps
           <MapPin className="h-4 w-4 mr-1 text-muted-foreground" />
           <span className="mr-2">{competition.location}</span>
           {competition.distance !== undefined && (
-            <Badge variant="outline" className="text-xs py-0">
+            <span className="text-xs py-0 flex items-center border border-input rounded-full px-2">
               <Navigation className="h-3 w-3 mr-1" />
-              <span>{formatDistance(competition.distance)}</span>
-            </Badge>
+              {formatDistance(competition.distance)}
+            </span>
           )}
         </CardDescription>
       </CardHeader>
