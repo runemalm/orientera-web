@@ -28,18 +28,12 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-
-interface SearchFiltersProps {
-  filters: SearchFilters;
-  onFilterChange: (filters: SearchFilters) => void;
-  hasLocation: boolean;
-}
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 
 const disciplines = ['Sprint', 'Medel', 'Lång', 'Natt', 'Stafett', 'Ultralång'];
 const levels = ['Klubb', 'Krets', 'Distrikt', 'Nationell', 'Internationell'];
 const distances = [10, 25, 50, 100, 200];
 
-// Schema for location validation - updated to handle city input
 const locationSchema = z.object({
   city: z.string().min(2, "Ange minst 2 tecken").max(100)
 });
@@ -58,7 +52,6 @@ const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: Search
     },
   });
 
-  // Debounced function to fetch city suggestions from Sweden only
   const fetchCitySuggestions = useCallback(
     debounce(async (query: string) => {
       if (query.length < 2) {
@@ -68,7 +61,6 @@ const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: Search
       
       setIsLoadingSuggestions(true);
       try {
-        // Add "Sweden" to the query to restrict search to Sweden
         const response = await fetch(
           `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}, Sweden&countrycodes=se&limit=5`
         );
@@ -94,7 +86,6 @@ const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: Search
     []
   );
 
-  // Update city suggestions when input changes
   useEffect(() => {
     if (citySearchValue) {
       fetchCitySuggestions(citySearchValue);
@@ -154,8 +145,6 @@ const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: Search
 
   const handleCitySelect = async (cityName: string) => {
     try {
-      // Use the OpenStreetMap Nominatim API to get coordinates from city name
-      // Restrict to Sweden
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cityName)}, Sweden&countrycodes=se&limit=1`
       );
@@ -186,7 +175,7 @@ const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: Search
     onFilterChange({
       ...filters,
       isManualLocation: false,
-      userLocation: undefined, // This will trigger the geolocation request in Search.tsx
+      userLocation: undefined,
       locationCity: undefined
     });
   };
@@ -223,16 +212,65 @@ const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: Search
             </AccordionTrigger>
             <AccordionContent>
               <div className="space-y-4">
-                {/* Location status and controls layout */}
                 <div className="space-y-2">
-                  {/* Location status indicator */}
                   <div className="text-sm">
                     {filters.userLocation ? (
-                      <span className="text-sm text-muted-foreground">
-                        {filters.isManualLocation 
-                          ? `Plats: ${filters.locationCity || "Manuellt vald position"}` 
-                          : "Detekterad position"}
-                      </span>
+                      <>
+                        {filters.isManualLocation ? (
+                          <span className="text-sm text-muted-foreground">
+                            {`Plats: ${filters.locationCity || "Manuellt vald position"}`}
+                          </span>
+                        ) : (
+                          <HoverCard>
+                            <HoverCardTrigger asChild>
+                              <span className="text-sm text-muted-foreground cursor-help flex items-center">
+                                <Locate className="h-3.5 w-3.5 mr-1.5" />
+                                {filters.detectedLocationInfo?.city ? 
+                                  `${filters.detectedLocationInfo.city}` : 
+                                  "Detekterad position"}
+                              </span>
+                            </HoverCardTrigger>
+                            <HoverCardContent className="w-80 p-4">
+                              <div className="space-y-2">
+                                <h4 className="text-sm font-semibold">Din detekterade position</h4>
+                                {filters.detectedLocationInfo ? (
+                                  <div className="text-xs space-y-1">
+                                    {filters.detectedLocationInfo.city && (
+                                      <p>
+                                        <span className="font-medium">Ort: </span>
+                                        {filters.detectedLocationInfo.city}
+                                      </p>
+                                    )}
+                                    {filters.detectedLocationInfo.municipality && (
+                                      <p>
+                                        <span className="font-medium">Kommun: </span>
+                                        {filters.detectedLocationInfo.municipality}
+                                      </p>
+                                    )}
+                                    {filters.detectedLocationInfo.county && (
+                                      <p>
+                                        <span className="font-medium">Län: </span>
+                                        {filters.detectedLocationInfo.county}
+                                      </p>
+                                    )}
+                                    <p className="text-xs text-muted-foreground mt-2 pt-2 border-t">
+                                      {filters.detectedLocationInfo.display_name}
+                                    </p>
+                                  </div>
+                                ) : (
+                                  <p className="text-xs">
+                                    Platsinformation saknas. Vi har dina koordinater men kunde inte 
+                                    hämta detaljerad information.
+                                  </p>
+                                )}
+                                <div className="text-xs text-muted-foreground mt-2">
+                                  Koordinater: {filters.userLocation.lat.toFixed(6)}, {filters.userLocation.lng.toFixed(6)}
+                                </div>
+                              </div>
+                            </HoverCardContent>
+                          </HoverCard>
+                        )}
+                      </>
                     ) : (
                       <span className="text-sm text-destructive font-medium">
                         Ingen position tillgänglig
@@ -240,7 +278,6 @@ const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: Search
                     )}
                   </div>
                   
-                  {/* Location control buttons in a responsive grid */}
                   <div className="grid grid-cols-2 gap-2">
                     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                       <DialogTrigger asChild>
@@ -322,7 +359,6 @@ const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: Search
                   </div>
                 </div>
                 
-                {/* Distance buttons UI */}
                 <div className="grid grid-cols-3 gap-2">
                   <Button 
                     variant={filters.distance === undefined ? "default" : "outline"}
@@ -470,7 +506,8 @@ const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: Search
             distance: undefined,
             userLocation: filters.userLocation,
             isManualLocation: filters.isManualLocation,
-            locationCity: filters.locationCity
+            locationCity: filters.locationCity,
+            detectedLocationInfo: filters.detectedLocationInfo
           })}
         >
           Rensa alla filter

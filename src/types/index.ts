@@ -18,6 +18,13 @@ export type Coordinates = {
   lng: number;
 };
 
+export type DetectedLocationInfo = {
+  city?: string;
+  municipality?: string;
+  county?: string;
+  display_name?: string;
+};
+
 export type Competition = {
   id: string;
   name: string;
@@ -46,4 +53,5 @@ export type SearchFilters = {
   userLocation?: Coordinates;
   isManualLocation?: boolean; // Added to track if location is manually set
   locationCity?: string; // Added for city-based location
+  detectedLocationInfo?: DetectedLocationInfo; // Added for detailed auto-detected location info
 };
