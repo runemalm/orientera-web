@@ -21,8 +21,8 @@ const Header = () => {
           <Link to="#" className="text-muted-foreground hover:text-foreground transition-colors">
             Min profil
           </Link>
-          <Link to="#" className="text-muted-foreground hover:text-foreground transition-colors">
-            Hjälp
+          <Link to="/om-oss" className="text-muted-foreground hover:text-foreground transition-colors">
+            Om Oss
           </Link>
         </nav>
         <div className="flex items-center space-x-2">
