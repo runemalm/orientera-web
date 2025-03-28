@@ -1,6 +1,6 @@
 
 import React, { useState, useCallback, useEffect } from "react";
-import { MapPinOff, History, X } from "lucide-react";
+import { MapPinOff, History, X, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { 
@@ -20,6 +20,7 @@ import {
   CommandSeparator,
 } from "@/components/ui/command";
 import { debounce } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 // Maximum number of locations to store in history
 const MAX_HISTORY_ITEMS = 5;
@@ -78,6 +79,17 @@ const removeFromHistory = (locationName: string) => {
   }
 };
 
+// Clear all location history
+const clearLocationHistory = () => {
+  try {
+    localStorage.removeItem('locationHistory');
+    return [];
+  } catch (error) {
+    console.error("Error clearing location history:", error);
+    return getLocationHistory();
+  }
+};
+
 interface LocationDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -89,6 +101,7 @@ const LocationDialog = ({ open, onOpenChange, onCitySelect }: LocationDialogProp
   const [citySearchValue, setCitySearchValue] = useState("");
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   const [locationHistory, setLocationHistory] = useState<{name: string, display: string}[]>([]);
+  const { toast } = useToast();
 
   // Load location history when dialog opens
   useEffect(() => {
@@ -159,6 +172,16 @@ const LocationDialog = ({ open, onOpenChange, onCitySelect }: LocationDialogProp
     setLocationHistory(updatedHistory);
   };
 
+  const handleClearHistory = () => {
+    const updatedHistory = clearLocationHistory();
+    setLocationHistory(updatedHistory);
+    toast({
+      title: "Platshistorik rensad",
+      description: "Alla tidigare platser har tagits bort",
+      duration: 3000,
+    });
+  };
+
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
@@ -194,6 +217,20 @@ const LocationDialog = ({ open, onOpenChange, onCitySelect }: LocationDialogProp
                       {locationHistory.length > 0 && (
                         <>
                           <CommandGroup heading="Tidigare platser">
+                            <div className="flex items-center justify-between px-2 mb-1">
+                              <span className="text-xs text-muted-foreground">
+                                Tidigare platser du använt
+                              </span>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={handleClearHistory}
+                                className="h-7 px-2 text-xs"
+                              >
+                                <Trash2 className="h-3 w-3 mr-1" />
+                                Rensa historik
+                              </Button>
+                            </div>
                             {locationHistory.map((city, index) => (
                               <CommandItem
                                 key={`history-${index}`}
