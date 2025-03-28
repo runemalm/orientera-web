@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { Calendar, MapPin, Flag, Star, Navigation } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Competition } from "@/types";
 import { formatDate, formatDistance } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { useEffect } from "react";
 
 interface CompetitionCardProps {
   competition: Competition;
@@ -13,6 +13,12 @@ interface CompetitionCardProps {
 }
 
 const CompetitionCard = ({ competition, featured = false }: CompetitionCardProps) => {
+  useEffect(() => {
+    if (competition.distance !== undefined) {
+      console.log(`Card for ${competition.name} rendered with distance: ${competition.distance}m (${formatDistance(competition.distance)})`);
+    }
+  }, [competition.distance, competition.name]);
+
   return (
     <Card className={`overflow-hidden transition-all hover:shadow-md ${featured ? 'border-accent border-2' : ''}`}>
       <CardHeader className="p-4 pb-2">

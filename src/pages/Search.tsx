@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CompetitionCard from "@/components/CompetitionCard";
@@ -44,6 +44,7 @@ const Search = () => {
 
   // Update filters when geolocation changes
   useEffect(() => {
+    console.log("Location changed, updating filters:", { userLocation, isManualLocation });
     setFilters(prevFilters => ({
       ...prevFilters,
       userLocation,
@@ -52,20 +53,34 @@ const Search = () => {
     }));
   }, [userLocation, detectedLocationInfo, isManualLocation]);
 
-  // Calculate distances for each competition if user location is available
-  const competitionsWithDistance = userLocation 
-    ? competitions.map(competition => {
-        const distance = getDistance(
-          userLocation.lat,
-          userLocation.lng,
-          competition.coordinates.lat,
-          competition.coordinates.lng
-        );
-        return { ...competition, distance };
-      })
-    : competitions;
+  // Use useMemo to calculate distances only when location or competitions change
+  const competitionsWithDistance = useMemo(() => {
+    console.log("Recalculating distances with userLocation:", userLocation);
+    
+    if (!userLocation) return competitions;
+    
+    return competitions.map(competition => {
+      if (!competition.coordinates) {
+        console.warn(`Competition ${competition.id} is missing coordinates!`);
+        return competition;
+      }
+      
+      const distance = getDistance(
+        userLocation.lat,
+        userLocation.lng,
+        competition.coordinates.lat,
+        competition.coordinates.lng
+      );
+      
+      console.log(`Competition ${competition.name} - Distance: ${distance}m`);
+      return { ...competition, distance };
+    });
+  }, [userLocation]); // Only recalculate when userLocation changes
 
-  const filteredCompetitions = filterCompetitions(competitionsWithDistance, filters);
+  // Apply filters to the competitions with calculated distances
+  const filteredCompetitions = useMemo(() => {
+    return filterCompetitions(competitionsWithDistance, filters);
+  }, [competitionsWithDistance, filters]);
 
   const handleFilterChange = (newFilters: SearchFiltersType) => {
     // Handle special cases for location changes
@@ -87,6 +102,7 @@ const Search = () => {
       });
     }
 
+    console.log("Filter changed:", newFilters);
     setFilters(newFilters);
   };
 
