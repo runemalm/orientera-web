@@ -61,12 +61,15 @@ const Search = () => {
     return competitions.map(competition => {
       if (!competition.coordinates) return competition;
       
+      // Calculate distance in meters
       const distance = getDistance(
         userLocation.lat,
         userLocation.lng,
         competition.coordinates.lat,
         competition.coordinates.lng
       );
+      
+      // Add calculated distance to competition object
       return { ...competition, distance };
     });
   }, [userLocation]); // Only recalculate when userLocation changes
@@ -208,4 +211,3 @@ const Search = () => {
 };
 
 export default Search;
-

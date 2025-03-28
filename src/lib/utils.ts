@@ -1,4 +1,3 @@
-
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { Competition, SearchFilters } from "@/types";
@@ -87,12 +86,19 @@ export function formatDate(dateString: string): string {
   return formatted;
 }
 
-// Add format distance function
+// Update format distance function to properly handle and display distances
 export function formatDistance(distanceInMeters: number): string {
+  // Make sure we're working with a valid number
+  if (typeof distanceInMeters !== 'number' || isNaN(distanceInMeters)) {
+    return "Okänt avstånd";
+  }
+  
   if (distanceInMeters < 1000) {
     return `${Math.round(distanceInMeters)} m`;
   } else {
     const km = distanceInMeters / 1000;
+    // For distances less than 10km, show one decimal place
+    // For larger distances, round to whole numbers
     return km < 10 
       ? `${km.toFixed(1)} km`
       : `${Math.round(km)} km`;
