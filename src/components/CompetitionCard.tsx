@@ -13,8 +13,6 @@ interface CompetitionCardProps {
 }
 
 const CompetitionCard = ({ competition, featured = false }: CompetitionCardProps) => {
-  const distanceValue = competition.distance;
-  
   return (
     <Card className={`overflow-hidden transition-all hover:shadow-md ${featured ? 'border-accent border-2' : ''}`}>
       <CardHeader className="p-4 pb-2">
@@ -25,16 +23,16 @@ const CompetitionCard = ({ competition, featured = false }: CompetitionCardProps
           </div>
         )}
         <CardTitle className="text-lg">{competition.name}</CardTitle>
-        <div className="flex items-center mt-1">
+        <CardDescription className="flex items-center mt-1">
           <MapPin className="h-4 w-4 mr-1 text-muted-foreground" />
           <span className="mr-2">{competition.location}</span>
-          {distanceValue !== undefined && (
-            <Badge variant="outline" className="text-xs flex items-center px-2 py-0 h-5">
+          {competition.distance !== undefined && (
+            <Badge variant="outline" className="text-xs py-0">
               <Navigation className="h-3 w-3 mr-1" />
-              {formatDistance(distanceValue)}
+              <span>{formatDistance(competition.distance)}</span>
             </Badge>
           )}
-        </div>
+        </CardDescription>
       </CardHeader>
       <CardContent className="p-4 pt-0 pb-2">
         <div className="grid grid-cols-2 gap-2 mt-2 text-sm">

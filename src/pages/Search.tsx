@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 import CompetitionCard from "@/components/CompetitionCard";
 import SearchFilters from "@/components/SearchFilters";
 import { competitions } from "@/data/competitions";
-import { filterCompetitions, getDistance } from "@/lib/utils";
+import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { Search as SearchIcon, X } from "lucide-react";
@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Command } from "@/components/ui/command";
 import { useToast } from "@/hooks/use-toast";
+import { getDistance } from "@/lib/utils";
 
 const Search = () => {
   const {
@@ -43,57 +44,26 @@ const Search = () => {
 
   // Update filters when geolocation changes
   useEffect(() => {
-    if (userLocation) {
-      console.log("Location updated in Search.tsx:", userLocation);
-      // When location changes, make sure to update the filters with the latest location
-      setFilters(prevFilters => ({
-        ...prevFilters,
-        userLocation, // This ensures the userLocation is always updated in filters
-        detectedLocationInfo,
-        isManualLocation
-      }));
-    }
+    setFilters(prevFilters => ({
+      ...prevFilters,
+      userLocation,
+      detectedLocationInfo,
+      isManualLocation
+    }));
   }, [userLocation, detectedLocationInfo, isManualLocation]);
 
   // Calculate distances for each competition if user location is available
-  const competitionsWithDistance = React.useMemo(() => {
-    if (!userLocation) return competitions;
-    
-    console.log("Recalculating distances for all competitions with user location:", userLocation);
-    
-    return competitions.map(competition => {
-      if (!competition.coordinates) return competition;
-      
-      // Calculate distance in meters
-      const distance = getDistance(
-        userLocation.lat,
-        userLocation.lng,
-        competition.coordinates.lat,
-        competition.coordinates.lng
-      );
-      
-      // Add calculated distance to competition object
-      return { ...competition, distance };
-    });
-  }, [userLocation]); // Only recalculate when userLocation changes
-
-  // Additional debugging of distance calculations
-  useEffect(() => {
-    if (userLocation && competitionsWithDistance.length > 0) {
-      const example = competitionsWithDistance[0];
-      if (example.coordinates) {
-        console.log("Example distance calculation:");
-        console.log("User location:", userLocation);
-        console.log("Competition coordinates:", example.coordinates);
-        console.log("Raw calculated distance:", getDistance(
+  const competitionsWithDistance = userLocation 
+    ? competitions.map(competition => {
+        const distance = getDistance(
           userLocation.lat,
           userLocation.lng,
-          example.coordinates.lat,
-          example.coordinates.lng
-        ));
-      }
-    }
-  }, [userLocation, competitionsWithDistance]);
+          competition.coordinates.lat,
+          competition.coordinates.lng
+        );
+        return { ...competition, distance };
+      })
+    : competitions;
 
   const filteredCompetitions = filterCompetitions(competitionsWithDistance, filters);
 
@@ -146,20 +116,6 @@ const Search = () => {
   const handleManualSearch = (e: React.FormEvent) => {
     e.preventDefault();
   };
-
-  // For debugging: log the competitions with distance when userLocation changes
-  useEffect(() => {
-    if (userLocation) {
-      console.log("User location is set:", userLocation);
-      console.log("First 3 competitions with calculated distances:", 
-        competitionsWithDistance.slice(0, 3).map(c => ({
-          name: c.name,
-          distance: c.distance,
-          formattedDistance: c.distance ? `${(c.distance/1000).toFixed(1)}km` : 'N/A'
-        }))
-      );
-    }
-  }, [userLocation, competitionsWithDistance]);
 
   return (
     <div className="flex min-h-screen flex-col">

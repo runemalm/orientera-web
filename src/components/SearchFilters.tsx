@@ -73,6 +73,8 @@ const SearchFiltersComponent = ({
   };
 
   const handleDetectLocation = () => {
+    // This is the handler for the auto detection button
+    // We need to properly trigger the useGeolocation hook's detectLocation method
     onFilterChange({
       ...filters,
       isManualLocation: false
@@ -89,20 +91,12 @@ const SearchFiltersComponent = ({
       
       if (data && data.length > 0) {
         const { lat, lon } = data[0];
-        
-        const newLocation = { 
-          lat: parseFloat(lat), 
-          lng: parseFloat(lon) 
-        };
-        
-        // Update filters with the new location data
         onFilterChange({
           ...filters,
-          userLocation: newLocation,
+          userLocation: { lat: parseFloat(lat), lng: parseFloat(lon) },
           isManualLocation: true,
           locationCity: cityName
         });
-        
         return true;
       }
       return false;
@@ -118,7 +112,7 @@ const SearchFiltersComponent = ({
       districts: [],
       disciplines: [],
       levels: [],
-      searchQuery: "",
+      searchQuery: "", // Make sure searchQuery is cleared
       distance: undefined,
       userLocation: filters.userLocation,
       isManualLocation: filters.isManualLocation,
