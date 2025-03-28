@@ -13,6 +13,11 @@ export type Discipline = 'Sprint' | 'Medel' | 'Lång' | 'Natt' | 'Stafett' | 'Ul
 
 export type CompetitionLevel = 'Klubb' | 'Krets' | 'Distrikt' | 'Nationell' | 'Internationell';
 
+export type Coordinates = {
+  lat: number;
+  lng: number;
+};
+
 export type Competition = {
   id: string;
   name: string;
@@ -21,10 +26,7 @@ export type Competition = {
   region: string;
   district: string;
   location: string;
-  coordinates: {
-    lat: number;
-    lng: number;
-  };
+  coordinates: Coordinates;
   discipline: Discipline;
   level: CompetitionLevel;
   registrationDeadline: string;
@@ -40,4 +42,5 @@ export type SearchFilters = {
   disciplines: Discipline[];
   levels: CompetitionLevel[];
   searchQuery: string;
+  userLocation?: Coordinates;
 };

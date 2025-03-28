@@ -1,10 +1,8 @@
-
 import { useState } from "react";
-import { SearchIcon, FilterIcon } from "lucide-react";
+import { SearchIcon, FilterIcon, MapPin } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   Accordion,
@@ -19,13 +17,14 @@ import { SearchFilters } from "@/types";
 interface SearchFiltersProps {
   filters: SearchFilters;
   onFilterChange: (filters: SearchFilters) => void;
+  hasLocation: boolean;
 }
 
 const disciplines = ['Sprint', 'Medel', 'Lång', 'Natt', 'Stafett', 'Ultralång'];
 const levels = ['Klubb', 'Krets', 'Distrikt', 'Nationell', 'Internationell'];
 const distances = [10, 25, 50, 100, 200];
 
-const SearchFiltersComponent = ({ filters, onFilterChange }: SearchFiltersProps) => {
+const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: SearchFiltersProps) => {
   const [searchQuery, setSearchQuery] = useState(filters.searchQuery || "");
   
   const handleTextSearch = (e: React.FormEvent) => {
@@ -100,6 +99,46 @@ const SearchFiltersComponent = ({ filters, onFilterChange }: SearchFiltersProps)
         </div>
 
         <Accordion type="multiple" defaultValue={["distance", "discipline", "level"]} className="space-y-4">
+          <AccordionItem value="distance" className="border-b-0">
+            <AccordionTrigger className="py-2 hover:no-underline">
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4" />
+                <span className="text-sm font-medium">Avstånd från min position</span>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent>
+              <div className="space-y-4">
+                {!hasLocation && (
+                  <div className="text-sm text-muted-foreground mb-2 p-2 bg-muted rounded-md">
+                    För att använda distansfiltrering behöver du tillåta platsinformation i din webbläsare
+                  </div>
+                )}
+                <div className="flex flex-wrap gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className={filters.distance === undefined ? "bg-primary text-primary-foreground" : ""}
+                    onClick={() => handleDistanceChange(null)}
+                  >
+                    Alla
+                  </Button>
+                  {distances.map(distance => (
+                    <Button 
+                      key={distance}
+                      variant="outline" 
+                      size="sm"
+                      disabled={!hasLocation}
+                      className={filters.distance === distance ? "bg-primary text-primary-foreground" : ""}
+                      onClick={() => handleDistanceChange(distance)}
+                    >
+                      {distance} km
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
           <AccordionItem value="regions" className="border-b-0">
             <AccordionTrigger className="py-2 hover:no-underline">
               <span className="text-sm font-medium">Län</span>
@@ -123,37 +162,6 @@ const SearchFiltersComponent = ({ filters, onFilterChange }: SearchFiltersProps)
                     </Label>
                   </div>
                 ))}
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-
-          <AccordionItem value="distance" className="border-b-0">
-            <AccordionTrigger className="py-2 hover:no-underline">
-              <span className="text-sm font-medium">Avstånd från min position</span>
-            </AccordionTrigger>
-            <AccordionContent>
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className={filters.distance === undefined ? "bg-primary text-primary-foreground" : ""}
-                    onClick={() => handleDistanceChange(null)}
-                  >
-                    Alla
-                  </Button>
-                  {distances.map(distance => (
-                    <Button 
-                      key={distance}
-                      variant="outline" 
-                      size="sm"
-                      className={filters.distance === distance ? "bg-primary text-primary-foreground" : ""}
-                      onClick={() => handleDistanceChange(distance)}
-                    >
-                      {distance} km
-                    </Button>
-                  ))}
-                </div>
               </div>
             </AccordionContent>
           </AccordionItem>
@@ -249,7 +257,8 @@ const SearchFiltersComponent = ({ filters, onFilterChange }: SearchFiltersProps)
             disciplines: [],
             levels: [],
             searchQuery: "",
-            distance: undefined
+            distance: undefined,
+            userLocation: filters.userLocation
           })}
         >
           Rensa alla filter

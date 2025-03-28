@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CompetitionCard from "@/components/CompetitionCard";
@@ -7,15 +7,55 @@ import SearchFilters from "@/components/SearchFilters";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
+import { useToast } from "@/hooks/use-toast";
 
 const Search = () => {
+  const { toast } = useToast();
   const [filters, setFilters] = useState<SearchFiltersType>({
     regions: [],
     districts: [],
     disciplines: [],
     levels: [],
     searchQuery: "",
+    userLocation: undefined
   });
+
+  useEffect(() => {
+    // Ask for user location if not already set
+    if (!filters.userLocation) {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            setFilters(prev => ({
+              ...prev,
+              userLocation: {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+              }
+            }));
+            toast({
+              title: "Plats hittad",
+              description: "Din position används nu för distansfiltrering.",
+            });
+          },
+          (error) => {
+            console.error("Error getting location:", error);
+            toast({
+              title: "Kunde inte hitta din position",
+              description: "Distansfiltrering kommer inte att fungera korrekt.",
+              variant: "destructive"
+            });
+          }
+        );
+      } else {
+        toast({
+          title: "Geolokalisering stöds inte",
+          description: "Din webbläsare stöder inte geolokalisering, vilket behövs för distansfiltrering.",
+          variant: "destructive"
+        });
+      }
+    }
+  }, []);
 
   const filteredCompetitions = filterCompetitions(competitions, filters);
 
@@ -32,7 +72,11 @@ const Search = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="md:col-span-1">
-            <SearchFilters filters={filters} onFilterChange={handleFilterChange} />
+            <SearchFilters 
+              filters={filters} 
+              onFilterChange={handleFilterChange} 
+              hasLocation={!!filters.userLocation}
+            />
           </div>
           
           <div className="md:col-span-3">
