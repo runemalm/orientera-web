@@ -18,7 +18,7 @@ const Header = () => {
           <Link to="/search" className="text-muted-foreground hover:text-foreground transition-colors">
             Sök tävlingar
           </Link>
-          <Link to="#" className="text-muted-foreground hover:text-foreground transition-colors">
+          <Link to="/profil" className="text-muted-foreground hover:text-foreground transition-colors">
             Min profil
           </Link>
           <Link to="/om-oss" className="text-muted-foreground hover:text-foreground transition-colors">
