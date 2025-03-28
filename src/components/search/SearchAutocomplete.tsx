@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command";
+import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command";
 import { Competition } from "@/types";
 import { Search as SearchIcon, MapPin } from "lucide-react";
 import { formatDate } from "@/lib/utils";
@@ -38,9 +38,13 @@ const SearchAutocomplete = ({
     setFilteredCompetitions(matches);
   }, [searchQuery, competitions]);
 
+  if (!isOpen) {
+    return null;
+  }
+
   return (
-    <div className={`relative ${isOpen ? '' : 'hidden'}`}>
-      <div className="absolute top-0 left-0 right-0 z-50 border rounded-md bg-background shadow-md mt-1">
+    <div className="absolute top-0 left-0 right-0 z-50 border rounded-md bg-background shadow-md mt-1">
+      <Command className="rounded-lg">
         <div className="flex items-center border-b px-3">
           <SearchIcon className="mr-2 h-4 w-4 shrink-0 opacity-50" />
           <CommandInput
@@ -76,7 +80,7 @@ const SearchAutocomplete = ({
             )
           )}
         </CommandList>
-      </div>
+      </Command>
     </div>
   );
 };

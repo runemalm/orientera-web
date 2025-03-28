@@ -127,13 +127,15 @@ const Search = () => {
                   </Button>
                 </form>
                 
-                <SearchAutocomplete
-                  competitions={competitions}
-                  searchQuery={searchInputValue}
-                  onSearchChange={handleSearchChange}
-                  onCompetitionSelect={handleCompetitionSelect}
-                  isOpen={isAutocompleteOpen}
-                />
+                <div className="relative mt-1">
+                  <SearchAutocomplete
+                    competitions={competitions}
+                    searchQuery={searchInputValue}
+                    onSearchChange={handleSearchChange}
+                    onCompetitionSelect={handleCompetitionSelect}
+                    isOpen={isAutocompleteOpen}
+                  />
+                </div>
               </div>
             </div>
             
