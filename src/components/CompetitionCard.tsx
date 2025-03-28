@@ -13,6 +13,12 @@ interface CompetitionCardProps {
 }
 
 const CompetitionCard = ({ competition, featured = false }: CompetitionCardProps) => {
+  // Add debug logging for the distance value
+  const distanceValue = competition.distance;
+  if (distanceValue !== undefined) {
+    console.log(`Rendering card for ${competition.name} with distance: ${distanceValue}m`);
+  }
+
   return (
     <Card className={`overflow-hidden transition-all hover:shadow-md ${featured ? 'border-accent border-2' : ''}`}>
       <CardHeader className="p-4 pb-2">

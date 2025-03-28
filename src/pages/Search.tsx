@@ -44,6 +44,7 @@ const Search = () => {
   // Update filters when geolocation changes
   useEffect(() => {
     if (userLocation) {
+      console.log("Location updated in Search.tsx:", userLocation);
       // When location changes, make sure to update the filters with the latest location
       setFilters(prevFilters => ({
         ...prevFilters,
@@ -58,6 +59,8 @@ const Search = () => {
   const competitionsWithDistance = React.useMemo(() => {
     if (!userLocation) return competitions;
     
+    console.log("Recalculating distances for all competitions with user location:", userLocation);
+    
     return competitions.map(competition => {
       if (!competition.coordinates) return competition;
       
@@ -68,6 +71,8 @@ const Search = () => {
         competition.coordinates.lat,
         competition.coordinates.lng
       );
+      
+      console.log(`Distance for ${competition.name}: ${distance}m (${distance/1000}km)`);
       
       // Add calculated distance to competition object (ensure it's a valid number)
       return { ...competition, distance };
@@ -125,6 +130,20 @@ const Search = () => {
   const handleManualSearch = (e: React.FormEvent) => {
     e.preventDefault();
   };
+
+  // For debugging: log the competitions with distance when userLocation changes
+  useEffect(() => {
+    if (userLocation) {
+      console.log("User location is set:", userLocation);
+      console.log("First 3 competitions with calculated distances:", 
+        competitionsWithDistance.slice(0, 3).map(c => ({
+          name: c.name,
+          distance: c.distance,
+          formattedDistance: c.distance ? `${(c.distance/1000).toFixed(1)}km` : 'N/A'
+        }))
+      );
+    }
+  }, [userLocation, competitionsWithDistance]);
 
   return (
     <div className="flex min-h-screen flex-col">

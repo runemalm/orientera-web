@@ -79,7 +79,7 @@ export const getDistance = (lat1: number, lon1: number, lat2: number, lon2: numb
 
   // Distance in meters
   const distance = R * c;
-  return distance;
+  return Math.round(distance); // Round to integer meters for consistency
 }
 
 // Update format date function with more user-friendly output
@@ -96,13 +96,16 @@ export function formatDate(dateString: string): string {
   return formatted;
 }
 
-// Update format distance function to properly handle and display distances
+// Updated format distance function with better handling for all cases
 export function formatDistance(distanceInMeters: number): string {
   // Make sure we're working with a valid number
   if (typeof distanceInMeters !== 'number' || isNaN(distanceInMeters)) {
     console.error('Invalid distance provided to formatDistance:', distanceInMeters);
     return "Okänt avstånd";
   }
+  
+  // Log the actual distance value for debugging
+  console.log('Formatting distance in meters:', distanceInMeters);
   
   if (distanceInMeters < 1000) {
     return `${Math.round(distanceInMeters)} m`;
@@ -111,7 +114,7 @@ export function formatDistance(distanceInMeters: number): string {
     // For distances less than 10km, show one decimal place
     // For larger distances, round to whole numbers
     return km < 10 
-      ? `${km.toFixed(1)} km`
+      ? `${km.toFixed(1).replace('.', ',')} km` // Use comma as decimal separator for Swedish locale
       : `${Math.round(km)} km`;
   }
 }

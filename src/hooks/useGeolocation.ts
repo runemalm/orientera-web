@@ -194,27 +194,66 @@ export const useGeolocation = (autoDetect = true) => {
 
   const setManualLocation = async (cityName: string) => {
     try {
+      console.log("Setting manual location for city:", cityName);
+      setState(prev => ({ ...prev, loading: true, error: null }));
+      
+      // First try with Nominatim to get proper coordinates
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cityName)}, Sweden&countrycodes=se&limit=1`
       );
       
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
+      console.log("Geocoding response for manual location:", data);
       
       if (data && data.length > 0) {
         const { lat, lon } = data[0];
+        
+        // Convert to proper number types and ensure they're valid
+        const parsedLat = parseFloat(lat);
+        const parsedLon = parseFloat(lon);
+        
+        if (isNaN(parsedLat) || isNaN(parsedLon)) {
+          throw new Error("Invalid coordinates returned from geocoding API");
+        }
+        
+        console.log(`Location coordinates for ${cityName}:`, { lat: parsedLat, lng: parsedLon });
+        
         setState({
-          coords: { lat: parseFloat(lat), lng: parseFloat(lon) },
+          coords: { lat: parsedLat, lng: parsedLon },
           detectedLocationInfo: { city: cityName },
           loading: false,
           error: null
         });
+        
         setIsManualLocation(true);
+        
+        toast({
+          title: "Plats vald",
+          description: `Ort "${cityName}" används nu för distansfiltrering.`,
+        });
+        
         return true;
+      } else {
+        toast({
+          title: "Ort hittades inte",
+          description: `Kunde inte hitta coordinates för "${cityName}".`,
+          variant: "destructive"
+        });
+        setState(prev => ({ ...prev, loading: false, error: "City not found" }));
+        return false;
       }
-      return false;
     } catch (error) {
       console.error("Error geocoding city:", error);
-      setState(prev => ({ ...prev, error: "Failed to geocode city" }));
+      setState(prev => ({ ...prev, loading: false, error: "Failed to geocode city" }));
+      toast({
+        title: "Problem med att hitta ort",
+        description: "Ett fel uppstod när vi försökte hitta koordinater för den angivna orten.",
+        variant: "destructive"
+      });
       return false;
     }
   };
@@ -227,6 +266,7 @@ export const useGeolocation = (autoDetect = true) => {
       error: null
     });
     setIsManualLocation(false);
+    console.log("Location cleared");
   };
 
   // Auto-detect location on mount if enabled
