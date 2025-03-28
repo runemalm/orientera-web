@@ -25,6 +25,17 @@ export type DetectedLocationInfo = {
   display_name?: string;
 };
 
+export type CompetitionResourceType = 'Inbjudan' | 'PM' | 'Startlista' | 'Resultat' | 'Sträcktider';
+
+export type CompetitionResource = {
+  type: CompetitionResourceType;
+  title: string;
+  url: string;
+  isFile: boolean;
+  fileType?: string; // e.g., 'pdf', 'html'
+  addedDate: string;
+};
+
 export type Competition = {
   id: string;
   name: string;
@@ -41,6 +52,7 @@ export type Competition = {
   website?: string;
   featured?: boolean;
   distance?: number; // Added distance field
+  resources?: CompetitionResource[]; // Added resources field
 };
 
 export type SearchFilters = {

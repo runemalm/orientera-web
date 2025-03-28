@@ -1,13 +1,13 @@
-
 import { useParams, Link } from "react-router-dom";
 import { useState } from "react";
 import { Calendar, MapPin, Flag, Star, Users, Globe, ArrowUp } from "lucide-react";
 import { competitions } from "@/data/competitions";
-import { formatDate } from "@/lib/utils";
+import { formatDate, formatDistance } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WaitlistDialog from "@/components/WaitlistDialog";
+import CompetitionResources from "@/components/CompetitionResources";
 
 const CompetitionDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -100,6 +100,10 @@ const CompetitionDetails = () => {
         <div className="container py-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="md:col-span-2 space-y-8">
+              {competition.resources && competition.resources.length > 0 && (
+                <CompetitionResources resources={competition.resources} />
+              )}
+              
               <div className="bg-card rounded-lg border p-6">
                 <h2 className="text-xl font-bold mb-4">Om tävlingen</h2>
                 <p className="whitespace-pre-line">{competition.description}</p>
@@ -132,6 +136,12 @@ const CompetitionDetails = () => {
                     <h3 className="font-medium text-muted-foreground mb-1">Sista anmälningsdag</h3>
                     <p>{formatDate(competition.registrationDeadline)}</p>
                   </div>
+                  {competition.distance !== undefined && (
+                    <div>
+                      <h3 className="font-medium text-muted-foreground mb-1">Avstånd från din position</h3>
+                      <p>{formatDistance(competition.distance)}</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -140,7 +150,6 @@ const CompetitionDetails = () => {
               <div className="bg-card rounded-lg border p-6 sticky top-20">
                 <h2 className="text-xl font-bold mb-4">Plats</h2>
                 <div className="aspect-square bg-muted rounded-lg mb-4 overflow-hidden">
-                  {/* Placeholder for map - would use actual map integration in production */}
                   <div className="w-full h-full bg-orienteering-green/20 flex items-center justify-center">
                     <MapPin className="h-8 w-8 text-orienteering-green" />
                   </div>

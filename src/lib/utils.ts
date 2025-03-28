@@ -71,14 +71,18 @@ export const getDistance = (lat1: number, lon1: number, lat2: number, lon2: numb
   return d;
 }
 
-// Add format date function
+// Update format date function with more user-friendly output
 export function formatDate(dateString: string): string {
   const date = new Date(dateString);
-  return new Intl.DateTimeFormat('sv-SE', {
+  const options: Intl.DateTimeFormatOptions = {
     year: 'numeric',
     month: 'short',
     day: 'numeric'
-  }).format(date);
+  };
+  
+  // Swedish month names are already used by the 'sv-SE' locale
+  const formatted = new Intl.DateTimeFormat('sv-SE', options).format(date);
+  return formatted;
 }
 
 // Add format distance function

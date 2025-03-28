@@ -1,5 +1,81 @@
+import { Competition, CompetitionResource } from '@/types';
 
-import { Competition } from '@/types';
+// Sample resources for competitions
+const stockholmResources: CompetitionResource[] = [
+  {
+    type: 'Inbjudan',
+    title: 'Inbjudan till Stockholms Vårsprinten 2024',
+    url: '/files/inbjudan_stockholm_varsprinten.pdf',
+    isFile: true,
+    fileType: 'pdf',
+    addedDate: '2024-04-01'
+  },
+  {
+    type: 'PM',
+    title: 'PM Stockholms Vårsprinten 2024',
+    url: '/files/pm_stockholm_varsprinten.pdf',
+    isFile: true,
+    fileType: 'pdf',
+    addedDate: '2024-05-10'
+  },
+  {
+    type: 'Startlista',
+    title: 'Startlista',
+    url: 'https://eventor.orientering.se/Events/StartList?eventId=38291',
+    isFile: false,
+    addedDate: '2024-05-12'
+  }
+];
+
+const goteborgResources: CompetitionResource[] = [
+  {
+    type: 'Inbjudan',
+    title: 'Inbjudan till Göteborgs Stafetten 2024',
+    url: '/files/inbjudan_goteborg_stafetten.pdf',
+    isFile: true,
+    fileType: 'pdf',
+    addedDate: '2024-04-15'
+  },
+  {
+    type: 'PM',
+    title: 'PM och övrig information',
+    url: 'https://gok.se/stafetten/pm',
+    isFile: false,
+    addedDate: '2024-05-25'
+  }
+];
+
+const oringenResources: CompetitionResource[] = [
+  {
+    type: 'Inbjudan',
+    title: 'Inbjudan O-Ringen 2024',
+    url: 'https://oringen.se/2024/inbjudan',
+    isFile: false,
+    addedDate: '2024-01-15'
+  },
+  {
+    type: 'PM',
+    title: 'PM Etapp 1',
+    url: '/files/pm_oringen_etapp1.pdf',
+    isFile: true,
+    fileType: 'pdf',
+    addedDate: '2024-07-15'
+  },
+  {
+    type: 'Startlista',
+    title: 'Startlista Etapp 1',
+    url: 'https://oringen.se/2024/startlista',
+    isFile: false,
+    addedDate: '2024-07-20'
+  },
+  {
+    type: 'Resultat',
+    title: 'Resultat Etapp 1',
+    url: 'https://liveresultat.orientering.se/followfull.php?comp=oringen2024etapp1',
+    isFile: false,
+    addedDate: '2024-07-22'
+  }
+];
 
 export const competitions: Competition[] = [
   {
@@ -19,7 +95,8 @@ export const competitions: Competition[] = [
     registrationDeadline: '2024-05-10',
     description: 'Välkommen till vårens höjdpunkt för stockholmslöpare! Snabba och tekniska banor genom Nackareservatet.',
     website: 'https://ifkstockholm.se/varsprinten',
-    featured: true
+    featured: true,
+    resources: stockholmResources
   },
   {
     id: '2',
@@ -38,7 +115,8 @@ export const competitions: Competition[] = [
     registrationDeadline: '2024-05-25',
     description: 'Klassisk stafett i Delsjöområdet med 3-mannalag. Missa inte årets roligaste lagaktivitet!',
     website: 'https://gok.se/stafetten',
-    featured: true
+    featured: true,
+    resources: goteborgResources
   },
   {
     id: '3',
@@ -166,7 +244,8 @@ export const competitions: Competition[] = [
     registrationDeadline: '2024-06-30',
     description: 'Första etappen av världens största orienteringsevenemang. Spektakulär fjällterräng i Idre.',
     website: 'https://oringen.se/2024',
-    featured: true
+    featured: true,
+    resources: oringenResources
   },
   {
     id: '10',
