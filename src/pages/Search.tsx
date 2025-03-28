@@ -8,10 +8,11 @@ import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
 import { useGeolocation } from "@/hooks/useGeolocation";
-import { Search as SearchIcon } from "lucide-react";
+import { Search as SearchIcon, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Command } from "@/components/ui/command";
+import { useToast } from "@/hooks/use-toast";
 
 const Search = () => {
   const {
@@ -38,6 +39,7 @@ const Search = () => {
 
   const [searchInputValue, setSearchInputValue] = useState("");
   const searchContainerRef = useRef<HTMLDivElement>(null);
+  const { toast } = useToast();
 
   // Update filters when geolocation changes
   useEffect(() => {
@@ -74,6 +76,19 @@ const Search = () => {
     });
   };
 
+  const handleClearSearch = () => {
+    setSearchInputValue("");
+    setFilters({
+      ...filters,
+      searchQuery: ""
+    });
+    toast({
+      title: "Sökningen rensad",
+      description: "Alla sökresultat visas nu",
+      duration: 2000,
+    });
+  };
+
   const handleManualSearch = (e: React.FormEvent) => {
     e.preventDefault();
   };
@@ -90,12 +105,24 @@ const Search = () => {
             <div className="rounded-lg border bg-card mb-4">
               <div className="p-4" ref={searchContainerRef}>
                 <form onSubmit={handleManualSearch} className="flex gap-2">
-                  <Input
-                    placeholder="Sök efter tävlingsnamn eller plats..."
-                    value={searchInputValue}
-                    onChange={(e) => handleSearchChange(e.target.value)}
-                    className="w-full"
-                  />
+                  <div className="relative flex-1">
+                    <Input
+                      placeholder="Sök efter tävlingsnamn eller plats..."
+                      value={searchInputValue}
+                      onChange={(e) => handleSearchChange(e.target.value)}
+                      className="w-full pr-8"
+                    />
+                    {searchInputValue && (
+                      <button
+                        type="button"
+                        onClick={handleClearSearch}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                        aria-label="Rensa sökning"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    )}
+                  </div>
                   <Button type="submit" size="icon">
                     <SearchIcon className="h-4 w-4" />
                   </Button>
