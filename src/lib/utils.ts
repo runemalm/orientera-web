@@ -55,7 +55,7 @@ export const filterCompetitions = (
 };
 
 // Function to calculate distance between two coordinates in meters
-const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+export const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
   const R = 6371e3; // Radius of the earth in meters
   const φ1 = lat1 * Math.PI / 180; // φ, λ in radians
   const φ2 = lat2 * Math.PI / 180;

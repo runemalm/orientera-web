@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Command } from "@/components/ui/command";
 import { useToast } from "@/hooks/use-toast";
+import { getDistance } from "@/lib/utils";
 
 const Search = () => {
   const {
@@ -51,7 +52,20 @@ const Search = () => {
     }));
   }, [userLocation, detectedLocationInfo, isManualLocation]);
 
-  const filteredCompetitions = filterCompetitions(competitions, filters);
+  // Calculate distances for each competition if user location is available
+  const competitionsWithDistance = userLocation 
+    ? competitions.map(competition => {
+        const distance = getDistance(
+          userLocation.lat,
+          userLocation.lng,
+          competition.coordinates.lat,
+          competition.coordinates.lng
+        );
+        return { ...competition, distance };
+      })
+    : competitions;
+
+  const filteredCompetitions = filterCompetitions(competitionsWithDistance, filters);
 
   const handleFilterChange = (newFilters: SearchFiltersType) => {
     // Handle special cases for location changes
