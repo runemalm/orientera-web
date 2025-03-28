@@ -1,8 +1,16 @@
 
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Compass } from "lucide-react";
+import WaitlistDialog from "./WaitlistDialog";
 
 const Footer = () => {
+  const [waitlistOpen, setWaitlistOpen] = useState(false);
+  
+  const showWaitlist = () => {
+    setWaitlistOpen(true);
+  };
+
   return (
     <footer className="border-t bg-muted/40">
       <div className="container py-8 md:py-12">
@@ -73,9 +81,12 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="#" className="text-muted-foreground hover:text-foreground transition-colors">
+                <button 
+                  onClick={showWaitlist}
+                  className="text-muted-foreground hover:text-foreground transition-colors text-sm text-left w-full"
+                >
                   För arrangörer
-                </Link>
+                </button>
               </li>
             </ul>
           </div>
@@ -85,6 +96,8 @@ const Footer = () => {
           <p>© {new Date().getFullYear()} Orientera.com. Alla rättigheter förbehållna.</p>
         </div>
       </div>
+      
+      <WaitlistDialog open={waitlistOpen} setOpen={setWaitlistOpen} />
     </footer>
   );
 };
