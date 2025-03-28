@@ -195,13 +195,10 @@ export const useGeolocation = (autoDetect = true) => {
       const data = await response.json();
       
       if (data && data.length > 0) {
-        const { lat, lon, display_name } = data[0];
+        const { lat, lon } = data[0];
         setState({
           coords: { lat: parseFloat(lat), lng: parseFloat(lon) },
-          detectedLocationInfo: { 
-            city: cityName,
-            display_name: display_name
-          },
+          detectedLocationInfo: { city: cityName },
           loading: false,
           error: null
         });
