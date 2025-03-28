@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -25,6 +26,7 @@ const Search = () => {
   
   const getLocationDetails = async (lat: number, lng: number) => {
     try {
+      console.log("Fetching location details for coordinates:", lat, lng);
       const response = await fetch(
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`
       );
@@ -50,6 +52,14 @@ const Search = () => {
       console.log("Position detected:", coords);
       
       try {
+        // First update state with just coordinates to ensure we have position data
+        // even if the detailed location lookup fails
+        setFilters(prevFilters => ({
+          ...prevFilters,
+          userLocation: coords
+        }));
+        
+        // Then try to get detailed location info
         const data = await getLocationDetails(coords.lat, coords.lng);
         
         const address = data.address || {};
@@ -72,11 +82,9 @@ const Search = () => {
         });
       } catch (detailsError) {
         console.error("Could not get location details, using coordinates only:", detailsError);
-        setFilters(prevFilters => ({
-          ...prevFilters,
-          userLocation: coords
-        }));
         
+        // We already set the coordinates above, so we don't need to set them again
+        // Just show a notification to the user
         toast({
           title: "Plats delvis hittad",
           description: "Din position används nu för distansfiltrering, men vi kunde inte hämta detaljerad platsinformation.",
@@ -120,6 +128,10 @@ const Search = () => {
   };
 
   useEffect(() => {
+    // Only attempt to get location if:
+    // - We don't already have a location
+    // - User hasn't chosen to enter location manually
+    // - We're not already in the process of requesting location
     if (!filters.userLocation && !filters.isManualLocation && !isRequestingLocation) {
       if (!navigator.geolocation) {
         toast({
@@ -134,14 +146,59 @@ const Search = () => {
         console.log("Requesting geolocation...");
         setIsRequestingLocation(true);
         
+        // Create a local copy of navigator.geolocation to avoid any potential
+        // issues with it being overridden by extensions during the async call
         const nativeGeolocation = navigator.geolocation;
         
+        // We've had issues with Chrome extensions intercepting geolocation
+        // Use a defensive approach with timeouts and separate error handling
+        const geoLocationTimeout = setTimeout(() => {
+          // If we haven't gotten a response after 10 seconds, consider it a timeout
+          if (isRequestingLocation) {
+            console.warn("Geolocation request timed out in our custom timeout");
+            setIsRequestingLocation(false);
+            toast({
+              title: "Positionsbegäran tog för lång tid",
+              description: "Det tog för lång tid att hämta din position. Prova att ange din position manuellt.",
+              variant: "destructive"
+            });
+          }
+        }, 15000);
+        
         nativeGeolocation.getCurrentPosition(
-          handleLocationSuccess,
-          handleLocationError,
+          // Wrap the success callback in a try/catch to handle unexpected errors
+          (position) => {
+            clearTimeout(geoLocationTimeout);
+            try {
+              handleLocationSuccess(position);
+            } catch (error) {
+              console.error("Error in geolocation success callback:", error);
+              setIsRequestingLocation(false);
+              toast({
+                title: "Fel vid hämtning av position",
+                description: "Ett oväntat fel uppstod när din position hämtades.",
+                variant: "destructive"
+              });
+            }
+          },
+          // Wrap the error callback in a try/catch
+          (error) => {
+            clearTimeout(geoLocationTimeout);
+            try {
+              handleLocationError(error);
+            } catch (callbackError) {
+              console.error("Error in geolocation error callback:", callbackError);
+              setIsRequestingLocation(false);
+              toast({
+                title: "Fel vid hämtning av position",
+                description: "Ett oväntat fel uppstod när din position hämtades.",
+                variant: "destructive"
+              });
+            }
+          },
           {
-            enableHighAccuracy: false, 
-            timeout: 30000,
+            enableHighAccuracy: false,
+            timeout: 30000, // Increased timeout for potentially slow connections
             maximumAge: 0
           }
         );
