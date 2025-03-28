@@ -9,9 +9,10 @@ import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType, Competition } from "@/types";
 import { useGeolocation } from "@/hooks/useGeolocation";
-import { SearchIcon } from "lucide-react";
+import { Search as SearchIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Command } from "@/components/ui/command";
 
 const Search = () => {
   const {
@@ -81,7 +82,15 @@ const Search = () => {
 
   const handleSearchChange = (value: string) => {
     setSearchInputValue(value);
-    // Don't update the filters yet - wait for selection or manual search
+    setIsAutocompleteOpen(value.length >= 2);
+    
+    // Immediately update filters for real-time search
+    if (value.length >= 2 || value === "") {
+      setFilters({
+        ...filters,
+        searchQuery: value
+      });
+    }
   };
 
   const handleCompetitionSelect = (competition: Competition) => {
@@ -114,28 +123,29 @@ const Search = () => {
           <div className="md:col-span-1">
             <div className="rounded-lg border bg-card mb-4">
               <div className="p-4" ref={searchContainerRef}>
-                <form onSubmit={handleManualSearch} className="flex gap-2">
-                  <Input
-                    placeholder="Sök efter tävlingsnamn eller plats..."
-                    value={searchInputValue}
-                    onChange={(e) => setSearchInputValue(e.target.value)}
-                    onFocus={() => setIsAutocompleteOpen(true)}
-                    className="flex-1"
-                  />
-                  <Button type="submit" size="icon">
-                    <SearchIcon className="h-4 w-4" />
-                  </Button>
-                </form>
-                
-                <div className="relative mt-1">
-                  <SearchAutocomplete
-                    competitions={competitions}
-                    searchQuery={searchInputValue}
-                    onSearchChange={handleSearchChange}
-                    onCompetitionSelect={handleCompetitionSelect}
-                    isOpen={isAutocompleteOpen}
-                  />
-                </div>
+                <Command className="rounded-lg border-none w-full" shouldFilter={false}>
+                  <form onSubmit={handleManualSearch} className="flex gap-2">
+                    <div className="relative flex-1">
+                      <Input
+                        placeholder="Sök efter tävlingsnamn eller plats..."
+                        value={searchInputValue}
+                        onChange={(e) => handleSearchChange(e.target.value)}
+                        onFocus={() => setIsAutocompleteOpen(searchInputValue.length >= 2)}
+                        className="w-full"
+                      />
+                      <SearchAutocomplete
+                        competitions={competitions}
+                        searchQuery={searchInputValue}
+                        onSearchChange={handleSearchChange}
+                        onCompetitionSelect={handleCompetitionSelect}
+                        isOpen={isAutocompleteOpen}
+                      />
+                    </div>
+                    <Button type="submit" size="icon">
+                      <SearchIcon className="h-4 w-4" />
+                    </Button>
+                  </form>
+                </Command>
               </div>
             </div>
             

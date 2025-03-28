@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Command, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command";
 import { Competition } from "@/types";
-import { Search as SearchIcon, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 
 interface SearchAutocompleteProps {
@@ -43,18 +43,8 @@ const SearchAutocomplete = ({
   }
 
   return (
-    <div className="absolute top-0 left-0 right-0 z-50 border rounded-md bg-background shadow-md mt-1">
-      <Command className="rounded-lg">
-        <div className="flex items-center border-b px-3">
-          <SearchIcon className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-          <CommandInput
-            value={searchQuery}
-            onValueChange={onSearchChange}
-            placeholder="Sök efter tävlingsnamn eller plats..."
-            className="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground"
-          />
-        </div>
-        
+    <div className="absolute top-full left-0 right-0 z-50 border rounded-md bg-background shadow-md mt-1">
+      <Command className="rounded-lg border-none">
         <CommandList className="max-h-[300px] overflow-y-auto p-1">
           {filteredCompetitions.length === 0 && searchQuery.length >= 2 ? (
             <CommandEmpty>Inga tävlingar hittades</CommandEmpty>
