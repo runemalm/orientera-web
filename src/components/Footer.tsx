@@ -50,19 +50,28 @@ const Footer = () => {
             <h3 className="text-lg font-medium mb-4">Resurser</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link to="#" className="text-muted-foreground hover:text-foreground transition-colors">
+                <button 
+                  onClick={showWaitlist}
+                  className="text-muted-foreground hover:text-foreground transition-colors text-sm text-left w-full"
+                >
                   Tävlingskalender
-                </Link>
+                </button>
               </li>
               <li>
-                <Link to="#" className="text-muted-foreground hover:text-foreground transition-colors">
+                <button 
+                  onClick={showWaitlist}
+                  className="text-muted-foreground hover:text-foreground transition-colors text-sm text-left w-full"
+                >
                   Resultat
-                </Link>
+                </button>
               </li>
               <li>
-                <Link to="#" className="text-muted-foreground hover:text-foreground transition-colors">
+                <button 
+                  onClick={showWaitlist}
+                  className="text-muted-foreground hover:text-foreground transition-colors text-sm text-left w-full"
+                >
                   Klubbar
-                </Link>
+                </button>
               </li>
             </ul>
           </div>

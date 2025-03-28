@@ -1,15 +1,22 @@
 
 import { useParams, Link } from "react-router-dom";
+import { useState } from "react";
 import { Calendar, MapPin, Flag, Star, Users, Globe, ArrowUp } from "lucide-react";
 import { competitions } from "@/data/competitions";
 import { formatDate } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import WaitlistDialog from "@/components/WaitlistDialog";
 
 const CompetitionDetails = () => {
   const { id } = useParams<{ id: string }>();
   const competition = competitions.find(comp => comp.id === id);
+  const [waitlistOpen, setWaitlistOpen] = useState(false);
+  
+  const showWaitlist = () => {
+    setWaitlistOpen(true);
+  };
 
   if (!competition) {
     return (
@@ -76,7 +83,7 @@ const CompetitionDetails = () => {
               </div>
               
               <div className="flex flex-col gap-3 md:min-w-[200px]">
-                <Button size="lg" className="w-full">Anmäl dig</Button>
+                <Button size="lg" className="w-full" onClick={showWaitlist}>Anmäl dig</Button>
                 {competition.website && (
                   <Button variant="outline" size="lg" asChild className="w-full">
                     <a href={competition.website} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center">
@@ -193,6 +200,7 @@ const CompetitionDetails = () => {
       </main>
       
       <Footer />
+      <WaitlistDialog open={waitlistOpen} setOpen={setWaitlistOpen} />
     </div>
   );
 };

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,6 +17,7 @@ import * as z from "zod";
 import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import WaitlistDialog from "@/components/WaitlistDialog";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Namn måste vara minst 2 tecken." }),
@@ -30,6 +30,7 @@ const formSchema = z.object({
 
 const ProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);
+  const [waitlistOpen, setWaitlistOpen] = useState(false);
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -44,13 +45,16 @@ const ProfilePage = () => {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Här skulle vi vanligtvis skicka data till en backend
     console.log(values);
     setIsEditing(false);
     toast.success("Profil uppdaterad", {
       description: "Dina profiluppgifter har sparats.",
     });
   }
+
+  const showWaitlist = () => {
+    setWaitlistOpen(true);
+  };
 
   const upcomingCompetitions = [
     { id: 1, name: "Hallands 3-dagars", date: "18 juni 2024", location: "Halmstad" },
@@ -191,7 +195,7 @@ const ProfilePage = () => {
                           </div>
                         </div>
                         <div className="flex justify-end">
-                          <Button onClick={() => setIsEditing(true)}>Redigera profil</Button>
+                          <Button onClick={showWaitlist}>Redigera profil</Button>
                         </div>
                       </div>
                     )}
@@ -429,6 +433,7 @@ const ProfilePage = () => {
         </div>
       </main>
       <Footer />
+      <WaitlistDialog open={waitlistOpen} setOpen={setWaitlistOpen} />
     </>
   );
 };
