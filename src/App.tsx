@@ -10,6 +10,7 @@ import CompetitionDetails from "./pages/CompetitionDetails";
 import NotFound from "./pages/NotFound";
 import AboutUs from "./pages/AboutUs";
 import Profile from "./pages/Profile";
+import Contact from "./pages/Contact";
 import { useScrollToTop } from "./hooks/useScrollToTop";
 
 const queryClient = new QueryClient();
@@ -33,6 +34,7 @@ const App = () => (
           <Route path="/competition/:id" element={<CompetitionDetails />} />
           <Route path="/om-oss" element={<AboutUs />} />
           <Route path="/profil" element={<Profile />} />
+          <Route path="/kontakt" element={<Contact />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
