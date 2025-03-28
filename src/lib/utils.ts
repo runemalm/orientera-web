@@ -1,3 +1,4 @@
+
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { Competition, SearchFilters } from "@/types";
@@ -55,6 +56,14 @@ export const filterCompetitions = (
 
 // Function to calculate distance between two coordinates in meters
 export const getDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+  // Ensure all inputs are valid numbers
+  if (typeof lat1 !== 'number' || typeof lon1 !== 'number' || 
+      typeof lat2 !== 'number' || typeof lon2 !== 'number' ||
+      isNaN(lat1) || isNaN(lon1) || isNaN(lat2) || isNaN(lon2)) {
+    console.error('Invalid coordinates provided to getDistance:', { lat1, lon1, lat2, lon2 });
+    return 0; // Return 0 instead of NaN to prevent rendering issues
+  }
+
   // Earth's radius in meters
   const R = 6371000; 
   
@@ -69,7 +78,8 @@ export const getDistance = (lat1: number, lon1: number, lat2: number, lon2: numb
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
   // Distance in meters
-  return R * c;
+  const distance = R * c;
+  return distance;
 }
 
 // Update format date function with more user-friendly output
@@ -90,6 +100,7 @@ export function formatDate(dateString: string): string {
 export function formatDistance(distanceInMeters: number): string {
   // Make sure we're working with a valid number
   if (typeof distanceInMeters !== 'number' || isNaN(distanceInMeters)) {
+    console.error('Invalid distance provided to formatDistance:', distanceInMeters);
     return "Okänt avstånd";
   }
   
