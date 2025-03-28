@@ -1,3 +1,4 @@
+
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { Competition, SearchFilters } from "@/types";
@@ -78,4 +79,34 @@ export function formatDate(dateString: string): string {
     month: 'short',
     day: 'numeric'
   }).format(date);
+}
+
+// Add format distance function
+export function formatDistance(distanceInMeters: number): string {
+  if (distanceInMeters < 1000) {
+    return `${Math.round(distanceInMeters)} m`;
+  } else {
+    const km = distanceInMeters / 1000;
+    return km < 10 
+      ? `${km.toFixed(1)} km`
+      : `${Math.round(km)} km`;
+  }
+}
+
+// Add debounce function
+export function debounce<T extends (...args: any[]) => any>(
+  func: T,
+  wait: number
+): (...args: Parameters<T>) => void {
+  let timeout: number | undefined;
+  
+  return function executedFunction(...args: Parameters<T>) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait) as unknown as number;
+  };
 }
