@@ -1,6 +1,6 @@
 
-import React, { useState, useCallback, useEffect } from "react";
-import { MapPinOff, History, X, Trash2 } from "lucide-react";
+import React, { useState, useEffect, useCallback } from "react";
+import { MapPinOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { 
@@ -12,83 +12,23 @@ import {
 } from "@/components/ui/dialog";
 import {
   Command,
-  CommandEmpty,
-  CommandGroup,
   CommandInput,
-  CommandItem,
   CommandList,
-  CommandSeparator,
 } from "@/components/ui/command";
-import { debounce } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-
-// Maximum number of locations to store in history
-const MAX_HISTORY_ITEMS = 5;
-
-// Get location history from localStorage
-const getLocationHistory = (): {name: string, display: string}[] => {
-  try {
-    const history = localStorage.getItem('locationHistory');
-    return history ? JSON.parse(history) : [];
-  } catch (error) {
-    console.error("Error reading location history:", error);
-    return [];
-  }
-};
-
-// Save location history to localStorage
-const saveLocationHistory = (location: {name: string, display: string}) => {
-  try {
-    // Get current history
-    let history = getLocationHistory();
-    
-    // Remove if this location already exists (to move it to the top)
-    history = history.filter(item => item.name !== location.name);
-    
-    // Add new location at the beginning
-    history.unshift(location);
-    
-    // Limit history size
-    if (history.length > MAX_HISTORY_ITEMS) {
-      history = history.slice(0, MAX_HISTORY_ITEMS);
-    }
-    
-    // Save updated history
-    localStorage.setItem('locationHistory', JSON.stringify(history));
-  } catch (error) {
-    console.error("Error saving location history:", error);
-  }
-};
-
-// Remove a location from history
-const removeFromHistory = (locationName: string) => {
-  try {
-    // Get current history
-    let history = getLocationHistory();
-    
-    // Filter out the location to remove
-    history = history.filter(item => item.name !== locationName);
-    
-    // Save updated history
-    localStorage.setItem('locationHistory', JSON.stringify(history));
-    
-    return history;
-  } catch (error) {
-    console.error("Error removing location from history:", error);
-    return getLocationHistory();
-  }
-};
-
-// Clear all location history
-const clearLocationHistory = () => {
-  try {
-    localStorage.removeItem('locationHistory');
-    return [];
-  } catch (error) {
-    console.error("Error clearing location history:", error);
-    return getLocationHistory();
-  }
-};
+import { 
+  getLocationHistory, 
+  saveLocationHistory, 
+  removeFromHistory, 
+  clearLocationHistory,
+  LocationItem 
+} from "@/utils/locationHistory";
+import { 
+  CitySuggestion,
+  debouncedFetchSuggestions 
+} from "@/services/locationService";
+import LocationHistoryList from "./LocationHistoryList";
+import LocationSearchResults from "./LocationSearchResults";
 
 interface LocationDialogProps {
   open: boolean;
@@ -97,10 +37,10 @@ interface LocationDialogProps {
 }
 
 const LocationDialog = ({ open, onOpenChange, onCitySelect }: LocationDialogProps) => {
-  const [citySuggestions, setCitySuggestions] = useState<{name: string, display: string}[]>([]);
+  const [citySuggestions, setCitySuggestions] = useState<CitySuggestion[]>([]);
   const [citySearchValue, setCitySearchValue] = useState("");
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
-  const [locationHistory, setLocationHistory] = useState<{name: string, display: string}[]>([]);
+  const [locationHistory, setLocationHistory] = useState<LocationItem[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
   const { toast } = useToast();
 
@@ -114,50 +54,34 @@ const LocationDialog = ({ open, onOpenChange, onCitySelect }: LocationDialogProp
     }
   }, [open]);
 
-  const fetchCitySuggestions = useCallback(
-    debounce(async (query: string) => {
-      if (query.length < 2) {
-        setCitySuggestions([]);
-        return;
-      }
-      
-      setIsLoadingSuggestions(true);
-      setHasSearched(true);
-      try {
-        const response = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}, Sweden&countrycodes=se&limit=5`
-        );
-        
-        const data = await response.json();
-        
-        if (data && data.length > 0) {
-          const suggestions = data.map((item: any) => ({
-            name: item.name,
-            display: item.display_name
-          }));
-          setCitySuggestions(suggestions);
-        } else {
-          setCitySuggestions([]);
-        }
-      } catch (error) {
-        console.error("Error fetching city suggestions:", error);
-        setCitySuggestions([]);
-      } finally {
-        setIsLoadingSuggestions(false);
-      }
-    }, 300),
-    []
-  );
+  const fetchSuggestions = useCallback(async (query: string) => {
+    if (query.length < 2) {
+      setCitySuggestions([]);
+      return;
+    }
+    
+    setIsLoadingSuggestions(true);
+    setHasSearched(true);
+    try {
+      const suggestions = await debouncedFetchSuggestions(query);
+      setCitySuggestions(suggestions);
+    } catch (error) {
+      console.error("Error fetching city suggestions:", error);
+      setCitySuggestions([]);
+    } finally {
+      setIsLoadingSuggestions(false);
+    }
+  }, []);
 
   // Fetch suggestions when search value changes
-  React.useEffect(() => {
+  useEffect(() => {
     if (citySearchValue) {
-      fetchCitySuggestions(citySearchValue);
+      fetchSuggestions(citySearchValue);
     } else {
       setCitySuggestions([]);
       setHasSearched(false);
     }
-  }, [citySearchValue, fetchCitySuggestions]);
+  }, [citySearchValue, fetchSuggestions]);
 
   const handleSelectCity = async (cityName: string, displayName?: string) => {
     const success = await onCitySelect(cityName);
@@ -216,91 +140,20 @@ const LocationDialog = ({ open, onOpenChange, onCitySelect }: LocationDialogProp
                   />
                 </div>
                 <CommandList>
-                  {isLoadingSuggestions ? (
-                    <div className="py-6 text-center text-sm">Laddar förslag...</div>
-                  ) : (
-                    <>
-                      {locationHistory.length > 0 && (
-                        <>
-                          <CommandGroup heading="Tidigare platser">
-                            <div className="flex items-center justify-between px-2 mb-1">
-                              <span className="text-xs text-muted-foreground">
-                                Tidigare platser du använt
-                              </span>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={handleClearHistory}
-                                className="h-7 px-2 text-xs"
-                              >
-                                <Trash2 className="h-3 w-3 mr-1" />
-                                Rensa historik
-                              </Button>
-                            </div>
-                            {locationHistory.map((city, index) => (
-                              <CommandItem
-                                key={`history-${index}`}
-                                value={`history-${city.name}`}
-                                onSelect={() => handleSelectCity(city.name, city.display)}
-                                className="cursor-pointer flex items-center justify-between"
-                              >
-                                <div className="flex items-center space-x-2">
-                                  <History className="h-4 w-4 opacity-50" />
-                                  <div className="text-sm">
-                                    <div className="font-medium">{city.name}</div>
-                                    <div className="text-xs text-muted-foreground truncate max-w-[200px]">
-                                      {city.display}
-                                    </div>
-                                  </div>
-                                </div>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="h-6 w-6 opacity-50 hover:opacity-100"
-                                  onClick={(e) => handleRemoveFromHistory(e, city.name)}
-                                >
-                                  <X className="h-3 w-3" />
-                                  <span className="sr-only">Ta bort från historik</span>
-                                </Button>
-                              </CommandItem>
-                            ))}
-                          </CommandGroup>
-                          <CommandSeparator />
-                        </>
-                      )}
-                      
-                      {hasSearched ? (
-                        <>
-                          <CommandEmpty>Inga träffar i Sverige</CommandEmpty>
-                          {citySuggestions.length > 0 && (
-                            <CommandGroup heading="Sökresultat">
-                              {citySuggestions.map((city, index) => (
-                                <CommandItem
-                                  key={index}
-                                  value={city.name}
-                                  onSelect={() => handleSelectCity(city.name, city.display)}
-                                  className="cursor-pointer"
-                                >
-                                  <div className="text-sm">
-                                    <div className="font-medium">{city.name}</div>
-                                    <div className="text-xs text-muted-foreground truncate max-w-[260px]">
-                                      {city.display}
-                                    </div>
-                                  </div>
-                                </CommandItem>
-                              ))}
-                            </CommandGroup>
-                          )}
-                        </>
-                      ) : (
-                        citySearchValue.length > 0 && citySearchValue.length < 2 && (
-                          <div className="py-6 text-center text-sm text-muted-foreground">
-                            Skriv minst två tecken för att söka
-                          </div>
-                        )
-                      )}
-                    </>
-                  )}
+                  <LocationHistoryList 
+                    locations={locationHistory}
+                    onSelectLocation={handleSelectCity}
+                    onRemoveLocation={handleRemoveFromHistory}
+                    onClearHistory={handleClearHistory}
+                  />
+                  
+                  <LocationSearchResults 
+                    hasSearched={hasSearched}
+                    searchValue={citySearchValue}
+                    isLoading={isLoadingSuggestions}
+                    results={citySuggestions}
+                    onSelectLocation={handleSelectCity}
+                  />
                 </CommandList>
               </Command>
             </div>
