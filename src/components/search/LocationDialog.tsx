@@ -62,13 +62,16 @@ const LocationDialog = ({ open, onOpenChange, onCitySelect }: LocationDialogProp
     
     setIsLoadingSuggestions(true);
     setHasSearched(true);
+    
     try {
-      const suggestions = await debouncedFetchSuggestions(query);
-      setCitySuggestions(suggestions);
+      // Use the updated debouncedFetchSuggestions with callback pattern
+      debouncedFetchSuggestions(query, (suggestions) => {
+        setCitySuggestions(suggestions);
+        setIsLoadingSuggestions(false);
+      });
     } catch (error) {
       console.error("Error fetching city suggestions:", error);
       setCitySuggestions([]);
-    } finally {
       setIsLoadingSuggestions(false);
     }
   }, []);

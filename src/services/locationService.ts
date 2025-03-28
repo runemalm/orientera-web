@@ -45,5 +45,15 @@ export const geocodeCity = async (cityName: string): Promise<boolean> => {
   }
 };
 
-// Create a debounced version of the fetch function
-export const debouncedFetchSuggestions = debounce(fetchCitySuggestions, 300);
+// Create a debounced version of the fetch function that properly handles the callback
+export const debouncedFetchSuggestions = (
+  query: string, 
+  callback: (results: CitySuggestion[]) => void
+) => {
+  const debouncedFn = debounce(async () => {
+    const results = await fetchCitySuggestions(query);
+    callback(results);
+  }, 300);
+  
+  debouncedFn();
+};
