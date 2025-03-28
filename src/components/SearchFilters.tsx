@@ -1,7 +1,6 @@
 
 import { useState } from "react";
-import { SearchIcon, FilterIcon } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { FilterIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Accordion
@@ -19,16 +18,16 @@ interface SearchFiltersProps {
   filters: SearchFiltersType;
   onFilterChange: (filters: SearchFiltersType) => void;
   hasLocation: boolean;
+  hideSearchInput?: boolean;
 }
 
-const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: SearchFiltersProps) => {
-  const [searchQuery, setSearchQuery] = useState(filters.searchQuery || "");
+const SearchFiltersComponent = ({ 
+  filters, 
+  onFilterChange, 
+  hasLocation,
+  hideSearchInput = false
+}: SearchFiltersProps) => {
   
-  const handleTextSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    onFilterChange({ ...filters, searchQuery });
-  };
-
   const handleRegionChange = (regionId: string, checked: boolean) => {
     let updatedRegions = [...filters.regions];
     if (checked) {
@@ -124,20 +123,6 @@ const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: Search
 
   return (
     <div className="rounded-lg border bg-card">
-      <div className="p-4 border-b">
-        <form onSubmit={handleTextSearch} className="flex gap-2">
-          <Input
-            placeholder="Sök efter tävlingsnamn eller plats..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="flex-1"
-          />
-          <Button type="submit" size="icon">
-            <SearchIcon className="h-4 w-4" />
-          </Button>
-        </form>
-      </div>
-
       <div className="p-4">
         <div className="flex items-center gap-2 mb-4">
           <FilterIcon className="h-4 w-4" />

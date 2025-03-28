@@ -153,6 +153,7 @@ const Search = () => {
               filters={filters} 
               onFilterChange={handleFilterChange} 
               hasLocation={!!filters.userLocation}
+              hideSearchInput={true} // Add this prop to hide the search input in SearchFilters
             />
           </div>
           

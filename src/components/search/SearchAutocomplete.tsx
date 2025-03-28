@@ -44,33 +44,29 @@ const SearchAutocomplete = ({
 
   return (
     <div className="absolute top-full left-0 right-0 z-50 border rounded-md bg-background shadow-md mt-1">
-      <Command className="rounded-lg border-none">
-        <CommandList className="max-h-[300px] overflow-y-auto p-1">
-          {filteredCompetitions.length === 0 && searchQuery.length >= 2 ? (
-            <CommandEmpty>Inga tävlingar hittades</CommandEmpty>
-          ) : (
-            filteredCompetitions.length > 0 && (
-              <CommandGroup heading="Tävlingar">
-                {filteredCompetitions.map((competition) => (
-                  <CommandItem
-                    key={competition.id}
-                    onSelect={() => onCompetitionSelect(competition)}
-                    className="flex flex-col items-start py-3 cursor-pointer"
-                  >
-                    <div className="font-medium">{competition.name}</div>
-                    <div className="flex items-center text-xs text-muted-foreground mt-1">
-                      <MapPin className="h-3 w-3 mr-1" />
-                      <span>{competition.location}</span>
-                      <span className="mx-2">•</span>
-                      <span>{formatDate(competition.date)}</span>
-                    </div>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            )
-          )}
-        </CommandList>
-      </Command>
+      <CommandList className="max-h-[300px] overflow-y-auto p-1">
+        {filteredCompetitions.length === 0 ? (
+          <CommandEmpty>Inga tävlingar hittades</CommandEmpty>
+        ) : (
+          <CommandGroup heading="Tävlingar">
+            {filteredCompetitions.map((competition) => (
+              <CommandItem
+                key={competition.id}
+                onSelect={() => onCompetitionSelect(competition)}
+                className="flex flex-col items-start py-3 cursor-pointer"
+              >
+                <div className="font-medium">{competition.name}</div>
+                <div className="flex items-center text-xs text-muted-foreground mt-1">
+                  <MapPin className="h-3 w-3 mr-1" />
+                  <span>{competition.location}</span>
+                  <span className="mx-2">•</span>
+                  <span>{formatDate(competition.date)}</span>
+                </div>
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        )}
+      </CommandList>
     </div>
   );
 };
