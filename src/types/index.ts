@@ -45,4 +45,5 @@ export type SearchFilters = {
   searchQuery: string;
   userLocation?: Coordinates;
   isManualLocation?: boolean; // Added to track if location is manually set
+  locationCity?: string; // Added for city-based location
 };

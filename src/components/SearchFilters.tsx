@@ -30,10 +30,9 @@ const disciplines = ['Sprint', 'Medel', 'Lång', 'Natt', 'Stafett', 'Ultralång'
 const levels = ['Klubb', 'Krets', 'Distrikt', 'Nationell', 'Internationell'];
 const distances = [10, 25, 50, 100, 200];
 
-// Schema for location validation
+// Schema for location validation - updated to handle city input
 const locationSchema = z.object({
-  lat: z.coerce.number().min(-90).max(90),
-  lng: z.coerce.number().min(-180).max(180),
+  city: z.string().min(2, "Ange minst 2 tecken").max(100)
 });
 
 const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: SearchFiltersProps) => {
@@ -43,8 +42,7 @@ const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: Search
   const form = useForm<z.infer<typeof locationSchema>>({
     resolver: zodResolver(locationSchema),
     defaultValues: {
-      lat: filters.userLocation?.lat || 59.329,
-      lng: filters.userLocation?.lng || 18.068,
+      city: filters.locationCity || "",
     },
   });
 
@@ -97,13 +95,29 @@ const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: Search
     onFilterChange({ ...filters, distance: distance || undefined });
   };
 
-  const handleLocationSubmit = (values: z.infer<typeof locationSchema>) => {
-    onFilterChange({
-      ...filters,
-      userLocation: { lat: values.lat, lng: values.lng },
-      isManualLocation: true
-    });
-    setIsDialogOpen(false);
+  const handleLocationSubmit = async (values: z.infer<typeof locationSchema>) => {
+    try {
+      // Use the OpenStreetMap Nominatim API to get coordinates from city name
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(values.city)}&limit=1`
+      );
+      
+      const data = await response.json();
+      
+      if (data && data.length > 0) {
+        const { lat, lon } = data[0];
+        onFilterChange({
+          ...filters,
+          userLocation: { lat: parseFloat(lat), lng: parseFloat(lon) },
+          isManualLocation: true,
+          locationCity: values.city
+        });
+      }
+      
+      setIsDialogOpen(false);
+    } catch (error) {
+      console.error("Error geocoding city:", error);
+    }
   };
 
   const handleAutoDetect = () => {
@@ -111,6 +125,7 @@ const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: Search
       ...filters,
       isManualLocation: false,
       userLocation: undefined, // This will trigger the geolocation request in Search.tsx
+      locationCity: undefined
     });
   };
 
@@ -146,13 +161,15 @@ const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: Search
             </AccordionTrigger>
             <AccordionContent>
               <div className="space-y-4">
-                {/* Improved location status and controls layout */}
+                {/* Location status and controls layout */}
                 <div className="space-y-2">
                   {/* Location status indicator */}
                   <div className="text-sm">
                     {filters.userLocation ? (
                       <span className="text-sm text-muted-foreground">
-                        {filters.isManualLocation ? "Manuellt vald position" : "Detekterad position"}
+                        {filters.isManualLocation 
+                          ? `Plats: ${filters.locationCity || "Manuellt vald position"}` 
+                          : "Detekterad position"}
                       </span>
                     ) : (
                       <span className="text-sm text-destructive font-medium">
@@ -167,37 +184,24 @@ const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: Search
                       <DialogTrigger asChild>
                         <Button variant="outline" size="sm" className="w-full">
                           <MapPinOff className="h-3.5 w-3.5 mr-1" />
-                          <span className="truncate">Manuell</span>
+                          <span className="truncate">Ange ort</span>
                         </Button>
                       </DialogTrigger>
                       <DialogContent>
                         <DialogHeader>
-                          <DialogTitle>Ange din position manuellt</DialogTitle>
+                          <DialogTitle>Ange stad eller ort</DialogTitle>
                         </DialogHeader>
                         <form onSubmit={form.handleSubmit(handleLocationSubmit)} className="space-y-4 pt-4">
-                          <div className="grid grid-cols-2 gap-4">
-                            <div className="space-y-2">
-                              <Label htmlFor="latitude">Latitude</Label>
-                              <Input
-                                id="latitude"
-                                placeholder="59.329"
-                                {...form.register("lat")}
-                              />
-                              {form.formState.errors.lat && (
-                                <p className="text-sm text-destructive">Ogiltigt latitudvärde</p>
-                              )}
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="longitude">Longitude</Label>
-                              <Input
-                                id="longitude"
-                                placeholder="18.068"
-                                {...form.register("lng")}
-                              />
-                              {form.formState.errors.lng && (
-                                <p className="text-sm text-destructive">Ogiltigt longitudvärde</p>
-                              )}
-                            </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="city">Stad eller ort</Label>
+                            <Input
+                              id="city"
+                              placeholder="t.ex. Stockholm"
+                              {...form.register("city")}
+                            />
+                            {form.formState.errors.city && (
+                              <p className="text-sm text-destructive">{form.formState.errors.city.message}</p>
+                            )}
                           </div>
                           <div className="flex justify-end">
                             <Button type="submit">Använd position</Button>
@@ -365,7 +369,8 @@ const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: Search
             searchQuery: "",
             distance: undefined,
             userLocation: filters.userLocation,
-            isManualLocation: filters.isManualLocation
+            isManualLocation: filters.isManualLocation,
+            locationCity: filters.locationCity
           })}
         >
           Rensa alla filter

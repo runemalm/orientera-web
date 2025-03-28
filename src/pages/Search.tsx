@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -18,7 +17,8 @@ const Search = () => {
     levels: [],
     searchQuery: "",
     userLocation: undefined,
-    isManualLocation: false
+    isManualLocation: false,
+    locationCity: undefined
   });
 
   useEffect(() => {
