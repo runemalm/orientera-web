@@ -14,9 +14,9 @@ export const fetchCitySuggestions = async (query: string): Promise<CitySuggestio
   }
   
   try {
-    // Use Photon API with Swedish language parameter and wider search
+    // Use Photon API with Swedish language parameter and proper place tags
     const response = await fetch(
-      `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&lang=sv&limit=5&bbox=10.5,55.3,24.2,69.1`
+      `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&lang=de&limit=5&osm_tag=place:city&osm_tag=place:town&osm_tag=place:village&osm_tag=place:hamlet&bbox=10.5,55.3,24.2,69.1`
     );
     
     const data = await response.json();
@@ -74,7 +74,7 @@ export const geocodeCity = async (cityName: string): Promise<boolean> => {
   try {
     // First try with Photon API for geocoding
     const response = await fetch(
-      `https://photon.komoot.io/api/?q=${encodeURIComponent(cityName)}&lang=sv&limit=1&bbox=10.5,55.3,24.2,69.1`
+      `https://photon.komoot.io/api/?q=${encodeURIComponent(cityName)}&lang=de&limit=1&osm_tag=place:city&osm_tag=place:town&osm_tag=place:village&osm_tag=place:hamlet&bbox=10.5,55.3,24.2,69.1`
     );
     
     const data = await response.json();
