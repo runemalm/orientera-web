@@ -101,12 +101,16 @@ const LocationDialog = ({ open, onOpenChange, onCitySelect }: LocationDialogProp
   const [citySearchValue, setCitySearchValue] = useState("");
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   const [locationHistory, setLocationHistory] = useState<{name: string, display: string}[]>([]);
+  const [hasSearched, setHasSearched] = useState(false);
   const { toast } = useToast();
 
   // Load location history when dialog opens
   useEffect(() => {
     if (open) {
       setLocationHistory(getLocationHistory());
+      // Reset search state when dialog opens
+      setCitySearchValue("");
+      setHasSearched(false);
     }
   }, [open]);
 
@@ -118,6 +122,7 @@ const LocationDialog = ({ open, onOpenChange, onCitySelect }: LocationDialogProp
       }
       
       setIsLoadingSuggestions(true);
+      setHasSearched(true);
       try {
         const response = await fetch(
           `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}, Sweden&countrycodes=se&limit=5`
@@ -150,6 +155,7 @@ const LocationDialog = ({ open, onOpenChange, onCitySelect }: LocationDialogProp
       fetchCitySuggestions(citySearchValue);
     } else {
       setCitySuggestions([]);
+      setHasSearched(false);
     }
   }, [citySearchValue, fetchCitySuggestions]);
 
@@ -263,25 +269,35 @@ const LocationDialog = ({ open, onOpenChange, onCitySelect }: LocationDialogProp
                         </>
                       )}
                       
-                      <CommandEmpty>Inga träffar i Sverige</CommandEmpty>
-                      {citySuggestions.length > 0 && (
-                        <CommandGroup heading="Sökresultat">
-                          {citySuggestions.map((city, index) => (
-                            <CommandItem
-                              key={index}
-                              value={city.name}
-                              onSelect={() => handleSelectCity(city.name, city.display)}
-                              className="cursor-pointer"
-                            >
-                              <div className="text-sm">
-                                <div className="font-medium">{city.name}</div>
-                                <div className="text-xs text-muted-foreground truncate max-w-[260px]">
-                                  {city.display}
-                                </div>
-                              </div>
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
+                      {hasSearched ? (
+                        <>
+                          <CommandEmpty>Inga träffar i Sverige</CommandEmpty>
+                          {citySuggestions.length > 0 && (
+                            <CommandGroup heading="Sökresultat">
+                              {citySuggestions.map((city, index) => (
+                                <CommandItem
+                                  key={index}
+                                  value={city.name}
+                                  onSelect={() => handleSelectCity(city.name, city.display)}
+                                  className="cursor-pointer"
+                                >
+                                  <div className="text-sm">
+                                    <div className="font-medium">{city.name}</div>
+                                    <div className="text-xs text-muted-foreground truncate max-w-[260px]">
+                                      {city.display}
+                                    </div>
+                                  </div>
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          )}
+                        </>
+                      ) : (
+                        citySearchValue.length > 0 && citySearchValue.length < 2 && (
+                          <div className="py-6 text-center text-sm text-muted-foreground">
+                            Skriv minst två tecken för att söka
+                          </div>
+                        )
                       )}
                     </>
                   )}
