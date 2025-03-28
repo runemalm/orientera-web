@@ -1,12 +1,20 @@
 
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Compass } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import FeaturedCompetitions from "@/components/FeaturedCompetitions";
+import WaitlistDialog from "@/components/WaitlistDialog";
 
 const Index = () => {
+  const [waitlistOpen, setWaitlistOpen] = useState(false);
+  
+  const showWaitlist = () => {
+    setWaitlistOpen(true);
+  };
+
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
@@ -29,8 +37,13 @@ const Index = () => {
                 <Button asChild size="lg" className="text-md">
                   <Link to="/search">Sök tävlingar</Link>
                 </Button>
-                <Button asChild variant="outline" size="lg" className="text-md">
-                  <Link to="#">För arrangörer</Link>
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="text-md"
+                  onClick={showWaitlist}
+                >
+                  För arrangörer
                 </Button>
               </div>
             </div>
@@ -107,6 +120,7 @@ const Index = () => {
       </main>
       
       <Footer />
+      <WaitlistDialog open={waitlistOpen} setOpen={setWaitlistOpen} />
     </div>
   );
 };

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Compass } from "lucide-react";
@@ -39,7 +38,7 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="#" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Link to="/profil" className="text-muted-foreground hover:text-foreground transition-colors">
                   Min profil
                 </Link>
               </li>
