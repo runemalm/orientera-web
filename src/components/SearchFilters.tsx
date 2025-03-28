@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from "react";
 import { SearchIcon, FilterIcon, MapPin, MapPinOff, Locate } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -12,7 +13,7 @@ import {
 } from "@/components/ui/accordion";
 import { regions } from "@/data/regions";
 import { districts } from "@/data/districts";
-import { SearchFilters, Coordinates } from "@/types";
+import { SearchFilters as SearchFiltersType } from "@/types";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -37,6 +38,12 @@ const distances = [10, 25, 50, 100, 200];
 const locationSchema = z.object({
   city: z.string().min(2, "Ange minst 2 tecken").max(100)
 });
+
+interface SearchFiltersProps {
+  filters: SearchFiltersType;
+  onFilterChange: (filters: SearchFiltersType) => void;
+  hasLocation: boolean;
+}
 
 const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: SearchFiltersProps) => {
   const [searchQuery, setSearchQuery] = useState(filters.searchQuery || "");

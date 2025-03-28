@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -28,42 +27,41 @@ const Search = () => {
     if (!filters.userLocation && !filters.isManualLocation) {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
-          async (position) => {
+          (position) => {
             const coords = {
               lat: position.coords.latitude,
               lng: position.coords.longitude
             };
             
             // Get location info from coordinates using reverse geocoding
-            try {
-              const response = await fetch(
-                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords.lat}&lon=${coords.lng}&zoom=18&addressdetails=1`
-              );
-              
-              const data = await response.json();
-              
-              setFilters(prev => ({
-                ...prev,
-                userLocation: coords,
-                detectedLocationInfo: {
-                  city: data.address.city || data.address.town || data.address.village || data.address.hamlet,
-                  municipality: data.address.municipality,
-                  county: data.address.county,
-                  display_name: data.display_name
-                }
-              }));
-            } catch (error) {
-              console.error("Error getting location details:", error);
-              setFilters(prev => ({
-                ...prev,
-                userLocation: coords
-              }));
-            }
-            
-            toast({
-              title: "Plats hittad",
-              description: "Din position används nu för distansfiltrering.",
-            });
+            fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords.lat}&lon=${coords.lng}&zoom=18&addressdetails=1`
+            )
+              .then(response => response.json())
+              .then(data => {
+                setFilters(prev => ({
+                  ...prev,
+                  userLocation: coords,
+                  detectedLocationInfo: {
+                    city: data.address.city || data.address.town || data.address.village || data.address.hamlet,
+                    municipality: data.address.municipality,
+                    county: data.address.county,
+                    display_name: data.display_name
+                  }
+                }));
+                
+                toast({
+                  title: "Plats hittad",
+                  description: "Din position används nu för distansfiltrering.",
+                });
+              })
+              .catch(error => {
+                console.error("Error getting location details:", error);
+                setFilters(prev => ({
+                  ...prev,
+                  userLocation: coords
+                }));
+              });
           },
           (error) => {
             console.error("Error getting location:", error);
@@ -82,7 +80,7 @@ const Search = () => {
         });
       }
     }
-  }, [filters.userLocation, filters.isManualLocation]);
+  }, [filters.userLocation, filters.isManualLocation, toast]);
 
   const filteredCompetitions = filterCompetitions(competitions, filters);
 
