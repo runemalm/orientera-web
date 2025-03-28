@@ -146,7 +146,9 @@ const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: Search
             </AccordionTrigger>
             <AccordionContent>
               <div className="space-y-4">
-                <div className="flex justify-between items-center mb-2">
+                {/* Improved location status and controls layout */}
+                <div className="space-y-2">
+                  {/* Location status indicator */}
                   <div className="text-sm">
                     {filters.userLocation ? (
                       <span className="text-sm text-muted-foreground">
@@ -158,12 +160,14 @@ const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: Search
                       </span>
                     )}
                   </div>
-                  <div className="flex gap-2">
+                  
+                  {/* Location control buttons in a responsive grid */}
+                  <div className="grid grid-cols-2 gap-2">
                     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                       <DialogTrigger asChild>
-                        <Button variant="outline" size="sm" className="h-8">
+                        <Button variant="outline" size="sm" className="w-full">
                           <MapPinOff className="h-3.5 w-3.5 mr-1" />
-                          Välj manuellt
+                          <span className="truncate">Manuell</span>
                         </Button>
                       </DialogTrigger>
                       <DialogContent>
@@ -205,16 +209,16 @@ const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: Search
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      className="h-8"
+                      className="w-full"
                       onClick={handleAutoDetect}
                     >
                       <Locate className="h-3.5 w-3.5 mr-1" />
-                      Auto
+                      <span className="truncate">Auto</span>
                     </Button>
                   </div>
                 </div>
                 
-                {/* Fix the distance buttons UI */}
+                {/* Distance buttons UI */}
                 <div className="grid grid-cols-3 gap-2">
                   <Button 
                     variant={filters.distance === undefined ? "default" : "outline"}
