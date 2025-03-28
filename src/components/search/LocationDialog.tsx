@@ -111,13 +111,15 @@ const LocationDialog = ({ open, onOpenChange, onCitySelect }: LocationDialogProp
             <div className="space-y-2">
               <Label htmlFor="city-search">Stad eller ort</Label>
               <Command className="rounded-lg border shadow-md">
-                <CommandInput 
-                  id="city-search"
-                  placeholder="Sök efter stad eller ort..." 
-                  value={citySearchValue}
-                  onValueChange={setCitySearchValue}
-                  icon={SearchIcon}
-                />
+                <div className="flex items-center border-b px-3">
+                  <SearchIcon className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                  <CommandInput 
+                    id="city-search"
+                    placeholder="Sök efter stad eller ort..." 
+                    value={citySearchValue}
+                    onValueChange={setCitySearchValue}
+                  />
+                </div>
                 <CommandList>
                   {isLoadingSuggestions ? (
                     <div className="py-6 text-center text-sm">Laddar förslag...</div>
