@@ -23,6 +23,24 @@ const Search = () => {
     detectedLocationInfo: undefined
   });
 
+  // A simple function to get location details from coordinates
+  const getLocationDetails = async (lat: number, lng: number) => {
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`
+      );
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      return await response.json();
+    } catch (error) {
+      console.error("Error fetching location details:", error);
+      throw error;
+    }
+  };
+
   useEffect(() => {
     // Ask for user location if not already set and not using manual location
     if (!filters.userLocation && !filters.isManualLocation) {
@@ -35,48 +53,51 @@ const Search = () => {
         return;
       }
 
-      const successCallback = (position: GeolocationPosition) => {
+      const handleSuccess = async (position: GeolocationPosition) => {
         try {
           const coords = {
             lat: position.coords.latitude,
             lng: position.coords.longitude
           };
           
-          // Simple fetch without reference to 'n'
-          fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords.lat}&lon=${coords.lng}&zoom=18&addressdetails=1`)
-            .then(response => response.json())
-            .then(data => {
-              const city = data.address?.city || 
-                          data.address?.town || 
-                          data.address?.village || 
-                          data.address?.hamlet;
-                
-              setFilters(prevFilters => ({
-                ...prevFilters,
-                userLocation: coords,
-                detectedLocationInfo: {
-                  city: city,
-                  municipality: data.address?.municipality,
-                  county: data.address?.county,
-                  display_name: data.display_name
-                }
-              }));
-              
-              toast({
-                title: "Plats hittad",
-                description: "Din position används nu för distansfiltrering.",
-              });
-            })
-            .catch(error => {
-              console.error("Error getting location details:", error);
-              // Fallback to just coordinates if we can't get detailed info
-              setFilters(prevFilters => ({
-                ...prevFilters,
-                userLocation: coords
-              }));
+          console.log("Position detected:", coords);
+          
+          try {
+            const data = await getLocationDetails(coords.lat, coords.lng);
+            
+            const address = data.address || {};
+            const city = address.city || address.town || address.village || address.hamlet;
+            
+            setFilters(prevFilters => ({
+              ...prevFilters,
+              userLocation: coords,
+              detectedLocationInfo: {
+                city: city,
+                municipality: address.municipality,
+                county: address.county,
+                display_name: data.display_name
+              }
+            }));
+            
+            toast({
+              title: "Plats hittad",
+              description: `Din position (${city || 'Okänd plats'}) används nu för distansfiltrering.`,
             });
+          } catch (detailsError) {
+            // If we can't get the details, still use the coordinates
+            console.error("Could not get location details, using coordinates only:", detailsError);
+            setFilters(prevFilters => ({
+              ...prevFilters,
+              userLocation: coords
+            }));
+            
+            toast({
+              title: "Plats delvis hittad",
+              description: "Din position används nu för distansfiltrering, men vi kunde inte hämta detaljerad platsinformation.",
+            });
+          }
         } catch (error) {
-          console.error("Error processing location:", error);
+          console.error("Error handling position:", error);
           toast({
             title: "Problem med att bearbeta position",
             description: "Ett fel uppstod när din position bearbetades.",
@@ -85,31 +106,45 @@ const Search = () => {
         }
       };
 
-      const errorCallback = (error: GeolocationPositionError) => {
-        console.error("Error getting location:", error);
+      const handleError = (error: GeolocationPositionError) => {
+        console.error("Geolocation error:", error);
+        let errorMessage = "Prova att ange din position manuellt för distansfiltrering.";
+        
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = "Du har blockerat åtkomst till din position. Aktivera platstjänster i din webbläsare.";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = "Din position är inte tillgänglig just nu. Prova igen senare.";
+            break;
+          case error.TIMEOUT:
+            errorMessage = "Det tog för lång tid att hämta din position. Prova igen eller ange manuellt.";
+            break;
+        }
+        
         toast({
           title: "Kunde inte hitta din position",
-          description: "Prova att ange din position manuellt för distansfiltrering.",
+          description: errorMessage,
           variant: "destructive"
         });
       };
 
-      // Use a try-catch block around the geolocation API call
       try {
+        console.log("Requesting geolocation...");
         navigator.geolocation.getCurrentPosition(
-          successCallback,
-          errorCallback,
-          { 
+          handleSuccess,
+          handleError,
+          {
             enableHighAccuracy: false, 
-            timeout: 10000, 
-            maximumAge: 0 
+            timeout: 15000,
+            maximumAge: 0
           }
         );
-      } catch (error) {
-        console.error("Geolocation API error:", error);
+      } catch (geoError) {
+        console.error("Fatal geolocation error:", geoError);
         toast({
           title: "Problem med positionstjänsten",
-          description: "Det uppstod ett problem med positionstjänsten. Prova att ange din position manuellt.",
+          description: "Det uppstod ett allvarligt problem med positionstjänsten. Prova att ange din position manuellt.",
           variant: "destructive"
         });
       }
