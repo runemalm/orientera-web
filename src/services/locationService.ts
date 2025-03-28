@@ -51,8 +51,13 @@ export const debouncedFetchSuggestions = (
   callback: (results: CitySuggestion[]) => void
 ) => {
   const debouncedFn = debounce(async () => {
-    const results = await fetchCitySuggestions(query);
-    callback(results);
+    try {
+      const results = await fetchCitySuggestions(query);
+      callback(results);
+    } catch (error) {
+      console.error("Error in debounced fetch:", error);
+      callback([]);
+    }
   }, 300);
   
   debouncedFn();

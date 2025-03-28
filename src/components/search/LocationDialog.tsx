@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect, useCallback } from "react";
-import { MapPinOff } from "lucide-react";
+import { MapPinOff, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { 
@@ -36,8 +37,8 @@ interface LocationDialogProps {
 }
 
 const LocationDialog = ({ open, onOpenChange, onCitySelect }: LocationDialogProps) => {
-  const [citySuggestions, setCitySuggestions] = useState<CitySuggestion[]>([]);
   const [citySearchValue, setCitySearchValue] = useState("");
+  const [citySuggestions, setCitySuggestions] = useState<CitySuggestion[]>([]);
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   const [locationHistory, setLocationHistory] = useState<LocationItem[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
