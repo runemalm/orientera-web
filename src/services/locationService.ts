@@ -7,49 +7,47 @@ export interface CitySuggestion {
   display: string;
 }
 
-// Fetch city suggestions from OpenStreetMap
+// Fetch city suggestions from Photon API which has better partial matching
 export const fetchCitySuggestions = async (query: string): Promise<CitySuggestion[]> => {
   if (query.length < 2) {
     return [];
   }
   
-  // First try with the exact query (without appending Sweden)
-  let response = await fetch(
-    `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=se&limit=5`
-  );
-  
-  let data = await response.json();
-  
-  // If no results and query is at least 3 characters, try with a wildcard approach
-  if (data.length === 0 && query.length >= 3) {
-    try {
-      // Add wildcard to improve partial matching
-      const wildcardQuery = `${query}*`;
-      response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(wildcardQuery)}&countrycodes=se&limit=5`
-      );
-      
-      data = await response.json();
-      
-      // If still no results, try one more approach by removing any filters
-      if (data.length === 0) {
-        // Use a more general search approach but still limit to Sweden
-        response = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=se&limit=5`
-        );
+  try {
+    // Use Photon API which has better partial matching support
+    const response = await fetch(
+      `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&lang=en&limit=5&osm_tag=place:city&osm_tag=place:town&osm_tag=place:village&bbox=10.5,55.3,24.2,69.1`
+    );
+    
+    const data = await response.json();
+    
+    if (data && data.features && data.features.length > 0) {
+      // Filter for only Swedish results
+      const swedishResults = data.features.filter((feature: any) => {
+        const country = feature.properties.country;
+        return country === "Sweden" || country === "Sverige";
+      });
+
+      return swedishResults.map((feature: any) => {
+        const name = feature.properties.name;
+        const city = feature.properties.city || name;
+        const state = feature.properties.state || "";
         
-        data = await response.json();
-      }
-    } catch (error) {
-      console.error("Error in enhanced search:", error);
+        let display = name;
+        if (state) {
+          display = `${name}, ${state}, Sweden`;
+        } else {
+          display = `${name}, Sweden`;
+        }
+        
+        return {
+          name: city,
+          display: display
+        };
+      });
     }
-  }
-  
-  if (data && data.length > 0) {
-    return data.map((item: any) => ({
-      name: item.name,
-      display: item.display_name
-    }));
+  } catch (error) {
+    console.error("Error fetching from Photon API:", error);
   }
   
   return [];
@@ -58,15 +56,22 @@ export const fetchCitySuggestions = async (query: string): Promise<CitySuggestio
 // Geocode a city name to coordinates
 export const geocodeCity = async (cityName: string): Promise<boolean> => {
   try {
+    // Use Photon API for geocoding
     const response = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cityName)}&countrycodes=se&limit=1`
+      `https://photon.komoot.io/api/?q=${encodeURIComponent(cityName)}&lang=en&limit=1&osm_tag=place:city&osm_tag=place:town&osm_tag=place:village&bbox=10.5,55.3,24.2,69.1`
     );
     
     const data = await response.json();
     
-    return data && data.length > 0;
+    if (data && data.features && data.features.length > 0) {
+      // Check if result is in Sweden
+      const country = data.features[0].properties.country;
+      return country === "Sweden" || country === "Sverige";
+    }
+    
+    return false;
   } catch (error) {
-    console.error("Error geocoding city:", error);
+    console.error("Error geocoding city with Photon:", error);
     return false;
   }
 };
@@ -81,7 +86,7 @@ const debouncedFetchFn = debounce(async (query: string, callback: (results: City
     console.error("Error in debounced fetch:", error);
     callback([]);
   }
-}, 500); // Increased to 500ms for better performance
+}, 500); // 500ms debounce time
 
 // This function uses the singleton debounced function
 export const debouncedFetchSuggestions = (
