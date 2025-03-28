@@ -52,14 +52,9 @@ export const fetchCitySuggestions = async (query: string): Promise<CitySuggestio
       
       console.log("Mapped results:", results);
       
-      // Always filter for Swedish locations, regardless of number of results
-      const filteredResults = results.filter((item: CitySuggestion) => 
-        item.display.toLowerCase().includes("sweden") || 
-        item.display.toLowerCase().includes("sverige")
-      );
-      
-      console.log("Filtered Swedish results:", filteredResults);
-      return filteredResults;
+      // Since we're already filtering by only searching in Sweden (appending "Sverige" to the query),
+      // and only using Swedish APIs with countrycodes=se parameter, we can return all results
+      return results;
     }
     
     // If no results found with Photon, try with Nominatim as backup
