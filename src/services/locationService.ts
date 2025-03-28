@@ -13,11 +13,39 @@ export const fetchCitySuggestions = async (query: string): Promise<CitySuggestio
     return [];
   }
   
-  const response = await fetch(
+  // First try with the exact query
+  let response = await fetch(
     `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}, Sweden&countrycodes=se&limit=5`
   );
   
-  const data = await response.json();
+  let data = await response.json();
+  
+  // If no results and query is at least 3 characters, try with a wildcard approach
+  // by appending an asterisk to trigger partial matching
+  if (data.length === 0 && query.length >= 3) {
+    try {
+      // Add wildcard to improve partial matching
+      const wildcardQuery = `${query}*`;
+      response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(wildcardQuery)}, Sweden&countrycodes=se&limit=5`
+      );
+      
+      data = await response.json();
+      
+      // If still no results, try a more aggressive approach with partial word
+      if (data.length === 0) {
+        // Use a more general search approach
+        const generalQuery = query;
+        response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(generalQuery)}&countrycodes=se&limit=5`
+        );
+        
+        data = await response.json();
+      }
+    } catch (error) {
+      console.error("Error in enhanced search:", error);
+    }
+  }
   
   if (data && data.length > 0) {
     return data.map((item: any) => ({
