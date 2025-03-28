@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from "react";
 import { SearchIcon, FilterIcon, MapPin, MapPinOff, Locate } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -59,7 +58,7 @@ const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: Search
     },
   });
 
-  // Debounced function to fetch city suggestions
+  // Debounced function to fetch city suggestions from Sweden only
   const fetchCitySuggestions = useCallback(
     debounce(async (query: string) => {
       if (query.length < 2) {
@@ -69,8 +68,9 @@ const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: Search
       
       setIsLoadingSuggestions(true);
       try {
+        // Add "Sweden" to the query to restrict search to Sweden
         const response = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}, Sweden&countrycodes=se&limit=5`
         );
         
         const data = await response.json();
@@ -155,8 +155,9 @@ const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: Search
   const handleCitySelect = async (cityName: string) => {
     try {
       // Use the OpenStreetMap Nominatim API to get coordinates from city name
+      // Restrict to Sweden
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cityName)}&limit=1`
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cityName)}, Sweden&countrycodes=se&limit=1`
       );
       
       const data = await response.json();
@@ -250,7 +251,7 @@ const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: Search
                       </DialogTrigger>
                       <DialogContent>
                         <DialogHeader>
-                          <DialogTitle>Ange stad eller ort</DialogTitle>
+                          <DialogTitle>Ange stad eller ort i Sverige</DialogTitle>
                         </DialogHeader>
                         <div className="space-y-4 pt-4">
                           <div className="space-y-2">
@@ -267,7 +268,7 @@ const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: Search
                                   <div className="py-6 text-center text-sm">Laddar förslag...</div>
                                 ) : (
                                   <>
-                                    <CommandEmpty>Inga träffar</CommandEmpty>
+                                    <CommandEmpty>Inga träffar i Sverige</CommandEmpty>
                                     <CommandGroup>
                                       {citySuggestions.map((city, index) => (
                                         <CommandItem
