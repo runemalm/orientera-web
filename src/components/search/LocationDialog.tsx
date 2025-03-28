@@ -1,6 +1,6 @@
 
-import React, { useState, useCallback } from "react";
-import { MapPinOff } from "lucide-react";
+import React, { useState, useCallback, useEffect } from "react";
+import { MapPinOff, History, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { 
@@ -17,8 +17,66 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
+  CommandSeparator,
 } from "@/components/ui/command";
 import { debounce } from "@/lib/utils";
+
+// Maximum number of locations to store in history
+const MAX_HISTORY_ITEMS = 5;
+
+// Get location history from localStorage
+const getLocationHistory = (): {name: string, display: string}[] => {
+  try {
+    const history = localStorage.getItem('locationHistory');
+    return history ? JSON.parse(history) : [];
+  } catch (error) {
+    console.error("Error reading location history:", error);
+    return [];
+  }
+};
+
+// Save location history to localStorage
+const saveLocationHistory = (location: {name: string, display: string}) => {
+  try {
+    // Get current history
+    let history = getLocationHistory();
+    
+    // Remove if this location already exists (to move it to the top)
+    history = history.filter(item => item.name !== location.name);
+    
+    // Add new location at the beginning
+    history.unshift(location);
+    
+    // Limit history size
+    if (history.length > MAX_HISTORY_ITEMS) {
+      history = history.slice(0, MAX_HISTORY_ITEMS);
+    }
+    
+    // Save updated history
+    localStorage.setItem('locationHistory', JSON.stringify(history));
+  } catch (error) {
+    console.error("Error saving location history:", error);
+  }
+};
+
+// Remove a location from history
+const removeFromHistory = (locationName: string) => {
+  try {
+    // Get current history
+    let history = getLocationHistory();
+    
+    // Filter out the location to remove
+    history = history.filter(item => item.name !== locationName);
+    
+    // Save updated history
+    localStorage.setItem('locationHistory', JSON.stringify(history));
+    
+    return history;
+  } catch (error) {
+    console.error("Error removing location from history:", error);
+    return getLocationHistory();
+  }
+};
 
 interface LocationDialogProps {
   open: boolean;
@@ -30,6 +88,14 @@ const LocationDialog = ({ open, onOpenChange, onCitySelect }: LocationDialogProp
   const [citySuggestions, setCitySuggestions] = useState<{name: string, display: string}[]>([]);
   const [citySearchValue, setCitySearchValue] = useState("");
   const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
+  const [locationHistory, setLocationHistory] = useState<{name: string, display: string}[]>([]);
+
+  // Load location history when dialog opens
+  useEffect(() => {
+    if (open) {
+      setLocationHistory(getLocationHistory());
+    }
+  }, [open]);
 
   const fetchCitySuggestions = useCallback(
     debounce(async (query: string) => {
@@ -74,11 +140,23 @@ const LocationDialog = ({ open, onOpenChange, onCitySelect }: LocationDialogProp
     }
   }, [citySearchValue, fetchCitySuggestions]);
 
-  const handleSelectCity = async (cityName: string) => {
+  const handleSelectCity = async (cityName: string, displayName?: string) => {
     const success = await onCitySelect(cityName);
     if (success) {
+      // Save to history if selection was successful
+      if (displayName) {
+        saveLocationHistory({ name: cityName, display: displayName });
+        // Update the local state to reflect changes
+        setLocationHistory(getLocationHistory());
+      }
       setCitySearchValue("");
     }
+  };
+
+  const handleRemoveFromHistory = (e: React.MouseEvent, name: string) => {
+    e.stopPropagation(); // Prevent triggering the parent's onClick
+    const updatedHistory = removeFromHistory(name);
+    setLocationHistory(updatedHistory);
   };
 
   return (
@@ -98,35 +176,76 @@ const LocationDialog = ({ open, onOpenChange, onCitySelect }: LocationDialogProp
             <div className="space-y-2">
               <Label htmlFor="city-search">Stad eller ort</Label>
               <Command className="rounded-lg border shadow-md">
-                <CommandInput 
-                  id="city-search"
-                  placeholder="Sök efter stad eller ort..." 
-                  value={citySearchValue}
-                  onValueChange={setCitySearchValue}
-                />
+                <div className="flex items-center border-b px-3">
+                  <Label htmlFor="city-search-input" className="sr-only">Search</Label>
+                  <MapPinOff className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                  <CommandInput 
+                    id="city-search-input"
+                    placeholder="Sök efter stad eller ort..." 
+                    value={citySearchValue}
+                    onValueChange={setCitySearchValue}
+                  />
+                </div>
                 <CommandList>
                   {isLoadingSuggestions ? (
                     <div className="py-6 text-center text-sm">Laddar förslag...</div>
                   ) : (
                     <>
+                      {locationHistory.length > 0 && (
+                        <>
+                          <CommandGroup heading="Tidigare platser">
+                            {locationHistory.map((city, index) => (
+                              <CommandItem
+                                key={`history-${index}`}
+                                value={`history-${city.name}`}
+                                onSelect={() => handleSelectCity(city.name, city.display)}
+                                className="cursor-pointer flex items-center justify-between"
+                              >
+                                <div className="flex items-center space-x-2">
+                                  <History className="h-4 w-4 opacity-50" />
+                                  <div className="text-sm">
+                                    <div className="font-medium">{city.name}</div>
+                                    <div className="text-xs text-muted-foreground truncate max-w-[200px]">
+                                      {city.display}
+                                    </div>
+                                  </div>
+                                </div>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-6 w-6 opacity-50 hover:opacity-100"
+                                  onClick={(e) => handleRemoveFromHistory(e, city.name)}
+                                >
+                                  <X className="h-3 w-3" />
+                                  <span className="sr-only">Ta bort från historik</span>
+                                </Button>
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                          <CommandSeparator />
+                        </>
+                      )}
+                      
                       <CommandEmpty>Inga träffar i Sverige</CommandEmpty>
-                      <CommandGroup>
-                        {citySuggestions.map((city, index) => (
-                          <CommandItem
-                            key={index}
-                            value={city.name}
-                            onSelect={() => handleSelectCity(city.name)}
-                            className="cursor-pointer"
-                          >
-                            <div className="text-sm">
-                              <div className="font-medium">{city.name}</div>
-                              <div className="text-xs text-muted-foreground truncate max-w-[260px]">
-                                {city.display}
+                      {citySuggestions.length > 0 && (
+                        <CommandGroup heading="Sökresultat">
+                          {citySuggestions.map((city, index) => (
+                            <CommandItem
+                              key={index}
+                              value={city.name}
+                              onSelect={() => handleSelectCity(city.name, city.display)}
+                              className="cursor-pointer"
+                            >
+                              <div className="text-sm">
+                                <div className="font-medium">{city.name}</div>
+                                <div className="text-xs text-muted-foreground truncate max-w-[260px]">
+                                  {city.display}
+                                </div>
                               </div>
-                            </div>
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      )}
                     </>
                   )}
                 </CommandList>
