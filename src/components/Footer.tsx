@@ -16,10 +16,10 @@ const Footer = () => {
       <div className="container py-8 md:py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="space-y-4">
-            <div className="flex items-center space-x-2">
+            <a href="https://orientera.com" className="flex items-center space-x-2">
               <Compass className="h-6 w-6 text-orienteering-green" />
               <span className="font-bold text-xl text-orienteering-dark">Orientera.com</span>
-            </div>
+            </a>
             <p className="text-muted-foreground text-sm">
               Din guide till orienteringstävlingar i Sverige.
             </p>

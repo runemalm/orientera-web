@@ -15,10 +15,10 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur">
       <div className="container flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center space-x-2">
+        <a href="https://orientera.com" className="flex items-center space-x-2">
           <Compass className="h-6 w-6 text-orienteering-green" />
           <span className="font-bold text-xl text-orienteering-dark">Orientera.com</span>
-        </Link>
+        </a>
         <nav className="hidden md:flex items-center space-x-6">
           <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">
             Hem
