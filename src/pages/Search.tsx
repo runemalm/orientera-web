@@ -63,6 +63,16 @@ const Search = () => {
       }
     }
 
+    // If the searchQuery was cleared by the filters, update the searchInputValue too
+    if (newFilters.searchQuery === "" && filters.searchQuery !== "") {
+      setSearchInputValue("");
+      toast({
+        title: "Sökfältet rensat",
+        description: "Sökfrågan har rensats",
+        duration: 2000,
+      });
+    }
+
     setFilters(newFilters);
   };
 

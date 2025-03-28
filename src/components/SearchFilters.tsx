@@ -112,7 +112,7 @@ const SearchFiltersComponent = ({
       districts: [],
       disciplines: [],
       levels: [],
-      searchQuery: "",
+      searchQuery: "", // Make sure searchQuery is cleared
       distance: undefined,
       userLocation: filters.userLocation,
       isManualLocation: filters.isManualLocation,
