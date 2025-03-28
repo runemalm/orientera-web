@@ -14,6 +14,7 @@ export const fetchCitySuggestions = async (query: string): Promise<CitySuggestio
   }
   
   try {
+    console.log("Fetching suggestions for:", query);
     // Use Photon API with place tags and "Sverige" suffix in the query
     // Note: Photon doesn't fully support 'sv' language code, using 'en' for better compatibility
     const response = await fetch(
@@ -21,11 +22,13 @@ export const fetchCitySuggestions = async (query: string): Promise<CitySuggestio
     );
     
     const data = await response.json();
+    console.log("API response data:", data);
     
     if (data && data.features && data.features.length > 0) {
       // Process all results, not just filtering for Sweden since we added "Sverige" to query
       const results = data.features.map((feature: any) => {
         const name = feature.properties.name;
+        // For hamlets and similar places that might not have a city property
         const city = feature.properties.city || name;
         const state = feature.properties.county || feature.properties.state || "";
         const country = feature.properties.country || "Sverige";
@@ -38,17 +41,21 @@ export const fetchCitySuggestions = async (query: string): Promise<CitySuggestio
         }
         
         return {
-          name: city,
+          name: name, // Use the actual name from the API, not city
           display: display
         };
       });
       
+      console.log("Mapped results:", results);
+      
       // Only apply Sweden filter if we have multiple results to avoid empty results
       if (results.length > 1) {
-        return results.filter((item: CitySuggestion) => 
+        const filteredResults = results.filter((item: CitySuggestion) => 
           item.display.toLowerCase().includes("sweden") || 
           item.display.toLowerCase().includes("sverige")
         );
+        console.log("Filtered results:", filteredResults);
+        return filteredResults;
       }
       
       return results;
