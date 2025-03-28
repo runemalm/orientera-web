@@ -44,4 +44,5 @@ export type SearchFilters = {
   levels: CompetitionLevel[];
   searchQuery: string;
   userLocation?: Coordinates;
+  isManualLocation?: boolean; // Added to track if location is manually set
 };

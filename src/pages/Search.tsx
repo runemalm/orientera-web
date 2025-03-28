@@ -17,12 +17,13 @@ const Search = () => {
     disciplines: [],
     levels: [],
     searchQuery: "",
-    userLocation: undefined
+    userLocation: undefined,
+    isManualLocation: false
   });
 
   useEffect(() => {
-    // Ask for user location if not already set
-    if (!filters.userLocation) {
+    // Ask for user location if not already set and not using manual location
+    if (!filters.userLocation && !filters.isManualLocation) {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           (position) => {
@@ -42,7 +43,7 @@ const Search = () => {
             console.error("Error getting location:", error);
             toast({
               title: "Kunde inte hitta din position",
-              description: "Distansfiltrering kommer inte att fungera korrekt.",
+              description: "Prova att ange din position manuellt för distansfiltrering.",
               variant: "destructive"
             });
           }
@@ -50,12 +51,12 @@ const Search = () => {
       } else {
         toast({
           title: "Geolokalisering stöds inte",
-          description: "Din webbläsare stöder inte geolokalisering, vilket behövs för distansfiltrering.",
+          description: "Din webbläsare stöder inte geolokalisering. Prova att ange din position manuellt.",
           variant: "destructive"
         });
       }
     }
-  }, []);
+  }, [filters.userLocation, filters.isManualLocation]);
 
   const filteredCompetitions = filterCompetitions(competitions, filters);
 

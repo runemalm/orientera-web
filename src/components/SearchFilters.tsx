@@ -1,5 +1,6 @@
+
 import { useState } from "react";
-import { SearchIcon, FilterIcon, MapPin } from "lucide-react";
+import { SearchIcon, FilterIcon, MapPin, MapPinOff, Locate } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -12,7 +13,12 @@ import {
 } from "@/components/ui/accordion";
 import { regions } from "@/data/regions";
 import { districts } from "@/data/districts";
-import { SearchFilters } from "@/types";
+import { SearchFilters, Coordinates } from "@/types";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Form, FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 interface SearchFiltersProps {
   filters: SearchFilters;
@@ -24,9 +30,24 @@ const disciplines = ['Sprint', 'Medel', 'Lång', 'Natt', 'Stafett', 'Ultralång'
 const levels = ['Klubb', 'Krets', 'Distrikt', 'Nationell', 'Internationell'];
 const distances = [10, 25, 50, 100, 200];
 
+// Schema for location validation
+const locationSchema = z.object({
+  lat: z.coerce.number().min(-90).max(90),
+  lng: z.coerce.number().min(-180).max(180),
+});
+
 const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: SearchFiltersProps) => {
   const [searchQuery, setSearchQuery] = useState(filters.searchQuery || "");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   
+  const form = useForm<z.infer<typeof locationSchema>>({
+    resolver: zodResolver(locationSchema),
+    defaultValues: {
+      lat: filters.userLocation?.lat || 59.329,
+      lng: filters.userLocation?.lng || 18.068,
+    },
+  });
+
   const handleTextSearch = (e: React.FormEvent) => {
     e.preventDefault();
     onFilterChange({ ...filters, searchQuery });
@@ -76,6 +97,23 @@ const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: Search
     onFilterChange({ ...filters, distance: distance || undefined });
   };
 
+  const handleLocationSubmit = (values: z.infer<typeof locationSchema>) => {
+    onFilterChange({
+      ...filters,
+      userLocation: { lat: values.lat, lng: values.lng },
+      isManualLocation: true
+    });
+    setIsDialogOpen(false);
+  };
+
+  const handleAutoDetect = () => {
+    onFilterChange({
+      ...filters,
+      isManualLocation: false,
+      userLocation: undefined, // This will trigger the geolocation request in Search.tsx
+    });
+  };
+
   return (
     <div className="rounded-lg border bg-card">
       <div className="p-4 border-b">
@@ -108,11 +146,74 @@ const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: Search
             </AccordionTrigger>
             <AccordionContent>
               <div className="space-y-4">
-                {!hasLocation && (
-                  <div className="text-sm text-muted-foreground mb-2 p-2 bg-muted rounded-md">
-                    För att använda distansfiltrering behöver du tillåta platsinformation i din webbläsare
+                <div className="flex justify-between items-center mb-2">
+                  <div className="text-sm">
+                    {filters.userLocation ? (
+                      <span className="text-sm text-muted-foreground">
+                        {filters.isManualLocation ? "Manuellt vald position" : "Detektion automatisk position"}
+                      </span>
+                    ) : (
+                      <span className="text-sm text-destructive font-medium">
+                        Ingen position tillgänglig
+                      </span>
+                    )}
                   </div>
-                )}
+                  <div className="flex gap-2">
+                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm" className="h-8">
+                          <MapPinOff className="h-3.5 w-3.5 mr-1" />
+                          Välj manuellt
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Ange din position manuellt</DialogTitle>
+                        </DialogHeader>
+                        <form onSubmit={form.handleSubmit(handleLocationSubmit)} className="space-y-4 pt-4">
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <Label htmlFor="latitude">Latitude</Label>
+                              <Input
+                                id="latitude"
+                                placeholder="59.329"
+                                {...form.register("lat")}
+                              />
+                              {form.formState.errors.lat && (
+                                <p className="text-sm text-destructive">Ogiltigt latitudvärde</p>
+                              )}
+                            </div>
+                            <div className="space-y-2">
+                              <Label htmlFor="longitude">Longitude</Label>
+                              <Input
+                                id="longitude"
+                                placeholder="18.068"
+                                {...form.register("lng")}
+                              />
+                              {form.formState.errors.lng && (
+                                <p className="text-sm text-destructive">Ogiltigt longitudvärde</p>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex justify-end">
+                            <Button type="submit">Använd position</Button>
+                          </div>
+                        </form>
+                      </DialogContent>
+                    </Dialog>
+                    
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="h-8"
+                      onClick={handleAutoDetect}
+                    >
+                      <Locate className="h-3.5 w-3.5 mr-1" />
+                      Auto
+                    </Button>
+                  </div>
+                </div>
+                
                 <div className="flex flex-wrap gap-2">
                   <Button 
                     variant="outline" 
@@ -127,7 +228,7 @@ const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: Search
                       key={distance}
                       variant="outline" 
                       size="sm"
-                      disabled={!hasLocation}
+                      disabled={!filters.userLocation}
                       className={filters.distance === distance ? "bg-primary text-primary-foreground" : ""}
                       onClick={() => handleDistanceChange(distance)}
                     >
@@ -258,7 +359,8 @@ const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: Search
             levels: [],
             searchQuery: "",
             distance: undefined,
-            userLocation: filters.userLocation
+            userLocation: filters.userLocation,
+            isManualLocation: filters.isManualLocation
           })}
         >
           Rensa alla filter
