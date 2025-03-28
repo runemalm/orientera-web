@@ -1,13 +1,17 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CompetitionCard from "@/components/CompetitionCard";
 import SearchFilters from "@/components/SearchFilters";
+import SearchAutocomplete from "@/components/search/SearchAutocomplete";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
-import { SearchFilters as SearchFiltersType } from "@/types";
+import { SearchFilters as SearchFiltersType, Competition } from "@/types";
 import { useGeolocation } from "@/hooks/useGeolocation";
+import { SearchIcon } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 const Search = () => {
   const {
@@ -32,6 +36,10 @@ const Search = () => {
     detectedLocationInfo: undefined
   });
 
+  const [searchInputValue, setSearchInputValue] = useState("");
+  const [isAutocompleteOpen, setIsAutocompleteOpen] = useState(false);
+  const searchContainerRef = useRef<HTMLDivElement>(null);
+
   // Update filters when geolocation changes
   useEffect(() => {
     setFilters(prevFilters => ({
@@ -41,6 +49,20 @@ const Search = () => {
       isManualLocation
     }));
   }, [userLocation, detectedLocationInfo, isManualLocation]);
+
+  // Close autocomplete when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
+        setIsAutocompleteOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const filteredCompetitions = filterCompetitions(competitions, filters);
 
@@ -57,6 +79,30 @@ const Search = () => {
     setFilters(newFilters);
   };
 
+  const handleSearchChange = (value: string) => {
+    setSearchInputValue(value);
+    // Don't update the filters yet - wait for selection or manual search
+  };
+
+  const handleCompetitionSelect = (competition: Competition) => {
+    // When a competition is selected from autocomplete, update search query
+    setSearchInputValue(competition.name);
+    setFilters({
+      ...filters,
+      searchQuery: competition.name
+    });
+    setIsAutocompleteOpen(false);
+  };
+
+  const handleManualSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setFilters({
+      ...filters,
+      searchQuery: searchInputValue
+    });
+    setIsAutocompleteOpen(false);
+  };
+
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
@@ -66,6 +112,31 @@ const Search = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="md:col-span-1">
+            <div className="rounded-lg border bg-card mb-4">
+              <div className="p-4" ref={searchContainerRef}>
+                <form onSubmit={handleManualSearch} className="flex gap-2">
+                  <Input
+                    placeholder="Sök efter tävlingsnamn eller plats..."
+                    value={searchInputValue}
+                    onChange={(e) => setSearchInputValue(e.target.value)}
+                    onFocus={() => setIsAutocompleteOpen(true)}
+                    className="flex-1"
+                  />
+                  <Button type="submit" size="icon">
+                    <SearchIcon className="h-4 w-4" />
+                  </Button>
+                </form>
+                
+                <SearchAutocomplete
+                  competitions={competitions}
+                  searchQuery={searchInputValue}
+                  onSearchChange={handleSearchChange}
+                  onCompetitionSelect={handleCompetitionSelect}
+                  isOpen={isAutocompleteOpen}
+                />
+              </div>
+            </div>
+            
             <SearchFilters 
               filters={filters} 
               onFilterChange={handleFilterChange} 
