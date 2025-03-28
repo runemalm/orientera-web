@@ -7,7 +7,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import LocationDialog from "./LocationDialog";
 import { LocationInfo } from "@/hooks/useGeolocation";
 
@@ -33,6 +33,9 @@ const DistanceFilter = ({
   onSetManualLocation,
 }: DistanceFilterProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  
+  // Preset distance options in kilometers
+  const distanceOptions = [10, 25, 50, 100, 150];
 
   const handleCitySelect = async (cityName: string) => {
     const success = await onSetManualLocation(cityName);
@@ -123,14 +126,23 @@ const DistanceFilter = ({
                 <div className="text-sm font-medium">Radie</div>
                 <div className="font-medium text-sm">{distance || 0} km</div>
               </div>
-              <Slider
-                id="distance"
-                min={5}
-                max={150}
-                step={5}
-                value={[distance || 30]}
-                onValueChange={(values) => onDistanceChange(values[0])}
-              />
+              <ToggleGroup 
+                type="single" 
+                value={distance?.toString()} 
+                onValueChange={(value) => onDistanceChange(value ? parseInt(value) : null)}
+                className="justify-between"
+              >
+                {distanceOptions.map((option) => (
+                  <ToggleGroupItem 
+                    key={option} 
+                    value={option.toString()}
+                    size="sm"
+                    className="flex-1"
+                  >
+                    {option} km
+                  </ToggleGroupItem>
+                ))}
+              </ToggleGroup>
             </div>
           )}
         </div>
