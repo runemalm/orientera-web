@@ -23,22 +23,18 @@ export const fetchCitySuggestions = async (query: string): Promise<CitySuggestio
     const data = await response.json();
     
     if (data && data.features && data.features.length > 0) {
-      // Filter for only Swedish results
-      const swedishResults = data.features.filter((feature: any) => {
-        const country = feature.properties.country;
-        return country === "Sweden" || country === "Sverige";
-      });
-
-      return swedishResults.map((feature: any) => {
+      // Process all results, not just filtering for Sweden since we added "Sverige" to query
+      const results = data.features.map((feature: any) => {
         const name = feature.properties.name;
         const city = feature.properties.city || name;
-        const state = feature.properties.state || "";
+        const state = feature.properties.county || feature.properties.state || "";
+        const country = feature.properties.country || "Sverige";
         
         let display = name;
         if (state) {
-          display = `${name}, ${state}, Sverige`;
+          display = `${name}, ${state}, ${country}`;
         } else {
-          display = `${name}, Sverige`;
+          display = `${name}, ${country}`;
         }
         
         return {
@@ -46,6 +42,16 @@ export const fetchCitySuggestions = async (query: string): Promise<CitySuggestio
           display: display
         };
       });
+      
+      // Only apply Sweden filter if we have multiple results to avoid empty results
+      if (results.length > 1) {
+        return results.filter((item: CitySuggestion) => 
+          item.display.toLowerCase().includes("sweden") || 
+          item.display.toLowerCase().includes("sverige")
+        );
+      }
+      
+      return results;
     }
     
     // If no results found with Photon, try with Nominatim as backup
