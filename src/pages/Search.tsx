@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -26,52 +27,76 @@ const Search = () => {
     // Ask for user location if not already set and not using manual location
     if (!filters.userLocation && !filters.isManualLocation) {
       if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const coords = {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude
-            };
-            
-            // Get location info from coordinates using reverse geocoding
-            fetch(
-              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords.lat}&lon=${coords.lng}&zoom=18&addressdetails=1`
-            )
-              .then(response => response.json())
-              .then(data => {
-                setFilters(prev => ({
-                  ...prev,
-                  userLocation: coords,
-                  detectedLocationInfo: {
-                    city: data.address.city || data.address.town || data.address.village || data.address.hamlet,
-                    municipality: data.address.municipality,
-                    county: data.address.county,
-                    display_name: data.display_name
-                  }
-                }));
+        // Create a safety wrapper for the geolocation API
+        const safeGeolocation = () => {
+          try {
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                // Safely capture coordinates
+                const coords = {
+                  lat: position.coords.latitude,
+                  lng: position.coords.longitude
+                };
                 
+                // Safe fetch operation using promises
+                fetch(
+                  `https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords.lat}&lon=${coords.lng}&zoom=18&addressdetails=1`
+                )
+                  .then(response => response.json())
+                  .then(data => {
+                    // Safe state update
+                    setFilters(prev => ({
+                      ...prev,
+                      userLocation: coords,
+                      detectedLocationInfo: {
+                        city: data.address?.city || data.address?.town || data.address?.village || data.address?.hamlet,
+                        municipality: data.address?.municipality,
+                        county: data.address?.county,
+                        display_name: data.display_name
+                      }
+                    }));
+                    
+                    toast({
+                      title: "Plats hittad",
+                      description: "Din position används nu för distansfiltrering.",
+                    });
+                  })
+                  .catch(error => {
+                    console.error("Error getting location details:", error);
+                    // Fallback to just coordinates if we can't get detailed info
+                    setFilters(prev => ({
+                      ...prev,
+                      userLocation: coords
+                    }));
+                  });
+              },
+              (error) => {
+                console.error("Error getting location:", error);
                 toast({
-                  title: "Plats hittad",
-                  description: "Din position används nu för distansfiltrering.",
+                  title: "Kunde inte hitta din position",
+                  description: "Prova att ange din position manuellt för distansfiltrering.",
+                  variant: "destructive"
                 });
-              })
-              .catch(error => {
-                console.error("Error getting location details:", error);
-                setFilters(prev => ({
-                  ...prev,
-                  userLocation: coords
-                }));
-              });
-          },
-          (error) => {
-            console.error("Error getting location:", error);
+              },
+              // Add options to make geolocation more reliable
+              { 
+                enableHighAccuracy: false, 
+                timeout: 5000, 
+                maximumAge: 0 
+              }
+            );
+          } catch (err) {
+            console.error("Geolocation error:", err);
             toast({
-              title: "Kunde inte hitta din position",
-              description: "Prova att ange din position manuellt för distansfiltrering.",
+              title: "Problem med platsinformation",
+              description: "Ett fel uppstod när din position skulle hämtas.",
               variant: "destructive"
             });
           }
-        );
+        };
+        
+        // Execute the safe geolocation function
+        safeGeolocation();
       } else {
         toast({
           title: "Geolokalisering stöds inte",
