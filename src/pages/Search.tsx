@@ -26,30 +26,36 @@ const Search = () => {
   useEffect(() => {
     // Ask for user location if not already set and not using manual location
     if (!filters.userLocation && !filters.isManualLocation) {
-      const getLocation = () => {
-        if (!navigator.geolocation) {
-          toast({
-            title: "Geolokalisering stöds inte",
-            description: "Din webbläsare stöder inte geolokalisering. Prova att ange din position manuellt.",
-            variant: "destructive"
-          });
-          return;
-        }
+      if (!navigator.geolocation) {
+        toast({
+          title: "Geolokalisering stöds inte",
+          description: "Din webbläsare stöder inte geolokalisering. Prova att ange din position manuellt.",
+          variant: "destructive"
+        });
+        return;
+      }
 
-        const successCallback = (position: GeolocationPosition) => {
+      const successCallback = (position: GeolocationPosition) => {
+        try {
           const coords = {
             lat: position.coords.latitude,
             lng: position.coords.longitude
           };
           
+          // Simple fetch without reference to 'n'
           fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords.lat}&lon=${coords.lng}&zoom=18&addressdetails=1`)
             .then(response => response.json())
             .then(data => {
+              const city = data.address?.city || 
+                          data.address?.town || 
+                          data.address?.village || 
+                          data.address?.hamlet;
+                
               setFilters(prevFilters => ({
                 ...prevFilters,
                 userLocation: coords,
                 detectedLocationInfo: {
-                  city: data.address?.city || data.address?.town || data.address?.village || data.address?.hamlet,
+                  city: city,
                   municipality: data.address?.municipality,
                   county: data.address?.county,
                   display_name: data.display_name
@@ -69,29 +75,44 @@ const Search = () => {
                 userLocation: coords
               }));
             });
-        };
-
-        const errorCallback = (error: GeolocationPositionError) => {
-          console.error("Error getting location:", error);
+        } catch (error) {
+          console.error("Error processing location:", error);
           toast({
-            title: "Kunde inte hitta din position",
-            description: "Prova att ange din position manuellt för distansfiltrering.",
+            title: "Problem med att bearbeta position",
+            description: "Ett fel uppstod när din position bearbetades.",
             variant: "destructive"
           });
-        };
+        }
+      };
 
+      const errorCallback = (error: GeolocationPositionError) => {
+        console.error("Error getting location:", error);
+        toast({
+          title: "Kunde inte hitta din position",
+          description: "Prova att ange din position manuellt för distansfiltrering.",
+          variant: "destructive"
+        });
+      };
+
+      // Use a try-catch block around the geolocation API call
+      try {
         navigator.geolocation.getCurrentPosition(
           successCallback,
           errorCallback,
           { 
             enableHighAccuracy: false, 
-            timeout: 5000, 
+            timeout: 10000, 
             maximumAge: 0 
           }
         );
-      };
-
-      getLocation();
+      } catch (error) {
+        console.error("Geolocation API error:", error);
+        toast({
+          title: "Problem med positionstjänsten",
+          description: "Det uppstod ett problem med positionstjänsten. Prova att ange din position manuellt.",
+          variant: "destructive"
+        });
+      }
     }
   }, [filters.userLocation, filters.isManualLocation, toast]);
 
