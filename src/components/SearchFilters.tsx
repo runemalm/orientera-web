@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { FilterIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -73,8 +72,6 @@ const SearchFiltersComponent = ({
   };
 
   const handleDetectLocation = () => {
-    // This is the handler for the auto detection button
-    // We need to properly trigger the useGeolocation hook's detectLocation method
     onFilterChange({
       ...filters,
       isManualLocation: false
@@ -91,12 +88,19 @@ const SearchFiltersComponent = ({
       
       if (data && data.length > 0) {
         const { lat, lon } = data[0];
+        
+        const newLocation = { 
+          lat: parseFloat(lat), 
+          lng: parseFloat(lon) 
+        };
+        
         onFilterChange({
           ...filters,
-          userLocation: { lat: parseFloat(lat), lng: parseFloat(lon) },
+          userLocation: newLocation,
           isManualLocation: true,
           locationCity: cityName
         });
+        
         return true;
       }
       return false;

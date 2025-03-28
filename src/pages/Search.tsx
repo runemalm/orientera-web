@@ -43,28 +43,33 @@ const Search = () => {
 
   // Update filters when geolocation changes
   useEffect(() => {
-    setFilters(prevFilters => ({
-      ...prevFilters,
-      userLocation,
-      detectedLocationInfo,
-      isManualLocation
-    }));
+    if (userLocation) {
+      // When location changes, make sure to update the filters with the latest location
+      setFilters(prevFilters => ({
+        ...prevFilters,
+        userLocation, // This ensures the userLocation is always updated in filters
+        detectedLocationInfo,
+        isManualLocation
+      }));
+    }
   }, [userLocation, detectedLocationInfo, isManualLocation]);
 
   // Calculate distances for each competition if user location is available
-  const competitionsWithDistance = userLocation 
-    ? competitions.map(competition => {
-        if (!competition.coordinates) return competition;
-        
-        const distance = getDistance(
-          userLocation.lat,
-          userLocation.lng,
-          competition.coordinates.lat,
-          competition.coordinates.lng
-        );
-        return { ...competition, distance };
-      })
-    : competitions;
+  const competitionsWithDistance = React.useMemo(() => {
+    if (!userLocation) return competitions;
+    
+    return competitions.map(competition => {
+      if (!competition.coordinates) return competition;
+      
+      const distance = getDistance(
+        userLocation.lat,
+        userLocation.lng,
+        competition.coordinates.lat,
+        competition.coordinates.lng
+      );
+      return { ...competition, distance };
+    });
+  }, [userLocation]); // Only recalculate when userLocation changes
 
   const filteredCompetitions = filterCompetitions(competitionsWithDistance, filters);
 
@@ -203,3 +208,4 @@ const Search = () => {
 };
 
 export default Search;
+
