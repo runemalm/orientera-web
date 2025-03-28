@@ -80,7 +80,7 @@ const Footer = () => {
             <h3 className="text-lg font-medium mb-4">Kontakt</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link to="/kontakt" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Link to="/om-oss#kontakt" className="text-muted-foreground hover:text-foreground transition-colors">
                   Kontakta oss
                 </Link>
               </li>

@@ -1,4 +1,3 @@
-
 import { MapPin, Users, Trophy, Calendar, Heart } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import Header from "@/components/Header";
@@ -69,7 +68,7 @@ const AboutUs = () => {
                 <MapPin className="h-10 w-10 text-orienteering-green mb-2" />
                 <h3 className="text-xl font-bold">Tillgänglighet</h3>
                 <p className="text-center text-muted-foreground">
-                  Vi strävar efter att göra orientering tillgängligt för alla, oavsett erfarenhetsnivå eller geografisk plats.
+                  Vi sträver efter att göra orientering tillgängligt för alla, oavsett erfarenhetsnivå eller geografisk plats.
                 </p>
               </div>
               
@@ -93,7 +92,7 @@ const AboutUs = () => {
                 <Trophy className="h-10 w-10 text-orienteering-green mb-2" />
                 <h3 className="text-xl font-bold">Excellens</h3>
                 <p className="text-center text-muted-foreground">
-                  Vi strävar efter att erbjuda den bästa möjliga upplevelsen för våra användare genom konstant innovation och förbättring.
+                  Vi sträver efter att erbjuda den bästa möjliga upplevelsen för våra användare genom konstant innovation och förbättring.
                 </p>
               </div>
               
@@ -108,7 +107,7 @@ const AboutUs = () => {
           </div>
         </section>
         
-        <section className="w-full py-12 md:py-24 lg:py-32">
+        <section id="kontakt" className="w-full py-12 md:py-24 lg:py-32">
           <div className="container px-4 md:px-6">
             <div className="grid gap-10 lg:gap-16 md:grid-cols-2 items-center">
               <div className="space-y-4">
@@ -131,7 +130,7 @@ const AboutUs = () => {
                   </li>
                 </ul>
                 <p className="text-muted-foreground pt-4">
-                  Vi strävar efter att svara på alla förfrågningar inom 48 timmar.
+                  Vi sträver efter att svara på alla förfrågningar inom 48 timmar.
                 </p>
               </div>
               <div className="space-y-4">
