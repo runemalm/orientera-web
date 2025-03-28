@@ -33,6 +33,7 @@ export type Competition = {
   description: string;
   website?: string;
   featured?: boolean;
+  distance?: number; // Added distance field
 };
 
 export type SearchFilters = {

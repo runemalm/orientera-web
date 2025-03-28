@@ -35,11 +35,39 @@ function deg2rad(deg: number): number {
   return deg * (Math.PI/180);
 }
 
+// Format distance to a readable string
+export function formatDistance(distance: number | undefined): string {
+  if (distance === undefined) return "";
+  
+  if (distance < 1) {
+    return `${Math.round(distance * 1000)} m`;
+  }
+  
+  return `${Math.round(distance)} km`;
+}
+
 export function filterCompetitions(competitions: Competition[], filters: SearchFilters): Competition[] {
   // Check if we need to filter by distance
   const userLocation = filters.userLocation;
   
-  return competitions.filter(competition => {
+  // Create a copy of the competitions array to add distances
+  const competitionsWithDistance = competitions.map(competition => {
+    const comp = { ...competition };
+    
+    // Calculate distance if user location is available
+    if (userLocation) {
+      comp.distance = calculateDistance(
+        userLocation.lat,
+        userLocation.lng,
+        competition.coordinates.lat,
+        competition.coordinates.lng
+      );
+    }
+    
+    return comp;
+  });
+  
+  return competitionsWithDistance.filter(competition => {
     // Filter by regions
     if (filters.regions.length > 0 && !filters.regions.includes(competition.region)) {
       return false;
@@ -62,14 +90,7 @@ export function filterCompetitions(competitions: Competition[], filters: SearchF
     
     // Filter by distance if userLocation is provided and distance filter is set
     if (userLocation && filters.distance) {
-      const distance = calculateDistance(
-        userLocation.lat,
-        userLocation.lng,
-        competition.coordinates.lat,
-        competition.coordinates.lng
-      );
-      
-      if (distance > filters.distance) {
+      if (competition.distance && competition.distance > filters.distance) {
         return false;
       }
     }
