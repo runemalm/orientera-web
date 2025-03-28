@@ -15,21 +15,18 @@ export const fetchCitySuggestions = async (query: string): Promise<CitySuggestio
   
   try {
     console.log("Fetching suggestions for:", query);
-    // Use Photon API with place tags and "Sverige" suffix in the query
-    // Note: Photon doesn't fully support 'sv' language code, using 'en' for better compatibility
+    // Always append "Sverige" to every search query
     const response = await fetch(
-      `https://photon.komoot.io/api/?q=${encodeURIComponent(query + " Sverige")}&lang=en&limit=5&osm_tag=place:city&osm_tag=place:town&osm_tag=place:village&osm_tag=place:hamlet`
+      `https://photon.komoot.io/api/?q=${encodeURIComponent(query + " Sverige")}&lang=en&limit=10&osm_tag=place:city&osm_tag=place:town&osm_tag=place:village&osm_tag=place:hamlet`
     );
     
     const data = await response.json();
     console.log("API response data:", data);
     
     if (data && data.features && data.features.length > 0) {
-      // Process all results, not just filtering for Sweden since we added "Sverige" to query
+      // Map all features to CitySuggestion objects
       const results = data.features.map((feature: any) => {
         const name = feature.properties.name;
-        // For hamlets and similar places that might not have a city property
-        const city = feature.properties.city || name;
         const state = feature.properties.county || feature.properties.state || "";
         const country = feature.properties.country || "Sverige";
         
@@ -41,28 +38,26 @@ export const fetchCitySuggestions = async (query: string): Promise<CitySuggestio
         }
         
         return {
-          name: name, // Use the actual name from the API, not city
+          name: name,
           display: display
         };
       });
       
       console.log("Mapped results:", results);
       
-      // Only apply Sweden filter if we have multiple results to avoid empty results
-      if (results.length > 1) {
-        const filteredResults = results.filter((item: CitySuggestion) => 
-          item.display.toLowerCase().includes("sweden") || 
-          item.display.toLowerCase().includes("sverige")
-        );
-        console.log("Filtered results:", filteredResults);
-        return filteredResults;
-      }
+      // Always filter for Swedish locations, regardless of number of results
+      const filteredResults = results.filter((item: CitySuggestion) => 
+        item.display.toLowerCase().includes("sweden") || 
+        item.display.toLowerCase().includes("sverige")
+      );
       
-      return results;
+      console.log("Filtered Swedish results:", filteredResults);
+      return filteredResults;
     }
     
     // If no results found with Photon, try with Nominatim as backup
     if (!data || !data.features || data.features.length === 0) {
+      // Only search in Sweden with Nominatim (countrycodes=se)
       const nominatimResponse = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=se&limit=5`
       );
@@ -86,7 +81,7 @@ export const fetchCitySuggestions = async (query: string): Promise<CitySuggestio
 // Geocode a city name to coordinates
 export const geocodeCity = async (cityName: string): Promise<boolean> => {
   try {
-    // First try with Photon API for geocoding
+    // First try with Photon API for geocoding, explicitly adding Sverige to search
     const response = await fetch(
       `https://photon.komoot.io/api/?q=${encodeURIComponent(cityName + " Sverige")}&lang=en&limit=1&osm_tag=place:city&osm_tag=place:town&osm_tag=place:village&osm_tag=place:hamlet`
     );
@@ -100,6 +95,7 @@ export const geocodeCity = async (cityName: string): Promise<boolean> => {
     }
     
     // If no results found with Photon, try with Nominatim as backup
+    // Explicitly set countrycodes=se to only search in Sweden
     const nominatimResponse = await fetch(
       `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cityName)}&countrycodes=se&limit=1`
     );
