@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { SearchIcon, FilterIcon, MapPin, MapPinOff, Locate } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,16 @@ import { Form, FormField, FormItem, FormLabel, FormControl } from "@/components/
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { debounce } from "@/lib/utils";
+import {
+  Command,
+  CommandDialog,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 
 interface SearchFiltersProps {
   filters: SearchFilters;
@@ -38,6 +48,9 @@ const locationSchema = z.object({
 const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: SearchFiltersProps) => {
   const [searchQuery, setSearchQuery] = useState(filters.searchQuery || "");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [citySuggestions, setCitySuggestions] = useState<{name: string, display: string}[]>([]);
+  const [citySearchValue, setCitySearchValue] = useState("");
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   
   const form = useForm<z.infer<typeof locationSchema>>({
     resolver: zodResolver(locationSchema),
@@ -45,6 +58,50 @@ const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: Search
       city: filters.locationCity || "",
     },
   });
+
+  // Debounced function to fetch city suggestions
+  const fetchCitySuggestions = useCallback(
+    debounce(async (query: string) => {
+      if (query.length < 2) {
+        setCitySuggestions([]);
+        return;
+      }
+      
+      setIsLoadingSuggestions(true);
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5`
+        );
+        
+        const data = await response.json();
+        
+        if (data && data.length > 0) {
+          const suggestions = data.map((item: any) => ({
+            name: item.name,
+            display: item.display_name
+          }));
+          setCitySuggestions(suggestions);
+        } else {
+          setCitySuggestions([]);
+        }
+      } catch (error) {
+        console.error("Error fetching city suggestions:", error);
+        setCitySuggestions([]);
+      } finally {
+        setIsLoadingSuggestions(false);
+      }
+    }, 300),
+    []
+  );
+
+  // Update city suggestions when input changes
+  useEffect(() => {
+    if (citySearchValue) {
+      fetchCitySuggestions(citySearchValue);
+    } else {
+      setCitySuggestions([]);
+    }
+  }, [citySearchValue, fetchCitySuggestions]);
 
   const handleTextSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -95,11 +152,11 @@ const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: Search
     onFilterChange({ ...filters, distance: distance || undefined });
   };
 
-  const handleLocationSubmit = async (values: z.infer<typeof locationSchema>) => {
+  const handleCitySelect = async (cityName: string) => {
     try {
       // Use the OpenStreetMap Nominatim API to get coordinates from city name
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(values.city)}&limit=1`
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cityName)}&limit=1`
       );
       
       const data = await response.json();
@@ -110,14 +167,18 @@ const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: Search
           ...filters,
           userLocation: { lat: parseFloat(lat), lng: parseFloat(lon) },
           isManualLocation: true,
-          locationCity: values.city
+          locationCity: cityName
         });
+        setIsDialogOpen(false);
+        form.reset({ city: cityName });
       }
-      
-      setIsDialogOpen(false);
     } catch (error) {
       console.error("Error geocoding city:", error);
     }
+  };
+
+  const handleLocationSubmit = async (values: z.infer<typeof locationSchema>) => {
+    await handleCitySelect(values.city);
   };
 
   const handleAutoDetect = () => {
@@ -191,22 +252,60 @@ const SearchFiltersComponent = ({ filters, onFilterChange, hasLocation }: Search
                         <DialogHeader>
                           <DialogTitle>Ange stad eller ort</DialogTitle>
                         </DialogHeader>
-                        <form onSubmit={form.handleSubmit(handleLocationSubmit)} className="space-y-4 pt-4">
+                        <div className="space-y-4 pt-4">
                           <div className="space-y-2">
-                            <Label htmlFor="city">Stad eller ort</Label>
-                            <Input
-                              id="city"
-                              placeholder="t.ex. Stockholm"
-                              {...form.register("city")}
-                            />
-                            {form.formState.errors.city && (
-                              <p className="text-sm text-destructive">{form.formState.errors.city.message}</p>
-                            )}
+                            <Label htmlFor="city-search">Stad eller ort</Label>
+                            <Command className="rounded-lg border shadow-md">
+                              <CommandInput 
+                                id="city-search"
+                                placeholder="Sök efter stad eller ort..." 
+                                value={citySearchValue}
+                                onValueChange={setCitySearchValue}
+                              />
+                              <CommandList>
+                                {isLoadingSuggestions ? (
+                                  <div className="py-6 text-center text-sm">Laddar förslag...</div>
+                                ) : (
+                                  <>
+                                    <CommandEmpty>Inga träffar</CommandEmpty>
+                                    <CommandGroup>
+                                      {citySuggestions.map((city, index) => (
+                                        <CommandItem
+                                          key={index}
+                                          value={city.name}
+                                          onSelect={() => handleCitySelect(city.name)}
+                                          className="cursor-pointer"
+                                        >
+                                          <div className="text-sm">
+                                            <div className="font-medium">{city.name}</div>
+                                            <div className="text-xs text-muted-foreground truncate max-w-[260px]">
+                                              {city.display}
+                                            </div>
+                                          </div>
+                                        </CommandItem>
+                                      ))}
+                                    </CommandGroup>
+                                  </>
+                                )}
+                              </CommandList>
+                            </Command>
                           </div>
-                          <div className="flex justify-end">
-                            <Button type="submit">Använd position</Button>
-                          </div>
-                        </form>
+                          <form onSubmit={form.handleSubmit(handleLocationSubmit)} className="flex justify-end space-x-2">
+                            <Button 
+                              type="button" 
+                              variant="outline" 
+                              onClick={() => setIsDialogOpen(false)}
+                            >
+                              Avbryt
+                            </Button>
+                            <Button 
+                              type="submit"
+                              disabled={citySearchValue.length < 2}
+                            >
+                              Använd position
+                            </Button>
+                          </form>
+                        </div>
                       </DialogContent>
                     </Dialog>
                     
