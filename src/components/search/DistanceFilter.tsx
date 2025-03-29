@@ -37,7 +37,12 @@ const DistanceFilter = ({
       <AccordionTrigger className="py-2 hover:no-underline">
         <div className="flex items-center gap-2">
           <MapPin className="h-4 w-4" />
-          <span className="text-sm font-medium">Avstånd</span>
+          <span className="text-sm font-medium">
+            Avstånd
+            {distance !== undefined && (
+              <span className="ml-1 text-muted-foreground">({distance} km)</span>
+            )}
+          </span>
           {locationName && (
             <Badge variant="outline" className="ml-2 font-normal">
               {locationName}

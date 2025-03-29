@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { sv } from "date-fns/locale";
 import { format } from "date-fns";
@@ -70,7 +71,12 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange, hasActiveFilter = false
       <AccordionTrigger className="py-3">
         <div className="flex items-center gap-2">
           <CalendarRange className="h-4 w-4" />
-          <span>Datum</span>
+          <span>
+            Datum
+            {activeFilterCount > 0 && (
+              <span className="ml-1 text-muted-foreground">({activeFilterCount})</span>
+            )}
+          </span>
         </div>
       </AccordionTrigger>
       <AccordionContent>

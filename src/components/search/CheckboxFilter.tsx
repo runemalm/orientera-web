@@ -6,6 +6,7 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "@/components/ui/accordion";
+import { Badge } from "@/components/ui/badge";
 
 interface CheckboxFilterProps {
   title: string;
@@ -22,11 +23,18 @@ const CheckboxFilter = ({
   onItemChange,
   accordionValue 
 }: CheckboxFilterProps) => {
+  const selectedCount = selectedItems.length;
+  
   return (
     <AccordionItem value={accordionValue} className="border-b-0">
       <AccordionTrigger className="py-2 hover:no-underline">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium">{title}</span>
+          <span className="text-sm font-medium">
+            {title}
+            {selectedCount > 0 && (
+              <span className="ml-1 text-muted-foreground">({selectedCount})</span>
+            )}
+          </span>
         </div>
       </AccordionTrigger>
       <AccordionContent>
