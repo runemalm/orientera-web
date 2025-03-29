@@ -1,4 +1,3 @@
-
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { Competition, SearchFilters } from "@/types";
@@ -33,23 +32,12 @@ export const filterCompetitions = (
       competition.location.toLowerCase().includes(filters.searchQuery.toLowerCase()) ||
       competition.organizer.toLowerCase().includes(filters.searchQuery.toLowerCase());
 
-    const distanceMatch =
-      filters.distance === undefined ||
-      (filters.userLocation !== undefined && competition.coordinates !== undefined &&
-        getDistance(
-          filters.userLocation.lat,
-          filters.userLocation.lng,
-          competition.coordinates.lat,
-          competition.coordinates.lng
-        ) <= (filters.distance * 1000)); // Convert km to meters
-
     return (
       regionMatch &&
       districtMatch &&
       disciplineMatch &&
       levelMatch &&
-      searchQueryMatch &&
-      distanceMatch
+      searchQueryMatch
     );
   });
 };

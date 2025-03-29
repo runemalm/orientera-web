@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -6,11 +6,10 @@ import SearchFilters from "@/components/SearchFilters";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
-import { X, Sparkles, Clock, Search as SearchIcon, ArrowRight, SlidersHorizontal, Filter } from "lucide-react";
+import { X, Sparkles, Clock, Search as SearchIcon, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { getDistance } from "@/lib/utils";
 import CompetitionCompactView from "@/components/CompetitionCompactView";
 import { isBefore, isAfter, isEqual, parseISO } from "date-fns";
 import { processNaturalLanguageQuery } from "@/utils/aiQueryProcessor";
@@ -29,9 +28,7 @@ const Search = () => {
     levels: [],
     types: [],
     branches: [],
-    searchQuery: "",
-    userLocation: undefined,
-    locationCity: undefined
+    searchQuery: ""
   });
 
   const [searchInputValue, setSearchInputValue] = useState("");
@@ -90,33 +87,8 @@ const Search = () => {
     }
   }, [location.search, toast]);
 
-  const competitionsWithDistance = useMemo(() => {
-    console.log("Recalculating distances with userLocation:", filters.userLocation);
-    
-    if (!filters.userLocation) return competitions;
-    
-    return competitions.map(competition => {
-      if (!competition.coordinates) {
-        console.warn(`Competition ${competition.id} is missing coordinates!`);
-        return competition;
-      }
-      
-      const distance = getDistance(
-        filters.userLocation!.lat,
-        filters.userLocation!.lng,
-        competition.coordinates.lat,
-        competition.coordinates.lng
-      );
-      
-      return { ...competition, distance };
-    });
-  }, [filters.userLocation]);
-
   const filteredCompetitions = useMemo(() => {
-    let filtered = filterCompetitions(competitionsWithDistance, {
-      ...filters,
-      userLocation: filters.userLocation,
-    });
+    let filtered = filterCompetitions(competitions, filters);
 
     if (filters.dateRange?.from) {
       filtered = filtered.filter(competition => {
@@ -149,7 +121,7 @@ const Search = () => {
     }
     
     return filtered;
-  }, [competitionsWithDistance, filters]);
+  }, [competitions, filters]);
 
   const handleFilterChange = (newFilters: SearchFiltersType) => {
     console.log("Filter changed:", newFilters);
@@ -328,7 +300,7 @@ const Search = () => {
                 <SearchFilters 
                   filters={filters} 
                   onFilterChange={handleFilterChange} 
-                  hasLocation={!!filters.userLocation}
+                  hasLocation={false}
                   hideSearchInput={true}
                 />
               </div>

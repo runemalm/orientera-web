@@ -1,3 +1,4 @@
+
 export type Region = {
   id: string;
   name: string;
@@ -48,13 +49,12 @@ export type Competition = {
   description: string;
   website?: string;
   featured?: boolean;
-  distance?: number; // Added distance field
-  resources?: CompetitionResource[]; // Added resources field
+  distance?: number; // Optional distance field
+  resources?: CompetitionResource[]; // Optional resources field
 };
 
 export type SearchFilters = {
   regions: string[];
-  distance?: number;
   districts: string[];
   disciplines: Discipline[];
   levels: CompetitionLevel[];
@@ -67,4 +67,5 @@ export type SearchFilters = {
     from: Date;
     to?: Date;
   }; // Date range for filtering
+  distance?: number; // Optional distance filter
 };

@@ -1,7 +1,8 @@
 
-import { useState, useMemo } from "react";
-import { format, addDays, endOfWeek, endOfMonth } from "date-fns";
+import { useMemo } from "react";
+import { addDays } from "date-fns";
 import { sv } from "date-fns/locale";
+import { format } from "date-fns";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -21,42 +22,33 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilterProps)
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   
-  const quickOptions = useMemo(() => [
+  const periods = useMemo(() => [
     {
-      label: "Alla",
-      value: () => undefined
+      label: "Alla datum",
+      value: undefined
     },
     {
-      label: "7 dagar",
-      value: () => ({
+      label: "Nästa 7 dagar",
+      value: {
         from: today,
         to: addDays(today, 7)
-      })
+      }
     },
     {
-      label: "30 dagar",
-      value: () => ({
+      label: "Nästa 30 dagar",
+      value: {
         from: today,
         to: addDays(today, 30)
-      })
+      }
     },
     {
-      label: "3 månader",
-      value: () => ({
+      label: "Nästa 3 månader",
+      value: {
         from: today,
         to: addDays(today, 90)
-      })
+      }
     }
   ], [today]);
-
-  const isDateRangeSelected = useMemo(() => {
-    return !!dateRange?.from;
-  }, [dateRange]);
-
-  const handleQuickOptionSelect = (option: any) => {
-    const newRange = option.value();
-    onDateRangeChange(newRange);
-  };
 
   const formatDateRange = (range?: DateRangeValue): string => {
     if (!range?.from) return "";
@@ -77,7 +69,7 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilterProps)
         <div className="flex items-center gap-2">
           <CalendarIcon className="h-4 w-4" />
           <span>Datum</span>
-          {isDateRangeSelected && (
+          {dateRange && (
             <Badge variant="secondary" className="ml-2">
               {formatDateRange(dateRange)}
             </Badge>
@@ -85,16 +77,24 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilterProps)
         </div>
       </AccordionTrigger>
       <AccordionContent>
-        <div className="grid grid-cols-4 gap-2 pt-2">
-          {quickOptions.map((option, index) => (
+        <div className="grid grid-cols-2 gap-2 pt-2">
+          {periods.map((period, index) => (
             <Button
               key={index}
               size="sm"
-              variant={dateRange === option.value() ? "default" : "outline"}
+              variant={
+                !dateRange && period.value === undefined
+                  ? "default"
+                  : dateRange && period.value && 
+                    dateRange.from.getTime() === period.value.from.getTime() && 
+                    (!dateRange.to || !period.value.to || dateRange.to.getTime() === period.value.to.getTime())
+                    ? "default"
+                    : "outline"
+              }
               className="w-full"
-              onClick={() => handleQuickOptionSelect(option)}
+              onClick={() => onDateRangeChange(period.value)}
             >
-              {option.label}
+              {period.label}
             </Button>
           ))}
         </div>
