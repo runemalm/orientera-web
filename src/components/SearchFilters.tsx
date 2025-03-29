@@ -9,7 +9,6 @@ import { districts } from "@/data/districts";
 import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 const disciplines = ['Sprint', 'Medel', 'Lång', 'Natt', 'Stafett', 'Ultralång'];
 const competitionTypes: CompetitionType[] = ['Värdetävlingar', 'Nationella tävlingar', 'Distriktstävlingar', 'Närtävlingar', 'Veckans bana'];
@@ -33,31 +32,11 @@ const SearchFiltersComponent = ({
   const { toast } = useToast();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [searchValue, setSearchValue] = useState("");
-  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-  
+
   // Ensure types and branches are always arrays
   const typesArray = Array.isArray(filters.types) ? filters.types : [];
   const branchesArray = Array.isArray(filters.branches) ? filters.branches : [];
   
-  useEffect(() => {
-    const savedExpandedItems = localStorage.getItem(EXPANDED_FILTERS_KEY);
-    if (savedExpandedItems) {
-      try {
-        const parsed = JSON.parse(savedExpandedItems);
-        setExpandedItems(parsed);
-      } catch (error) {
-        console.error("Failed to parse saved expanded filters", error);
-        setExpandedItems([]);
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    if (expandedItems.length > 0) {
-      localStorage.setItem(EXPANDED_FILTERS_KEY, JSON.stringify(expandedItems));
-    }
-  }, [expandedItems]);
-
   useEffect(() => {
     setSearchValue(filters.searchQuery || "");
   }, [filters.searchQuery]);
@@ -141,38 +120,6 @@ const SearchFiltersComponent = ({
       title: "Filtren har återställts",
       description: "Alla valda filter har rensats"
     });
-  };
-
-  const handleClearFilter = (filterType: 'districts' | 'disciplines' | 'types' | 'branches' | 'search' | 'date') => {
-    const updatedFilters = {...filters};
-    
-    if (filterType === 'search') {
-      updatedFilters.searchQuery = "";
-      setSearchValue("");
-    } else if (filterType === 'date') {
-      updatedFilters.dateRange = undefined;
-    } else {
-      updatedFilters[filterType] = [];
-    }
-    
-    onFilterChange(updatedFilters);
-    
-    toast({
-      title: `${getFilterGroupName(filterType)} borttaget`,
-      description: `Filtret har tagits bort`
-    });
-  };
-  
-  const getFilterGroupName = (filterType: string): string => {
-    switch(filterType) {
-      case 'districts': return 'Distrikt';
-      case 'disciplines': return 'Discipliner';
-      case 'types': return 'Tävlingstyper';
-      case 'branches': return 'Orienteringsgrenar';
-      case 'search': return 'Sökord';
-      case 'date': return 'Datumintervall';
-      default: return 'Filter';
-    }
   };
 
   const hasActiveDateFilter = Boolean(filters.dateRange?.from || filters.dateRange?.to);
@@ -357,34 +304,7 @@ const SearchFiltersComponent = ({
           )}
         </div>
 
-        <div className="md:hidden mb-4">
-          <Collapsible
-            open={mobileFiltersOpen}
-            onOpenChange={setMobileFiltersOpen}
-            className="w-full"
-          >
-            <CollapsibleTrigger asChild>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="w-full justify-between"
-              >
-                {mobileFiltersOpen ? "Dölj filter" : "Visa filter"}
-                {hasActiveFilters && !mobileFiltersOpen && (
-                  <Badge variant="secondary" className="ml-2">
-                    {(filters.disciplines.length + filters.districts.length + typesArray.length + branchesArray.length) + 
-                    (hasActiveDateFilter ? 1 : 0) + (hasSearchQuery ? 1 : 0)}
-                  </Badge>
-                )}
-              </Button>
-            </CollapsibleTrigger>
-            <CollapsibleContent className="mt-4">
-              {filterContent}
-            </CollapsibleContent>
-          </Collapsible>
-        </div>
-
-        <div className="hidden md:block">
+        <div className="md:block">
           {filterContent}
         </div>
       </div>

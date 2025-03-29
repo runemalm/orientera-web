@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -191,6 +192,7 @@ const Search = () => {
         </div>
         
         <div className="flex flex-col md:flex-row gap-6 w-full max-w-full">
+          {/* Only show this button on mobile */}
           {isMobile && (
             <Button
               variant="outline"
@@ -235,6 +237,7 @@ const Search = () => {
                 </div>
                 
                 <div className="flex items-center gap-2">
+                  {/* Only show filter toggle on desktop */}
                   {!isMobile && (
                     <Button
                       variant="outline"
