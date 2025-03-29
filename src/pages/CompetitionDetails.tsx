@@ -1,5 +1,6 @@
+
 import { useParams, Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Calendar, MapPin, Flag, Star, Users, Globe, ArrowUp } from "lucide-react";
 import { competitions } from "@/data/competitions";
 import { formatDate, formatDistance } from "@/lib/utils";
@@ -8,15 +9,81 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WaitlistDialog from "@/components/WaitlistDialog";
 import CompetitionResources from "@/components/CompetitionResources";
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
+// Fix for Leaflet marker icons
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+let DefaultIcon = L.icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+});
+
+L.Marker.prototype.options.icon = DefaultIcon;
 
 const CompetitionDetails = () => {
   const { id } = useParams<{ id: string }>();
   const competition = competitions.find(comp => comp.id === id);
   const [waitlistOpen, setWaitlistOpen] = useState(false);
+  const mapRef = useRef<HTMLDivElement>(null);
+  const leafletMap = useRef<L.Map | null>(null);
   
   const showWaitlist = () => {
     setWaitlistOpen(true);
   };
+
+  // Initialize map when component mounts or competition changes
+  useEffect(() => {
+    if (!competition || !mapRef.current) return;
+    
+    // Create map if it doesn't exist
+    if (!leafletMap.current) {
+      leafletMap.current = L.map(mapRef.current, {
+        center: [competition.coordinates.lat, competition.coordinates.lng],
+        zoom: 13,
+        zoomControl: false
+      });
+      
+      // Add tile layer
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(leafletMap.current);
+      
+      // Add zoom control to top-right
+      L.control.zoom({ position: 'topright' }).addTo(leafletMap.current);
+    } else {
+      // Update map center if it already exists
+      leafletMap.current.setView([competition.coordinates.lat, competition.coordinates.lng], 13);
+    }
+    
+    // Add marker for competition location
+    const marker = L.marker([competition.coordinates.lat, competition.coordinates.lng])
+      .addTo(leafletMap.current);
+    
+    // Create popup content
+    const popupContent = `
+      <div style="padding: 5px; max-width: 200px">
+        <h3 style="font-weight: bold; margin-bottom: 5px">${competition.name}</h3>
+        <p style="margin-bottom: 5px">${competition.date}</p>
+        <p style="margin-bottom: 5px">${competition.location}</p>
+      </div>
+    `;
+    
+    // Bind popup to marker
+    marker.bindPopup(popupContent);
+    
+    // Clean up when component unmounts
+    return () => {
+      if (leafletMap.current) {
+        leafletMap.current.remove();
+        leafletMap.current = null;
+      }
+    };
+  }, [competition]);
 
   if (!competition) {
     return (
@@ -149,16 +216,19 @@ const CompetitionDetails = () => {
             <div>
               <div className="bg-card rounded-lg border p-6 sticky top-20">
                 <h2 className="text-xl font-bold mb-4">Plats</h2>
-                <div className="aspect-square bg-muted rounded-lg mb-4 overflow-hidden">
-                  <div className="w-full h-full bg-orienteering-green/20 flex items-center justify-center">
-                    <MapPin className="h-8 w-8 text-orienteering-green" />
-                  </div>
-                </div>
+                <div 
+                  ref={mapRef}
+                  className="aspect-square bg-muted rounded-lg mb-4 overflow-hidden"
+                ></div>
                 <p className="font-medium">{competition.location}</p>
                 <p className="text-sm text-muted-foreground mb-4">
                   Koordinater: {competition.coordinates.lat.toFixed(6)}, {competition.coordinates.lng.toFixed(6)}
                 </p>
-                <Button variant="outline" className="w-full">
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => window.open(`https://www.openstreetmap.org/?mlat=${competition.coordinates.lat}&mlon=${competition.coordinates.lng}&zoom=15`, '_blank')}
+                >
                   <MapPin className="mr-2 h-4 w-4" />
                   Visa vägbeskrivning
                 </Button>
