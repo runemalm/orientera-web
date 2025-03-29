@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -188,6 +189,7 @@ const Search = () => {
     }
 
     setIsProcessing(true);
+    setSearchInputValue(query); // Update the search input value when processing a query
 
     try {
       const newFilters = processNaturalLanguageQuery(query);

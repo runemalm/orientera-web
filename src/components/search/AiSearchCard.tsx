@@ -92,7 +92,7 @@ const AiSearchCard = ({ onSearchComplete, initialQuery = "" }: AiSearchCardProps
   };
 
   const handleQuickSearch = (query: string) => {
-    setAiQuery(query);
+    setAiQuery(query); // Update the AI query input when a quick search is selected
     processQuery(query);
   };
 
