@@ -35,6 +35,10 @@ const SearchFiltersComponent = ({
   const { toast } = useToast();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   
+  // Ensure types and branches are always arrays
+  const typesArray = Array.isArray(filters.types) ? filters.types : [];
+  const branchesArray = Array.isArray(filters.branches) ? filters.branches : [];
+  
   useEffect(() => {
     const savedExpandedItems = localStorage.getItem(EXPANDED_FILTERS_KEY);
     if (savedExpandedItems) {
@@ -66,7 +70,7 @@ const SearchFiltersComponent = ({
 
   const handleTypeChange = (type: string, checked: boolean) => {
     // Ensure types array exists before modifying
-    const currentTypes = Array.isArray(filters.types) ? [...filters.types] : [];
+    const currentTypes = typesArray;
     let updatedTypes = [...currentTypes];
     
     if (checked) {
@@ -75,12 +79,13 @@ const SearchFiltersComponent = ({
       updatedTypes = updatedTypes.filter(t => t !== type);
     }
     
+    console.log("Type filter changed:", type, checked, updatedTypes);
     onFilterChange({ ...filters, types: updatedTypes });
   };
 
   const handleBranchChange = (branch: string, checked: boolean) => {
     // Ensure branches array exists before modifying
-    const currentBranches = Array.isArray(filters.branches) ? [...filters.branches] : [];
+    const currentBranches = branchesArray;
     let updatedBranches = [...currentBranches];
     
     if (checked) {
@@ -89,6 +94,7 @@ const SearchFiltersComponent = ({
       updatedBranches = updatedBranches.filter(b => b !== branch);
     }
     
+    console.log("Branch filter changed:", branch, checked, updatedBranches);
     onFilterChange({ ...filters, branches: updatedBranches });
   };
 
@@ -147,10 +153,6 @@ const SearchFiltersComponent = ({
       default: return 'Filter';
     }
   };
-
-  // Ensure types and branches arrays always exist
-  const typesArray = Array.isArray(filters.types) ? filters.types : [];
-  const branchesArray = Array.isArray(filters.branches) ? filters.branches : [];
 
   const hasActiveDateFilter = Boolean(filters.dateRange?.from || filters.dateRange?.to);
   const hasActiveFilters = filters.districts.length > 0 || 

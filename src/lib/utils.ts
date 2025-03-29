@@ -32,17 +32,21 @@ export const filterCompetitions = (
     const levelMatch =
       filters.levels.length === 0 || filters.levels.includes(competition.level);
 
-    // Type filter (fixed logic)
-    const typeMatch =
-      !filters.types || 
-      filters.types.length === 0 || 
-      (competition.type && filters.types.includes(competition.type));
+    // Type filter - fixed to correctly handle undefined types
+    const typeMatch = (() => {
+      if (!filters.types || filters.types.length === 0) return true;
+      // If competition.type is undefined but filters.types has items, it should not match
+      if (!competition.type) return false;
+      return filters.types.includes(competition.type);
+    })();
 
-    // Branch filter (fixed logic)
-    const branchMatch =
-      !filters.branches || 
-      filters.branches.length === 0 || 
-      (competition.branch && filters.branches.includes(competition.branch));
+    // Branch filter - fixed to correctly handle undefined branches
+    const branchMatch = (() => {
+      if (!filters.branches || filters.branches.length === 0) return true;
+      // If competition.branch is undefined but filters.branches has items, it should not match
+      if (!competition.branch) return false;
+      return filters.branches.includes(competition.branch);
+    })();
 
     // Date range filter
     const dateMatch = (() => {

@@ -47,8 +47,8 @@ const Search = () => {
       try {
         const parsedFilters = JSON.parse(savedFilters);
         
-        parsedFilters.types = parsedFilters.types || [];
-        parsedFilters.branches = parsedFilters.branches || [];
+        parsedFilters.types = Array.isArray(parsedFilters.types) ? parsedFilters.types : [];
+        parsedFilters.branches = Array.isArray(parsedFilters.branches) ? parsedFilters.branches : [];
         
         if (parsedFilters.dateRange) {
           if (parsedFilters.dateRange.from) {
@@ -136,8 +136,8 @@ const Search = () => {
   }, [filters]);
 
   const handleFilterChange = (newFilters: SearchFiltersType) => {
-    newFilters.types = newFilters.types || [];
-    newFilters.branches = newFilters.branches || [];
+    newFilters.types = Array.isArray(newFilters.types) ? newFilters.types : [];
+    newFilters.branches = Array.isArray(newFilters.branches) ? newFilters.branches : [];
     
     console.log("Filter changed:", newFilters);
     setFilters(newFilters);
@@ -187,8 +187,15 @@ const Search = () => {
                           filters.dateRange?.from !== undefined;
 
   const filteredCompetitions = useMemo(() => {
+    console.log("Filtering with:", { 
+      typesLength: typesArray.length, 
+      types: typesArray,
+      branchesLength: branchesArray.length,
+      branches: branchesArray
+    });
+    
     return filterCompetitions(competitions, filters);
-  }, [competitions, filters]);
+  }, [competitions, filters, typesArray, branchesArray]);
 
   return (
     <div className="flex min-h-screen flex-col">
