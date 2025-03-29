@@ -47,6 +47,9 @@ const Search = () => {
       try {
         const parsedFilters = JSON.parse(savedFilters);
         
+        parsedFilters.types = parsedFilters.types || [];
+        parsedFilters.branches = parsedFilters.branches || [];
+        
         if (parsedFilters.dateRange) {
           if (parsedFilters.dateRange.from) {
             parsedFilters.dateRange.from = new Date(parsedFilters.dateRange.from);
@@ -132,11 +135,10 @@ const Search = () => {
     }
   }, [filters]);
 
-  const filteredCompetitions = useMemo(() => {
-    return filterCompetitions(competitions, filters);
-  }, [competitions, filters]);
-
   const handleFilterChange = (newFilters: SearchFiltersType) => {
+    newFilters.types = newFilters.types || [];
+    newFilters.branches = newFilters.branches || [];
+    
     console.log("Filter changed:", newFilters);
     setFilters(newFilters);
   };
@@ -173,13 +175,20 @@ const Search = () => {
     }));
   };
 
+  const typesArray = Array.isArray(filters.types) ? filters.types : [];
+  const branchesArray = Array.isArray(filters.branches) ? filters.branches : [];
+  
   const hasActiveFilters = filters.regions.length > 0 || 
                           filters.districts.length > 0 || 
                           filters.disciplines.length > 0 || 
                           filters.levels.length > 0 || 
-                          filters.types?.length > 0 || 
-                          filters.branches?.length > 0 ||
+                          typesArray.length > 0 || 
+                          branchesArray.length > 0 ||
                           filters.dateRange?.from !== undefined;
+
+  const filteredCompetitions = useMemo(() => {
+    return filterCompetitions(competitions, filters);
+  }, [competitions, filters]);
 
   return (
     <div className="flex min-h-screen flex-col">

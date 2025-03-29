@@ -1,3 +1,4 @@
+
 import { FilterIcon, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -64,22 +65,30 @@ const SearchFiltersComponent = ({
   };
 
   const handleTypeChange = (type: string, checked: boolean) => {
-    let updatedTypes = [...(filters.types || [])];
+    // Ensure types array exists before modifying
+    const currentTypes = Array.isArray(filters.types) ? [...filters.types] : [];
+    let updatedTypes = [...currentTypes];
+    
     if (checked) {
       updatedTypes.push(type as CompetitionType);
     } else {
       updatedTypes = updatedTypes.filter(t => t !== type);
     }
+    
     onFilterChange({ ...filters, types: updatedTypes });
   };
 
   const handleBranchChange = (branch: string, checked: boolean) => {
-    let updatedBranches = [...(filters.branches || [])];
+    // Ensure branches array exists before modifying
+    const currentBranches = Array.isArray(filters.branches) ? [...filters.branches] : [];
+    let updatedBranches = [...currentBranches];
+    
     if (checked) {
       updatedBranches.push(branch as CompetitionBranch);
     } else {
       updatedBranches = updatedBranches.filter(b => b !== branch);
     }
+    
     onFilterChange({ ...filters, branches: updatedBranches });
   };
 
@@ -139,11 +148,15 @@ const SearchFiltersComponent = ({
     }
   };
 
+  // Ensure types and branches arrays always exist
+  const typesArray = Array.isArray(filters.types) ? filters.types : [];
+  const branchesArray = Array.isArray(filters.branches) ? filters.branches : [];
+
   const hasActiveDateFilter = Boolean(filters.dateRange?.from || filters.dateRange?.to);
   const hasActiveFilters = filters.districts.length > 0 || 
                            filters.disciplines.length > 0 || 
-                           filters.types?.length > 0 || 
-                           filters.branches?.length > 0 ||
+                           typesArray.length > 0 || 
+                           branchesArray.length > 0 ||
                            hasActiveDateFilter;
 
   return (
@@ -185,17 +198,17 @@ const SearchFiltersComponent = ({
                 </Button>
               </Badge>
             )}
-            {filters.types && filters.types.length > 0 && (
+            {typesArray.length > 0 && (
               <Badge variant="outline" className="flex items-center gap-1 px-1.5 py-1 h-6 bg-background">
-                <span className="text-xs">{filters.types.length} tävlingstyper</span>
+                <span className="text-xs">{typesArray.length} tävlingstyper</span>
                 <Button variant="ghost" size="sm" onClick={() => handleClearFilter('types')} className="h-4 w-4 p-0">
                   <X className="h-3 w-3" />
                 </Button>
               </Badge>
             )}
-            {filters.branches && filters.branches.length > 0 && (
+            {branchesArray.length > 0 && (
               <Badge variant="outline" className="flex items-center gap-1 px-1.5 py-1 h-6 bg-background">
-                <span className="text-xs">{filters.branches.length} grenar</span>
+                <span className="text-xs">{branchesArray.length} grenar</span>
                 <Button variant="ghost" size="sm" onClick={() => handleClearFilter('branches')} className="h-4 w-4 p-0">
                   <X className="h-3 w-3" />
                 </Button>
@@ -233,7 +246,7 @@ const SearchFiltersComponent = ({
           <CheckboxFilter
             title="Typ av tävling"
             items={competitionTypes.map(t => ({ id: t, name: t }))}
-            selectedItems={filters.types || []}
+            selectedItems={typesArray}
             onItemChange={handleTypeChange}
             accordionValue="type"
           />
@@ -257,7 +270,7 @@ const SearchFiltersComponent = ({
           <CheckboxFilter
             title="Orienteringsgren"
             items={competitionBranches.map(b => ({ id: b, name: b }))}
-            selectedItems={filters.branches || []}
+            selectedItems={branchesArray}
             onItemChange={handleBranchChange}
             accordionValue="branch"
           />

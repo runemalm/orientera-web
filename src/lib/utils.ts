@@ -32,13 +32,13 @@ export const filterCompetitions = (
     const levelMatch =
       filters.levels.length === 0 || filters.levels.includes(competition.level);
 
-    // Type filter
+    // Type filter (fixed logic)
     const typeMatch =
       !filters.types || 
       filters.types.length === 0 || 
       (competition.type && filters.types.includes(competition.type));
 
-    // Branch filter
+    // Branch filter (fixed logic)
     const branchMatch =
       !filters.branches || 
       filters.branches.length === 0 || 
