@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -297,7 +296,7 @@ const Search = () => {
                   </Button>
                 </form>
                 
-                {recentSearches.length > 0 ? (
+                {recentSearches.length > 0 && (
                   <div className="mt-4">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
@@ -329,28 +328,28 @@ const Search = () => {
                       ))}
                     </div>
                   </div>
-                ) : (
-                  <div className="mt-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <TrendingUp className="h-4 w-4 text-primary" />
-                      <h3 className="text-sm font-medium">Populära sökningar</h3>
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      {popularSearches.map((search, index) => (
-                        <Button
-                          key={index}
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => processQuery(search)}
-                          className="text-xs justify-start h-auto py-1.5 text-muted-foreground hover:text-foreground"
-                        >
-                          <SearchIcon className="h-3 w-3 mr-2" />
-                          {search}
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
                 )}
+                
+                <div className="mt-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <TrendingUp className="h-4 w-4 text-primary" />
+                    <h3 className="text-sm font-medium">Populära sökningar</h3>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    {popularSearches.map((search, index) => (
+                      <Button
+                        key={index}
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => processQuery(search)}
+                        className="text-xs justify-start h-auto py-1.5 text-muted-foreground hover:text-foreground"
+                      >
+                        <SearchIcon className="h-3 w-3 mr-2" />
+                        {search}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
               </div>
             </TabsContent>
             
