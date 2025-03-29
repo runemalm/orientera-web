@@ -111,8 +111,8 @@ const SearchFiltersComponent = ({
     onFilterChange(resetFilters);
     
     toast({
-      title: "Filter rensade",
-      description: "Alla filter har återställts"
+      title: "Filtren har återställts",
+      description: "Alla valda filter har rensats - nu visas alla tävlingar"
     });
   };
 
@@ -124,14 +124,14 @@ const SearchFiltersComponent = ({
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <FilterIcon className="h-4 w-4" />
-            <h3 className="font-medium">Filtrera</h3>
+            <h3 className="font-medium">Anpassa din sökning</h3>
           </div>
           <Button 
             variant="ghost" 
             size="sm"
             onClick={handleClearAllFilters}
           >
-            Rensa alla
+            Rensa filter
           </Button>
         </div>
 
@@ -163,7 +163,7 @@ const SearchFiltersComponent = ({
           />
 
           <CheckboxFilter
-            title="Typ"
+            title="Typ av tävling"
             items={competitionTypes.map(t => ({ id: t, name: t }))}
             selectedItems={filters.types || []}
             onItemChange={handleTypeChange}
@@ -179,7 +179,7 @@ const SearchFiltersComponent = ({
           />
 
           <CheckboxFilter
-            title="Gren"
+            title="Orienteringsgren"
             items={competitionBranches.map(b => ({ id: b, name: b }))}
             selectedItems={filters.branches || []}
             onItemChange={handleBranchChange}

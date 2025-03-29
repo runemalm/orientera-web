@@ -188,8 +188,7 @@ const Search = () => {
     });
     toast({
       title: "Sökningen rensad",
-      description: "Alla sökresultat visas nu",
-      duration: 2000,
+      description: "Alla tävlingar visas nu utan sökfilter"
     });
   };
 
@@ -197,9 +196,8 @@ const Search = () => {
     setRecentSearches([]);
     localStorage.removeItem(RECENT_AI_SEARCHES_KEY);
     toast({
-      title: "Historik rensad",
-      description: "Alla tidigare sökningar har tagits bort",
-      duration: 2000,
+      title: "Sökhistoriken rensad",
+      description: "Dina tidigare sökningar har tagits bort"
     });
   };
 
@@ -207,7 +205,7 @@ const Search = () => {
     if (!query.trim()) {
       toast({
         title: "Tomt sökfält",
-        description: "Vänligen beskriv vad du letar efter",
+        description: "Beskriv gärna vilken typ av tävling du letar efter",
         variant: "destructive",
       });
       return;
@@ -232,15 +230,14 @@ const Search = () => {
       });
       
       toast({
-        title: "Sökning bearbetad",
-        description: "Filtren har uppdaterats baserat på din sökning",
-        duration: 3000,
+        title: "Sökningen bearbetad",
+        description: "Din sökning har tolkats och resultaten visas nedan"
       });
     } catch (error) {
       console.error("Error processing query:", error);
       toast({
         title: "Något gick fel",
-        description: "Det gick inte att bearbeta din sökning",
+        description: "Vi kunde inte bearbeta din sökning just nu",
         variant: "destructive",
       });
     } finally {
@@ -262,32 +259,32 @@ const Search = () => {
       <Header />
       
       <main className="flex-1 container py-8">
-        <h1 className="text-3xl font-bold mb-6">Sök tävlingar</h1>
+        <h1 className="text-3xl font-bold mb-6">Hitta din nästa orienteringsutmaning</h1>
         
         <div className="max-w-3xl mx-auto">
           <Tabs value={activeTab} onValueChange={handleTabChange} className="mb-6">
             <TabsList className="grid w-full grid-cols-2 mb-4">
               <TabsTrigger value="ai">
                 <Sparkles className="mr-2 h-4 w-4" />
-                Sök med AI
+                Smarta sökningar
               </TabsTrigger>
               <TabsTrigger value="manual">
                 <Filter className="mr-2 h-4 w-4" />
-                Klassisk sök
+                Filtrera tävlingar
               </TabsTrigger>
             </TabsList>
             
             <TabsContent value="ai" className="space-y-4">
               <div className="rounded-lg border bg-card p-4">
                 <div className="mb-4 text-sm text-muted-foreground">
-                  <p className="mb-2">Beskriv den tävling du letar efter med dina egna ord, så hjälper vår AI dig att hitta rätt.</p>
-                  <p>Exempel: "Nationella tävlingar nära Stockholm i juni" eller "Sprint för ungdomar på klubbnivå"</p>
+                  <p className="mb-2">Beskriv tävlingen du söker med dina egna ord, så hjälper vår AI dig hitta den perfekta matchen.</p>
+                  <p>Testa att beskriva plats, disciplin, svårighetsgrad eller när du vill tävla!</p>
                 </div>
                 
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="relative">
                     <Input
-                      placeholder="Sök efter tävlingar med vanligt språk..."
+                      placeholder="Till exempel: "Sprinttävlingar i Skåne under våren"..."
                       value={searchInputValue}
                       onChange={(e) => handleSearchChange(e.target.value)}
                       className="pr-8 text-base"
@@ -312,12 +309,12 @@ const Search = () => {
                     {isProcessing ? (
                       <>
                         <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full mr-2"></div>
-                        Bearbetar sökning...
+                        Letar efter tävlingar...
                       </>
                     ) : (
                       <>
                         <Sparkles className="mr-2 h-4 w-4" />
-                        Sök
+                        Hitta tävlingar
                       </>
                     )}
                   </Button>
@@ -328,7 +325,7 @@ const Search = () => {
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4 text-muted-foreground" />
-                        <h3 className="text-sm font-medium">Senaste sökningar</h3>
+                        <h3 className="text-sm font-medium">Dina senaste sökningar</h3>
                       </div>
                       <Button
                         variant="ghost"
@@ -395,7 +392,8 @@ const Search = () => {
           <div className="bg-card rounded-lg border p-4 mb-6">
             <div className="flex justify-between items-center">
               <h2 className="font-semibold">
-                {filteredCompetitions.length} {filteredCompetitions.length === 1 ? 'tävling' : 'tävlingar'} hittades
+                {filteredCompetitions.length === 0 ? 'Inga tävlingar hittades' : 
+                 `${filteredCompetitions.length} ${filteredCompetitions.length === 1 ? 'tävling' : 'tävlingar'} matchar dina kriterier`}
               </h2>
               
               {activeTab === "manual" && (
@@ -437,10 +435,21 @@ const Search = () => {
             </>
           ) : (
             <div className="bg-card rounded-lg border p-8 text-center">
-              <h3 className="text-lg font-medium mb-2">Inga tävlingar hittades</h3>
+              <h3 className="text-lg font-medium mb-2">Inga matchande tävlingar</h3>
               <p className="text-muted-foreground mb-4">
-                Det finns inga tävlingar som matchar dina filter. Prova att ändra dina sökkriterier.
+                Vi hittade inga tävlingar som matchar dina kriterier. Prova att:
               </p>
+              <ul className="text-left text-sm text-muted-foreground ml-6 mb-4 list-disc space-y-1">
+                <li>Ändra ditt datumintervall</li>
+                <li>Ta bort några filter</li>
+                <li>Bredda din sökning med färre söktermer</li>
+              </ul>
+              <Button
+                variant="outline"
+                onClick={handleClearAllFilters}
+              >
+                Rensa alla filter
+              </Button>
             </div>
           )}
         </div>
