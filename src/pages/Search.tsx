@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -9,7 +10,7 @@ import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
 import { useGeolocation } from "@/hooks/useGeolocation";
-import { Search as SearchIcon, X, Grid, Calendar as CalendarIcon, List, MenuSquare, Map as MapIcon } from "lucide-react";
+import { Search as SearchIcon, X, Grid, Calendar as CalendarIcon, List, MenuSquare, Map as MapIcon, Sparkles, SlidersHorizontal } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Command } from "@/components/ui/command";
@@ -21,6 +22,7 @@ import CompetitionCompactView from "@/components/CompetitionCompactView";
 import CompetitionListView from "@/components/CompetitionListView";
 import CompetitionMapView from "@/components/CompetitionMapView";
 import { isBefore, isAfter, isEqual, parseISO } from "date-fns";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const Search = () => {
   const location = useLocation();
@@ -53,6 +55,7 @@ const Search = () => {
   
   const [locationChangeCounter, setLocationChangeCounter] = useState(0);
   const [viewMode, setViewMode] = useState<"grid" | "list" | "compact" | "calendar" | "map">("grid");
+  const [searchMode, setSearchMode] = useState<"manual" | "ai">("manual");
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -75,6 +78,7 @@ const Search = () => {
     }
     
     const searchQuery = searchParams.get('q') || "";
+    const aiMode = searchParams.get('mode') === 'ai';
     
     if (disciplines.length > 0 || levels.length > 0 || dateRange || searchQuery) {
       setFilters(prevFilters => ({
@@ -87,11 +91,14 @@ const Search = () => {
       
       setSearchInputValue(searchQuery);
       
-      toast({
-        title: "Sökning från AI",
-        description: "Filtren har applicerats baserat på din AI-sökning",
-        duration: 3000,
-      });
+      if (aiMode) {
+        setSearchMode("ai");
+        toast({
+          title: "Sökning från AI",
+          description: "Filtren har applicerats baserat på din AI-sökning",
+          duration: 3000,
+        });
+      }
     }
   }, [location.search, toast]);
 
@@ -229,10 +236,28 @@ const Search = () => {
       <main className="flex-1 container py-8">
         <h1 className="text-3xl font-bold mb-6">Sök tävlingar</h1>
         
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-4">Sök med AI</h2>
-          <AiSearch className="w-full" />
-        </div>
+        <Tabs value={searchMode} onValueChange={(value) => setSearchMode(value as "manual" | "ai")} className="w-full mb-8">
+          <TabsList className="grid w-full max-w-md grid-cols-2 mb-4">
+            <TabsTrigger value="manual" className="flex items-center gap-2">
+              <SlidersHorizontal className="h-4 w-4" />
+              Vanlig sökning
+            </TabsTrigger>
+            <TabsTrigger value="ai" className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4" />
+              Sök med AI
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="manual" className="mt-0">
+            {/* Vanlig sökning - inget här behövs direkt */}
+          </TabsContent>
+          
+          <TabsContent value="ai" className="mt-0">
+            <div className="mb-6">
+              <AiSearch className="w-full" />
+            </div>
+          </TabsContent>
+        </Tabs>
         
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="md:col-span-1">
