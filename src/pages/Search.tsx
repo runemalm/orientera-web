@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -7,7 +6,7 @@ import SearchFilters from "@/components/SearchFilters";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
-import { X, Sparkles, Clock, Search as SearchIcon, ArrowRight } from "lucide-react";
+import { X, Sparkles, Clock, Search as SearchIcon, ArrowRight, SlidersHorizontal } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -33,7 +32,7 @@ const Search = () => {
   });
 
   const [searchInputValue, setSearchInputValue] = useState("");
-  const [showFilters, setShowFilters] = useState(true);
+  const [showFilters, setShowFilters] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [recentSearches, setRecentSearches] = useState<string[]>(() => {
     const saved = localStorage.getItem('recentAiSearches');
@@ -143,7 +142,6 @@ const Search = () => {
     
     if (newFilters.searchQuery === "" && filters.searchQuery !== "") {
       setSearchInputValue("");
-      setShowFilters(true);
     }
   };
 
@@ -151,7 +149,6 @@ const Search = () => {
     setSearchInputValue(value);
     
     if (value === "") {
-      setShowFilters(true);
       setFilters({
         ...filters,
         searchQuery: ""
@@ -165,7 +162,6 @@ const Search = () => {
       ...filters,
       searchQuery: ""
     });
-    setShowFilters(true);
     toast({
       title: "Sökningen rensad",
       description: "Alla sökresultat visas nu",
@@ -224,8 +220,8 @@ const Search = () => {
     processQuery(searchInputValue);
   };
 
-  const handleShowFilters = () => {
-    setShowFilters(true);
+  const handleToggleFilters = () => {
+    setShowFilters(!showFilters);
   };
 
   return (
@@ -300,19 +296,17 @@ const Search = () => {
             )}
           </div>
           
-          {filters.searchQuery && !showFilters && (
-            <div className="mb-4">
-              <Button
-                variant="outline" 
-                size="sm" 
-                onClick={handleShowFilters}
-                className="text-xs"
-              >
-                Visa filter
-                <ArrowRight className="ml-1 h-3 w-3" />
-              </Button>
-            </div>
-          )}
+          <div className="mb-4">
+            <Button
+              variant="outline" 
+              size="sm" 
+              onClick={handleToggleFilters}
+              className="text-xs"
+            >
+              <SlidersHorizontal className="mr-1 h-3 w-3" />
+              {showFilters ? "Dölj manuella filter" : "Visa manuella filter"}
+            </Button>
+          </div>
           
           {showFilters && (
             <div className="mb-4">
