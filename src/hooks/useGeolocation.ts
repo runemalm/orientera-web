@@ -194,6 +194,14 @@ export const useGeolocation = (autoDetect = true) => {
 
   const setManualLocation = async (cityName: string) => {
 
+    setState({
+      coords: undefined,
+      detectedLocationInfo: undefined,
+      loading: true,
+      error: null
+    });
+    setIsManualLocation(true);
+
     try {
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cityName)}, Sweden&countrycodes=se&limit=1`
