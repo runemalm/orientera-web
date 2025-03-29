@@ -94,7 +94,7 @@ const SearchFiltersComponent = ({
   };
 
   // Determine if any date filters are active
-  const hasActiveDateFilter = filters.dateRange?.from || filters.dateRange?.to;
+  const hasActiveDateFilter = Boolean(filters.dateRange?.from || filters.dateRange?.to);
 
   return (
     <div className="rounded-lg border bg-card">
