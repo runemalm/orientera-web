@@ -296,21 +296,6 @@ const Search = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
-  const getContainerClassName = () => {
-    if (resultsView === "map" || resultsView === "calendar") {
-      return "w-full max-w-full";
-    }
-    
-    switch (breakpoint) {
-      case "desktop":
-        return "max-w-6xl mx-auto";
-      case "tablet":
-        return "max-w-4xl mx-auto";
-      default:
-        return "w-full";
-    }
-  };
-
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
@@ -318,7 +303,7 @@ const Search = () => {
       <main className="flex-1 container py-8">
         <h1 className="text-3xl font-bold mb-6">Hitta din nästa orienteringsutmaning</h1>
         
-        <div className={cn("flex flex-col md:flex-row gap-6", getContainerClassName())}>
+        <div className="flex flex-col md:flex-row gap-6 w-full max-w-full">
           {isMobile && (
             <Button
               variant="outline"
