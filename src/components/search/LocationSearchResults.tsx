@@ -35,7 +35,7 @@ const LocationSearchResults = ({
 
   return (
     <>
-      <CommandEmpty>Inga träffar i Sverige</CommandEmpty>
+      {results.length === 0 && <CommandEmpty>Inga träffar i Sverige</CommandEmpty>}
       {results.length > 0 && (
         <CommandGroup heading="Sökresultat">
           {results.map((city, index) => (

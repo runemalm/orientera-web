@@ -49,6 +49,7 @@ const LocationDialog = ({ open, onOpenChange, onCitySelect }: LocationDialogProp
     if (open) {
       setLocationHistory(getLocationHistory());
       setCitySearchValue("");
+      setCitySuggestions([]);
       setHasSearched(false);
     }
   }, [open]);
@@ -105,70 +106,68 @@ const LocationDialog = ({ open, onOpenChange, onCitySelect }: LocationDialogProp
   };
 
   return (
-    <>
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogTrigger asChild>
-          <Button variant="outline" size="sm" className="w-full">
-            <MapPinOff className="h-3.5 w-3.5 mr-1" />
-            <span className="truncate">Ange ort</span>
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Ange stad eller ort i Sverige</DialogTitle>
-            <DialogDescription className="text-sm text-muted-foreground">
-              Sök efter en plats för att visa tävlingar i närheten
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 pt-2">
-            <div className="space-y-2">
-              <Label htmlFor="city-search">Stad eller ort</Label>
-              <Command className="rounded-lg border shadow-md">
-                <CommandInput 
-                  id="city-search-input"
-                  placeholder="Sök efter stad eller ort..." 
-                  value={citySearchValue}
-                  onValueChange={setCitySearchValue}
-                  className="border-0"
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="sm" className="w-full">
+          <MapPinOff className="h-3.5 w-3.5 mr-1" />
+          <span className="truncate">Ange ort</span>
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Ange stad eller ort i Sverige</DialogTitle>
+          <DialogDescription className="text-sm text-muted-foreground">
+            Sök efter en plats för att visa tävlingar i närheten
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4 pt-2">
+          <div className="space-y-2">
+            <Label htmlFor="city-search">Stad eller ort</Label>
+            <Command className="rounded-lg border shadow-md">
+              <CommandInput 
+                id="city-search"
+                placeholder="Sök efter stad eller ort..." 
+                value={citySearchValue}
+                onValueChange={setCitySearchValue}
+                className="border-0"
+              />
+              <CommandList className="max-h-[250px] h-full overflow-auto">
+                <LocationHistoryList 
+                  locations={locationHistory}
+                  onSelectLocation={handleSelectCity}
+                  onRemoveLocation={handleRemoveFromHistory}
+                  onClearHistory={handleClearHistory}
                 />
-                <CommandList className="max-h-[250px] h-full overflow-auto">
-                  <LocationHistoryList 
-                    locations={locationHistory}
-                    onSelectLocation={handleSelectCity}
-                    onRemoveLocation={handleRemoveFromHistory}
-                    onClearHistory={handleClearHistory}
-                  />
-                  
-                  <LocationSearchResults 
-                    hasSearched={hasSearched}
-                    searchValue={citySearchValue}
-                    isLoading={isLoadingSuggestions}
-                    results={citySuggestions}
-                    onSelectLocation={handleSelectCity}
-                  />
-                </CommandList>
-              </Command>
-            </div>
-            <div className="flex justify-end gap-2 mt-4">
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={() => onOpenChange(false)}
-              >
-                Avbryt
-              </Button>
-              <Button 
-                type="button"
-                disabled={citySearchValue.length < 2}
-                onClick={() => handleSelectCity(citySearchValue)}
-              >
-                Använd position
-              </Button>
-            </div>
+                
+                <LocationSearchResults 
+                  hasSearched={hasSearched}
+                  searchValue={citySearchValue}
+                  isLoading={isLoadingSuggestions}
+                  results={citySuggestions}
+                  onSelectLocation={handleSelectCity}
+                />
+              </CommandList>
+            </Command>
           </div>
-        </DialogContent>
-      </Dialog>
-    </>
+          <div className="flex justify-end gap-2 mt-4">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={() => onOpenChange(false)}
+            >
+              Avbryt
+            </Button>
+            <Button 
+              type="button"
+              disabled={citySearchValue.length < 2}
+              onClick={() => handleSelectCity(citySearchValue)}
+            >
+              Använd position
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 
