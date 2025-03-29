@@ -1,9 +1,7 @@
-
 import { useState, useEffect } from "react";
 import { sv } from "date-fns/locale";
 import { format } from "date-fns";
 import { CalendarRange, X } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -28,7 +26,6 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange, hasActiveFilter = false
   const [fromDateOpen, setFromDateOpen] = useState(false);
   const [toDateOpen, setToDateOpen] = useState(false);
   
-  // Sync local state with props
   useEffect(() => {
     setFromDate(dateRange?.from);
     setToDate(dateRange?.to);
@@ -66,7 +63,6 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange, hasActiveFilter = false
     setToDateOpen(false);
   };
 
-  // Count active date filters
   const activeFilterCount = (dateRange?.from ? 1 : 0) + (dateRange?.to ? 1 : 0);
 
   return (
@@ -75,21 +71,11 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange, hasActiveFilter = false
         <div className="flex items-center gap-2">
           <CalendarRange className="h-4 w-4" />
           <span>Datum</span>
-          {activeFilterCount > 0 ? (
-            <Badge variant="secondary" className="ml-1 font-normal">
-              {activeFilterCount}
-            </Badge>
-          ) : (
-            <Badge variant="outline" className="ml-1 font-normal text-xs">
-              Alla datum
-            </Badge>
-          )}
         </div>
       </AccordionTrigger>
       <AccordionContent>
         <div className="pt-2 space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            {/* From date selector */}
             <div className="space-y-2">
               <Label htmlFor="from-date">Från</Label>
               <Popover open={fromDateOpen} onOpenChange={setFromDateOpen}>
@@ -118,7 +104,6 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange, hasActiveFilter = false
               </Popover>
             </div>
 
-            {/* To date selector */}
             <div className="space-y-2">
               <Label htmlFor="to-date">Till</Label>
               <Popover open={toDateOpen} onOpenChange={setToDateOpen}>
