@@ -25,7 +25,7 @@ interface CompetitionMapViewProps {
   competitions: Competition[];
 }
 
-// Create custom markers for competitions
+// Create custom markers for competitions with an orienteering flag design
 const createCustomMarkerIcon = (competition: Competition) => {
   const color = competition.featured ? '#f97316' : '#3b82f6';
   
@@ -34,17 +34,65 @@ const createCustomMarkerIcon = (competition: Competition) => {
       <div style="
         width: 30px; 
         height: 30px; 
-        border-radius: 50%; 
-        background-color: ${color}; 
-        border: 2px solid white;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: white;
-        font-weight: bold;
+        position: relative;
         cursor: pointer;
       ">
-        ${String(competition.id).slice(0, 1)}
+        <div style="
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 30px;
+          height: 30px;
+          border-radius: 3px;
+          overflow: hidden;
+        ">
+          <!-- Orienteering flag - white and orange squares -->
+          <div style="
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 15px;
+            height: 15px;
+            background-color: white;
+          "></div>
+          <div style="
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 15px;
+            height: 15px;
+            background-color: #f97316;
+          "></div>
+          <div style="
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 15px;
+            height: 15px;
+            background-color: white;
+          "></div>
+          <div style="
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 15px;
+            height: 15px;
+            background-color: #f97316;
+          "></div>
+          <!-- Circle behind the flag for featured competitions -->
+          ${competition.featured ? `
+            <div style="
+              position: absolute;
+              width: 36px;
+              height: 36px;
+              border-radius: 50%;
+              background-color: rgba(249, 115, 22, 0.3);
+              top: -3px;
+              left: -3px;
+              z-index: -1;
+            "></div>
+          ` : ''}
+        </div>
       </div>
     `,
     className: 'competition-marker',
