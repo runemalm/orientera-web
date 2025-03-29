@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from 'react';
 import { Competition } from '@/types';
 import { toast } from 'sonner';
@@ -25,9 +24,10 @@ interface CompetitionMapViewProps {
   competitions: Competition[];
 }
 
-// Create custom markers for competitions with an orienteering flag design
+// Create custom markers for competitions with a traditional orienteering control flag design
 const createCustomMarkerIcon = (competition: Competition) => {
-  const color = competition.featured ? '#f97316' : '#3b82f6';
+  // Using the orienteering orange from the color palette
+  const orangeColor = '#f97316';
   
   return L.divIcon({
     html: `
@@ -43,41 +43,29 @@ const createCustomMarkerIcon = (competition: Competition) => {
           left: 0;
           width: 30px;
           height: 30px;
-          border-radius: 3px;
+          border-radius: 2px;
           overflow: hidden;
+          transform: rotate(0deg);
+          border: 1px solid rgba(0, 0, 0, 0.2);
         ">
-          <!-- Orienteering flag - white and orange squares -->
+          <!-- Traditional orienteering control flag with diagonal split -->
           <div style="
             position: absolute;
             top: 0;
             left: 0;
-            width: 15px;
-            height: 15px;
+            width: 100%;
+            height: 100%;
             background-color: white;
           "></div>
           <div style="
             position: absolute;
             top: 0;
             right: 0;
-            width: 15px;
-            height: 15px;
-            background-color: #f97316;
-          "></div>
-          <div style="
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            width: 15px;
-            height: 15px;
-            background-color: white;
-          "></div>
-          <div style="
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 15px;
-            height: 15px;
-            background-color: #f97316;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 30px 30px 0 0;
+            border-color: ${orangeColor} transparent transparent transparent;
           "></div>
           <!-- Circle behind the flag for featured competitions -->
           ${competition.featured ? `
