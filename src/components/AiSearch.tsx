@@ -1,77 +1,11 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { SearchFilters } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-
-// Simple NLP processing to extract key terms from natural language queries
-const processNaturalLanguageQuery = (query: string): SearchFilters => {
-  query = query.toLowerCase();
-  const filters: SearchFilters = {
-    regions: [],
-    districts: [],
-    disciplines: [],
-    levels: [],
-    searchQuery: "",
-  };
-
-  // Extract disciplines
-  const disciplines = ['sprint', 'medel', 'lång', 'natt', 'stafett', 'ultralång'];
-  disciplines.forEach(discipline => {
-    if (query.includes(discipline)) {
-      // Convert to proper case for first letter
-      const formattedDiscipline = discipline.charAt(0).toUpperCase() + discipline.slice(1);
-      filters.disciplines.push(formattedDiscipline as any);
-    }
-  });
-
-  // Extract competition levels
-  const levels = ['klubb', 'krets', 'distrikt', 'nationell', 'internationell'];
-  levels.forEach(level => {
-    if (query.includes(level)) {
-      // Convert to proper case for first letter
-      const formattedLevel = level.charAt(0).toUpperCase() + level.slice(1);
-      filters.levels.push(formattedLevel as any);
-    }
-  });
-
-  // Extract dates - basic date extraction
-  if (query.includes('30 dagar') || query.includes('nästa månad')) {
-    const now = new Date();
-    const thirtyDaysLater = new Date();
-    thirtyDaysLater.setDate(now.getDate() + 30);
-    
-    filters.dateRange = {
-      from: now,
-      to: thirtyDaysLater
-    };
-  } else if (query.includes('denna vecka') || query.includes('den här veckan')) {
-    const now = new Date();
-    const endOfWeek = new Date();
-    const day = endOfWeek.getDay();
-    const diff = 7 - day;
-    endOfWeek.setDate(endOfWeek.getDate() + diff);
-    
-    filters.dateRange = {
-      from: now,
-      to: endOfWeek
-    };
-  }
-
-  // Extract text for general search
-  // Remove the detected filters to leave the search terms
-  const searchTerms = query
-    .replace(/sprint|medel|lång|natt|stafett|ultralång/g, '')
-    .replace(/klubb|krets|distrikt|nationell|internationell/g, '')
-    .replace(/30 dagar|nästa månad|denna vecka|den här veckan/g, '')
-    .trim();
-
-  filters.searchQuery = searchTerms;
-
-  return filters;
-};
+import { processNaturalLanguageQuery } from "@/utils/aiQueryProcessor";
 
 interface AiSearchProps {
   className?: string;
@@ -127,6 +61,9 @@ const AiSearch: React.FC<AiSearchProps> = ({ className }) => {
       if (filters.searchQuery) {
         searchParams.append('q', filters.searchQuery);
       }
+      
+      // Add mode parameter to indicate AI search
+      searchParams.append('mode', 'ai');
 
       // Navigate to search page with the extracted filters
       navigate(`/search?${searchParams.toString()}`);
@@ -201,3 +138,4 @@ const AiSearch: React.FC<AiSearchProps> = ({ className }) => {
 };
 
 export default AiSearch;
+export { processNaturalLanguageQuery };

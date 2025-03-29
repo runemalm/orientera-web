@@ -8,13 +8,15 @@ import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
 import { useGeolocation } from "@/hooks/useGeolocation";
-import { Search as SearchIcon, X } from "lucide-react";
+import { Search as SearchIcon, X, Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { getDistance } from "@/lib/utils";
 import CompetitionCompactView from "@/components/CompetitionCompactView";
 import { isBefore, isAfter, isEqual, parseISO } from "date-fns";
+import { processNaturalLanguageQuery } from "@/components/AiSearch";
 
 const Search = () => {
   const location = useLocation();
@@ -41,11 +43,14 @@ const Search = () => {
     detectedLocationInfo: undefined
   });
 
+  const [aiQuery, setAiQuery] = useState("");
+  const [isAiProcessing, setIsAiProcessing] = useState(false);
   const [searchInputValue, setSearchInputValue] = useState("");
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   
   const [locationChangeCounter, setLocationChangeCounter] = useState(0);
+  const [showAiAssistant, setShowAiAssistant] = useState(false);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -218,15 +223,134 @@ const Search = () => {
     e.preventDefault();
   };
 
+  const toggleAiAssistant = () => {
+    setShowAiAssistant(prev => !prev);
+    if (!showAiAssistant) {
+      setAiQuery("");
+    }
+  };
+
+  const handleAiQuerySubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!aiQuery.trim()) {
+      toast({
+        title: "Tomt sökfält",
+        description: "Vänligen beskriv vad du letar efter",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsAiProcessing(true);
+
+    try {
+      // Process the natural language query
+      const newFilters = processNaturalLanguageQuery(aiQuery);
+      
+      // Merge with existing filters to preserve location settings
+      setFilters(prevFilters => ({
+        ...prevFilters,
+        disciplines: newFilters.disciplines,
+        levels: newFilters.levels,
+        dateRange: newFilters.dateRange,
+        searchQuery: newFilters.searchQuery
+      }));
+      
+      setSearchInputValue(newFilters.searchQuery || "");
+      
+      toast({
+        title: "AI-sökning bearbetad",
+        description: "Filtren har uppdaterats baserat på din sökning",
+        duration: 3000,
+      });
+      
+      // Hide AI assistant after successful query
+      setShowAiAssistant(false);
+    } catch (error) {
+      console.error("Error processing AI query:", error);
+      toast({
+        title: "Något gick fel",
+        description: "Det gick inte att bearbeta din sökning",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAiProcessing(false);
+    }
+  };
+
+  const renderAiAssistant = () => {
+    if (!showAiAssistant) return null;
+    
+    return (
+      <div className="bg-card rounded-lg border p-4 mb-4">
+        <form onSubmit={handleAiQuerySubmit} className="space-y-4">
+          <div className="relative">
+            <Textarea
+              placeholder="Beskriv den tävling du letar efter, t.ex. 'Nationella tävlingar i Skåne nästa månad'"
+              value={aiQuery}
+              onChange={(e) => setAiQuery(e.target.value)}
+              className="min-h-[100px] text-base resize-none p-4 pr-12"
+            />
+            <Sparkles className="absolute right-4 top-4 h-5 w-5 text-muted-foreground" />
+          </div>
+          
+          <div className="flex justify-end gap-2">
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={toggleAiAssistant}
+            >
+              Avbryt
+            </Button>
+            <Button 
+              type="submit" 
+              disabled={isAiProcessing}
+            >
+              {isAiProcessing ? "Bearbetar sökning..." : "Sök med AI"}
+            </Button>
+          </div>
+        </form>
+      </div>
+    );
+  };
+
+  const filteredCompetitions = useMemo(() => {
+    let filtered = filterCompetitions(competitionsWithDistance, {
+      ...filters,
+      userLocation,
+    });
+
+    if (filters.dateRange?.from) {
+      filtered = filtered.filter(competition => {
+        const competitionDate = parseISO(competition.date);
+        
+        if (filters.dateRange?.from && isBefore(competitionDate, filters.dateRange.from) && 
+            !isEqual(competitionDate, filters.dateRange.from)) {
+          return false;
+        }
+        
+        if (filters.dateRange?.to && isAfter(competitionDate, filters.dateRange.to) && 
+            !isEqual(competitionDate, filters.dateRange.to)) {
+          return false;
+        }
+        
+        return true;
+      });
+    }
+    
+    return filtered;
+  }, [competitionsWithDistance, filters, userLocation]);
+
   const renderSearchResults = () => (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
       <div className="md:col-span-1">
         <div className="rounded-lg border bg-card mb-4">
           <div className="p-4" ref={searchContainerRef}>
-            <form onSubmit={handleManualSearch} className="flex gap-2">
+            <div className="flex gap-2">
               <div className="relative flex-1">
                 <Input
-                  placeholder="Sök efter tävlingsnamn eller plats..."
+                  placeholder="Sök efter namn eller plats..."
                   value={searchInputValue}
                   onChange={(e) => handleSearchChange(e.target.value)}
                   className="w-full pr-8"
@@ -242,12 +366,20 @@ const Search = () => {
                   </button>
                 )}
               </div>
-              <Button type="submit" size="icon">
-                <SearchIcon className="h-4 w-4" />
+              <Button 
+                type="button" 
+                onClick={toggleAiAssistant}
+                variant={showAiAssistant ? "default" : "outline"}
+                className="flex-shrink-0"
+              >
+                <Sparkles className="h-4 w-4" />
+                <span className="sr-only md:not-sr-only md:ml-2">AI-hjälp</span>
               </Button>
-            </form>
+            </div>
           </div>
         </div>
+        
+        {renderAiAssistant()}
         
         <SearchFilters 
           filters={filters} 
