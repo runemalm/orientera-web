@@ -25,11 +25,10 @@ const PRESET_OPTIONS = [
   { id: 'today', label: 'Idag' },
   { id: 'tomorrow', label: 'Imorgon' },
   { id: 'thisWeekend', label: 'Helgen' },
-  { id: 'next7days', label: '7 dagar' },
-  { id: 'next14days', label: '14 dagar' },
-  { id: 'next30days', label: '30 dagar' },
-  { id: 'thisMonth', label: 'Denna mån' },
-  { id: 'nextMonth', label: 'Nästa mån' },
+  { id: 'next7days', label: 'Kommande 7 dagar' },
+  { id: 'next30days', label: 'Kommande 30 dagar' },
+  { id: 'thisMonth', label: 'Denna månad' },
+  { id: 'nextMonth', label: 'Nästa månad' },
 ];
 
 const DateRangeFilter = ({ 
@@ -195,11 +194,6 @@ const DateRangeFilter = ({
         to = addDays(today, 6);
         break;
         
-      case 'next14days':
-        from = new Date(today);
-        to = addDays(today, 13);
-        break;
-        
       case 'next30days':
         from = new Date(today);
         to = addDays(today, 29);
@@ -224,8 +218,41 @@ const DateRangeFilter = ({
   return (
     <div className="space-y-4">
       <div className="space-y-3">
+        {/* First row: Idag, Imorgon, Helgen */}
         <div className="grid grid-cols-3 gap-1.5">
-          {PRESET_OPTIONS.map(option => (
+          {PRESET_OPTIONS.slice(0, 3).map(option => (
+            <Button
+              key={option.id}
+              type="button"
+              variant={selectedPreset === option.id ? "default" : "outline"}
+              size="sm"
+              className="text-xs h-7 w-full px-2 truncate"
+              onClick={() => handlePresetChange(option.id)}
+            >
+              {option.label}
+            </Button>
+          ))}
+        </div>
+        
+        {/* Second row: Kommande 7 dagar, Kommande 30 dagar */}
+        <div className="grid grid-cols-2 gap-1.5">
+          {PRESET_OPTIONS.slice(3, 5).map(option => (
+            <Button
+              key={option.id}
+              type="button"
+              variant={selectedPreset === option.id ? "default" : "outline"}
+              size="sm"
+              className="text-xs h-7 w-full px-2 truncate"
+              onClick={() => handlePresetChange(option.id)}
+            >
+              {option.label}
+            </Button>
+          ))}
+        </div>
+        
+        {/* Third row: Denna månad, Nästa månad */}
+        <div className="grid grid-cols-2 gap-1.5">
+          {PRESET_OPTIONS.slice(5, 7).map(option => (
             <Button
               key={option.id}
               type="button"
