@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -19,6 +18,7 @@ import { cn } from "@/lib/utils";
 
 const SEARCH_RESULTS_VIEW_KEY = "search-results-view";
 const SEARCH_SIDEBAR_OPEN_KEY = "search-sidebar-open";
+const SEARCH_FILTERS_KEY = "search-filters";
 
 const Search = () => {
   const location = useLocation();
@@ -38,6 +38,28 @@ const Search = () => {
   });
 
   const [resultsView, setResultsView] = useState<"calendar" | "map">("calendar");
+
+  useEffect(() => {
+    const savedFilters = localStorage.getItem(SEARCH_FILTERS_KEY);
+    if (savedFilters) {
+      try {
+        const parsedFilters = JSON.parse(savedFilters);
+        
+        if (parsedFilters.dateRange) {
+          if (parsedFilters.dateRange.from) {
+            parsedFilters.dateRange.from = new Date(parsedFilters.dateRange.from);
+          }
+          if (parsedFilters.dateRange.to) {
+            parsedFilters.dateRange.to = new Date(parsedFilters.dateRange.to);
+          }
+        }
+        
+        setFilters(parsedFilters);
+      } catch (error) {
+        console.error("Failed to parse saved filters", error);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const savedView = localStorage.getItem(SEARCH_RESULTS_VIEW_KEY) as "calendar" | "map" | null;

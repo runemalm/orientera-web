@@ -11,7 +11,7 @@ export type District = {
 
 export type Discipline = 'Sprint' | 'Medel' | 'Lång' | 'Natt' | 'Stafett' | 'Ultralång';
 
-export type CompetitionLevel = 'Klubb' | 'Krets' | 'Distrikt' | 'Nationell' | 'Internationell';
+export type CompetitionLevel = 'Klubb' | 'Krets' | 'Distrikt' | 'Nationell' | 'Internationell' | 'Närtävling';
 
 export type CompetitionType = 'Värdetävlingar' | 'Nationella tävlingar' | 'Distriktstävlingar' | 'Närtävlingar' | 'Veckans bana';
 export type CompetitionBranch = 'Orienteringslöpning' | 'Skidorientering' | 'Mountainbikeorientering' | 'Precisionsorientering' | 'Orienteringsskytte';
