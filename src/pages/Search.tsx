@@ -235,7 +235,7 @@ const Search = () => {
               </TabsTrigger>
               <TabsTrigger value="manual">
                 <Filter className="mr-2 h-4 w-4" />
-                Manuellt filter
+                Filtrera
               </TabsTrigger>
             </TabsList>
             
