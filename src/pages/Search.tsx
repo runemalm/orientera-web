@@ -79,8 +79,11 @@ const Search = () => {
   }, [userLocation, locationChangeCounter]);
 
   const filteredCompetitions = useMemo(() => {
-    return filterCompetitions(competitionsWithDistance, filters);
-  }, [competitionsWithDistance, filters]);
+    return filterCompetitions(competitionsWithDistance, {
+      ...filters,
+      userLocation,
+    });
+  }, [competitionsWithDistance, filters, userLocation]);
 
   const handleFilterChange = (newFilters: SearchFiltersType) => {
     if (newFilters.isManualLocation !== filters.isManualLocation) {
