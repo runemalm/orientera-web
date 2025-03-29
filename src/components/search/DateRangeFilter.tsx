@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { sv } from "date-fns/locale";
 import { format } from "date-fns";
@@ -9,7 +8,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 
 type DateRangeValue = {
   from?: Date;
@@ -149,7 +147,6 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange, hasActiveFilter = false
           )}
         </div>
       </AccordionContent>
-      <Separator className="mt-2" />
     </AccordionItem>
   );
 };
