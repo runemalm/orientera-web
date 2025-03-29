@@ -768,4 +768,115 @@ const smalandVeteranCompetitions: Competition[] = [
     organizer: 'Nybro OK',
     region: 'kalmar',
     district: 'smaland',
-    location: 'Svartbäck
+    location: 'Svartbäcksmåla, Nybro',
+    coordinates: {
+      lat: 56.7450,
+      lng: 15.9157
+    },
+    discipline: 'Medel',
+    level: 'Närtävling',
+    registrationDeadline: '2025-03-17',
+    description: 'Veteran-OL i Nybroskogarna. Teknisk orientering med kontroller i detaljrika områden.'
+  }
+];
+
+// More Småland competitions throughout the year
+const additionalSmalandCompetitions: Competition[] = [
+  {
+    id: '38',
+    name: 'Veteran-OL Orion',
+    date: '2025-04-02',
+    organizer: 'OK Orion',
+    region: 'kronoberg',
+    district: 'smaland',
+    location: 'Teleborg, Växjö',
+    coordinates: {
+      lat: 56.8570,
+      lng: 14.8359
+    },
+    discipline: 'Medel',
+    level: 'Närtävling',
+    registrationDeadline: '2025-03-31',
+    description: 'Veteran-OL arrangerad av OK Orion. Trevliga banor för alla veteraner i området kring Teleborg.'
+  },
+  {
+    id: '39',
+    name: 'Veteran-OL Emmaboda',
+    date: '2025-04-16',
+    organizer: 'Emmaboda Verda OK',
+    region: 'kalmar',
+    district: 'smaland',
+    location: 'Emmaboda Centrum',
+    coordinates: {
+      lat: 56.6309,
+      lng: 15.5371
+    },
+    discipline: 'Sprint',
+    level: 'Närtävling',
+    registrationDeadline: '2025-04-14',
+    description: 'Urban sprintorientering i Emmaboda. Perfekt för alla som uppskattar snabba beslut och korta sträckor.'
+  },
+  {
+    id: '40',
+    name: 'Veteran-OL Torsås',
+    date: '2025-04-30',
+    organizer: 'Torsås OK',
+    region: 'kronoberg',
+    district: 'smaland',
+    location: 'Bergkvara, Torsås',
+    coordinates: {
+      lat: 56.3950,
+      lng: 16.0970
+    },
+    discipline: 'Lång',
+    level: 'Närtävling',
+    registrationDeadline: '2025-04-28',
+    description: 'Längre banor som passar veteraner som vill ha lite mer utmaning och distans.'
+  },
+  {
+    id: '41',
+    name: 'Veteran-OL Nybro',
+    date: '2025-05-14',
+    organizer: 'Nybro OK',
+    region: 'kalmar',
+    district: 'smaland',
+    location: 'Örsjö, Nybro',
+    coordinates: {
+      lat: 56.7121,
+      lng: 15.8334
+    },
+    discipline: 'Medel',
+    level: 'Närtävling',
+    registrationDeadline: '2025-05-12',
+    description: 'Vårorientering i härlig småländsk terräng. Varierande svårighetsgrad på alla banor.'
+  },
+  {
+    id: '42',
+    name: 'Veteran-OL Orion',
+    date: '2025-05-28',
+    organizer: 'OK Orion',
+    region: 'kronoberg',
+    district: 'smaland',
+    location: 'Fylleryd, Växjö',
+    coordinates: {
+      lat: 56.8874,
+      lng: 14.8762
+    },
+    discipline: 'Medel',
+    level: 'Närtävling',
+    registrationDeadline: '2025-05-26',
+    description: 'Våravslutning för Veteran-OL med gemensam fika efteråt. Trevliga banor i vacker miljö.'
+  }
+];
+
+// Combine all competitions into one exported array
+export const competitions = [
+  ...originalCompetitions,
+  ...januaryCompetitions,
+  ...februaryCompetitions,
+  ...marchCompetitions, 
+  ...aprilCompetitions,
+  ...mayCompetitions,
+  ...smalandVeteranCompetitions,
+  ...additionalSmalandCompetitions
+];
