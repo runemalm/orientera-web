@@ -1,6 +1,4 @@
-
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,17 +8,17 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { UserRound, Settings, Mail, Medal, MapPin, Calendar, Clock, Shield } from "lucide-react";
+import { UserRound, Settings, Mail, Medal, MapPin, Calendar, Clock, Shield, LogIn } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
-import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WaitlistDialog from "@/components/WaitlistDialog";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Namn måste vara minst 2 tecken." }),
@@ -40,21 +38,6 @@ const isAuthenticated = () => {
 const ProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [waitlistOpen, setWaitlistOpen] = useState(false);
-  const navigate = useNavigate();
-  const { toast: showToast } = useToast();
-  
-  useEffect(() => {
-    if (!isAuthenticated()) {
-      showToast({
-        title: "Du måste logga in",
-        description: "Du måste vara inloggad för att visa din profil.",
-        variant: "destructive",
-      });
-      
-      // Optional: you can uncomment this to redirect to home page after the notification
-      // setTimeout(() => navigate("/"), 2000);
-    }
-  }, [showToast, navigate]);
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -92,8 +75,64 @@ const ProfilePage = () => {
     { id: 6, name: "Nattugglan", date: "18 februari 2024", location: "Linköping", result: "DNF" },
   ];
 
-  // If not authenticated, we could show a different UI, but for now we'll just show the toast
-  // and display the normal profile page (which in a real app would have no real data)
+  // Check if user is authenticated
+  const userIsAuthenticated = isAuthenticated();
+  
+  if (!userIsAuthenticated) {
+    return (
+      <>
+        <Header />
+        <main className="container py-8">
+          <div className="flex flex-col space-y-6">
+            <div className="flex items-center justify-between">
+              <h1 className="text-2xl font-bold">Min profil</h1>
+            </div>
+            
+            <Card className="p-6">
+              <div className="space-y-6">
+                {/* Skeleton header with avatar */}
+                <div className="flex items-center space-x-4">
+                  <Skeleton className="h-16 w-16 rounded-full" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-6 w-48" />
+                    <Skeleton className="h-4 w-32" />
+                  </div>
+                </div>
+                
+                <Separator />
+                
+                {/* Skeleton content */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Skeleton className="h-12 w-full" />
+                  <Skeleton className="h-12 w-full" />
+                  <Skeleton className="h-12 w-full" />
+                  <Skeleton className="h-12 w-full" />
+                </div>
+                
+                {/* Login CTA */}
+                <div className="flex flex-col items-center justify-center space-y-4 py-6">
+                  <div className="text-center space-y-2">
+                    <h3 className="text-lg font-medium">Du måste logga in för att se din profil</h3>
+                    <p className="text-muted-foreground">Logga in för att se din profil, kommande tävlingar och resultat.</p>
+                  </div>
+                  <Button 
+                    size="lg" 
+                    className="w-full md:w-auto"
+                    onClick={showWaitlist}
+                  >
+                    <LogIn className="mr-2 h-4 w-4" />
+                    Logga in
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          </div>
+        </main>
+        <Footer />
+        <WaitlistDialog open={waitlistOpen} setOpen={setWaitlistOpen} />
+      </>
+    );
+  }
   
   return (
     <>
