@@ -70,7 +70,7 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilterProps)
       })
     },
     {
-      label: "Resten av året",
+      label: "Hela året",
       value: () => ({
         from: today,
         to: endOfYear(today)
