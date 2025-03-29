@@ -76,15 +76,17 @@ const DistanceFilter = ({
           )}
         </div>
       </AccordionTrigger>
-      <AccordionContent>
-        <div className="space-y-4">
+      <AccordionContent className="px-1">
+        <div className="space-y-4 pt-2">
           <form onSubmit={handleSearch} className="flex gap-2 items-center">
-            <Input 
-              placeholder="Sök ort i Sverige..."
-              value={cityInput}
-              onChange={(e) => setCityInput(e.target.value)}
-              className="flex-1"
-            />
+            <div className="relative flex-1">
+              <Input 
+                placeholder="Sök ort i Sverige..."
+                value={cityInput}
+                onChange={(e) => setCityInput(e.target.value)}
+                className="w-full"
+              />
+            </div>
             <Button 
               type="submit" 
               size="sm"

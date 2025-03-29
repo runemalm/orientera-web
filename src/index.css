@@ -81,8 +81,14 @@
     @apply font-bold text-orienteering-dark;
   }
   
-  input:focus-visible {
-    @apply ring-2 ring-primary ring-offset-2 border-primary outline-none transition-colors;
+  /* Ensure focus rings are fully visible */
+  input:focus-visible, 
+  button:focus-visible, 
+  a:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    @apply outline-none;
+    outline: none;
     box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--primary) / 0.8);
   }
 }
