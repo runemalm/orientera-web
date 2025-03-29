@@ -25,10 +25,10 @@ const PRESET_OPTIONS = [
   { id: 'today', label: 'Idag' },
   { id: 'tomorrow', label: 'Imorgon' },
   { id: 'thisWeekend', label: 'Helgen' },
-  { id: 'next7days', label: 'Kommande 7d' },
-  { id: 'next30days', label: 'Kommande 30d' },
-  { id: 'thisMonth', label: 'Denna månad' },
-  { id: 'nextMonth', label: 'Nästa månad' },
+  { id: 'next7days', label: '7 dagar' },
+  { id: 'next30days', label: '30 dagar' },
+  { id: 'thisMonth', label: 'Denna mån' },
+  { id: 'nextMonth', label: 'Nästa mån' },
 ];
 
 const DateRangeFilter = ({ 
@@ -220,7 +220,7 @@ const DateRangeFilter = ({
               type="button"
               variant={selectedPreset === option.id ? "default" : "outline"}
               size="sm"
-              className="text-xs h-7 w-full px-1"
+              className="text-xs h-7 w-full px-2 truncate"
               onClick={() => handlePresetChange(option.id)}
             >
               {option.label}
