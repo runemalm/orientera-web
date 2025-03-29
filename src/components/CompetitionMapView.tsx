@@ -1,11 +1,11 @@
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Competition } from '@/types';
 import { toast } from 'sonner';
 import { Button } from './ui/button';
 import { Info, Map as MapIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
@@ -29,28 +29,15 @@ interface CompetitionMapViewProps {
 
 // Component to adjust map view to fit all markers
 const MapBoundsAdjuster = ({ competitions }: { competitions: Competition[] }) => {
-  const map = useMap();
+  const map = L.map('map'); // We won't use this directly, just setting up for type checking
   
   useEffect(() => {
-    const competitionsWithCoordinates = competitions.filter(
-      comp => comp.coordinates && comp.coordinates.lat && comp.coordinates.lng
-    );
+    // The map and bounds adjustment logic will be handled differently
+    const mapElement = document.getElementById('competition-map');
+    if (!mapElement) return;
     
-    if (competitionsWithCoordinates.length === 0) return;
-    
-    if (competitionsWithCoordinates.length === 1) {
-      const comp = competitionsWithCoordinates[0];
-      map.setView([comp.coordinates!.lat, comp.coordinates!.lng], 10);
-      return;
-    }
-    
-    // Create bounds to fit all markers
-    const bounds = L.latLngBounds(
-      competitionsWithCoordinates.map(comp => [comp.coordinates!.lat, comp.coordinates!.lng])
-    );
-    
-    map.fitBounds(bounds, { padding: [50, 50] });
-  }, [competitions, map]);
+    // This is now handled in the main component
+  }, [competitions]);
   
   return null;
 };
@@ -86,6 +73,7 @@ const createCustomMarkerIcon = (competition: Competition) => {
 const CompetitionMapView: React.FC<CompetitionMapViewProps> = ({ competitions }) => {
   const navigate = useNavigate();
   const [mapInitialized, setMapInitialized] = useState(false);
+  const [map, setMap] = useState<L.Map | null>(null);
   
   // Filter competitions with coordinates
   const competitionsWithCoordinates = competitions.filter(
@@ -103,60 +91,95 @@ const CompetitionMapView: React.FC<CompetitionMapViewProps> = ({ competitions })
   // Center point for Sweden (default view)
   const swedenCenter: [number, number] = [62.5, 15.5];
   
+  // Initialize map and adjust bounds when component mounts or competitions change
+  useEffect(() => {
+    if (!mapInitialized || !map) return;
+    
+    // Add competition markers to map using direct Leaflet methods
+    competitionsWithCoordinates.forEach(competition => {
+      if (!map || !competition.coordinates) return;
+      
+      const marker = L.marker(
+        [competition.coordinates.lat, competition.coordinates.lng],
+        { icon: createCustomMarkerIcon(competition) }
+      ).addTo(map);
+      
+      marker.on('click', () => {
+        navigate(`/competition/${competition.id}`);
+      });
+      
+      const popupContent = `
+        <div style="padding: 5px; max-width: 250px">
+          <h3 style="font-weight: bold; margin-bottom: 5px">${competition.name}</h3>
+          <p style="margin-bottom: 5px">${competition.date}</p>
+          <p style="margin-bottom: 10px">${competition.location}</p>
+          <p style="color: ${competition.featured ? '#f97316' : '#3b82f6'}; font-weight: bold">
+            ${competition.featured ? 'Utmärkt tävling' : competition.discipline}
+          </p>
+        </div>
+      `;
+      
+      marker.bindPopup(popupContent);
+    });
+    
+    // Adjust map bounds to fit all markers
+    if (competitionsWithCoordinates.length > 0) {
+      if (competitionsWithCoordinates.length === 1) {
+        const comp = competitionsWithCoordinates[0];
+        map.setView([comp.coordinates!.lat, comp.coordinates!.lng], 10);
+      } else {
+        const bounds = L.latLngBounds(
+          competitionsWithCoordinates.map(comp => [comp.coordinates!.lat, comp.coordinates!.lng])
+        );
+        map.fitBounds(bounds, { padding: [50, 50] });
+      }
+    }
+    
+    return () => {
+      // Clean up markers when component unmounts or competitions change
+      map.eachLayer(layer => {
+        if (layer instanceof L.Marker) {
+          map.removeLayer(layer);
+        }
+      });
+    };
+  }, [mapInitialized, map, competitionsWithCoordinates, navigate]);
+
+  // Initialize the map
+  useEffect(() => {
+    if (!mapInitialized) return;
+    
+    const mapElement = document.getElementById('competition-map');
+    if (!mapElement) return;
+    
+    // Create map instance
+    const mapInstance = L.map('competition-map', {
+      center: swedenCenter,
+      zoom: 4.5,
+      zoomControl: false
+    });
+    
+    // Add tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(mapInstance);
+    
+    // Add zoom control to top-right
+    L.control.zoom({ position: 'topright' }).addTo(mapInstance);
+    
+    setMap(mapInstance);
+    
+    return () => {
+      // Clean up map when component unmounts
+      mapInstance.remove();
+    };
+  }, [mapInitialized]);
+  
   return (
     <div className="relative">
       <div className="w-full h-[600px] rounded-lg border border-border shadow-sm">
         {/* The map container */}
-        <MapContainer 
-          style={{ height: '100%', width: '100%', borderRadius: '0.5rem' }}
-          zoom={4.5}
-          zoomControl={false}
-          center={swedenCenter}
-        >
-          {/* Add zoom control to top-right */}
-          <div className="leaflet-top leaflet-right">
-            <div className="leaflet-control-zoom leaflet-bar leaflet-control">
-              <a className="leaflet-control-zoom-in" href="#" title="Zoom in" role="button" aria-label="Zoom in"></a>
-              <a className="leaflet-control-zoom-out" href="#" title="Zoom out" role="button" aria-label="Zoom out"></a>
-            </div>
-          </div>
-          
-          {/* Add OpenStreetMap tile layer */}
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          />
-          
-          {/* Add competition markers */}
-          {competitionsWithCoordinates.map((competition) => (
-            <Marker 
-              key={competition.id}
-              position={[competition.coordinates!.lat, competition.coordinates!.lng]}
-              eventHandlers={{
-                click: () => {
-                  navigate(`/competition/${competition.id}`);
-                }
-              }}
-            >
-              <Popup>
-                <div style={{ padding: '5px', maxWidth: '250px' }}>
-                  <h3 style={{ fontWeight: 'bold', marginBottom: '5px' }}>{competition.name}</h3>
-                  <p style={{ marginBottom: '5px' }}>{competition.date}</p>
-                  <p style={{ marginBottom: '10px' }}>{competition.location}</p>
-                  <p style={{ 
-                    color: competition.featured ? '#f97316' : '#3b82f6', 
-                    fontWeight: 'bold' 
-                  }}>
-                    {competition.featured ? 'Utmärkt tävling' : competition.discipline}
-                  </p>
-                </div>
-              </Popup>
-            </Marker>
-          ))}
-          
-          {/* Adjuster to fit map bounds */}
-          <MapBoundsAdjuster competitions={competitionsWithCoordinates} />
-        </MapContainer>
+        <div id="competition-map" style={{ height: '100%', width: '100%', borderRadius: '0.5rem' }}></div>
       </div>
       
       {/* Message for no competitions with coordinates */}
