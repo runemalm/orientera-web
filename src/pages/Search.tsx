@@ -55,6 +55,10 @@ const Search = () => {
     setLocationChangeCounter(prev => prev + 1);
   }, [userLocation, detectedLocationInfo, isManualLocation]);
 
+  useEffect(() => {
+    console.log("🚀 userLocation changed in Search:", userLocation);
+  }, [userLocation]);
+
   const competitionsWithDistance = useMemo(() => {
     console.log("Recalculating distances with userLocation:", userLocation);
     
@@ -79,8 +83,11 @@ const Search = () => {
   }, [userLocation, locationChangeCounter]);
 
   const filteredCompetitions = useMemo(() => {
-    return filterCompetitions(competitionsWithDistance, filters);
-  }, [competitionsWithDistance, filters]);
+    return filterCompetitions(competitionsWithDistance, {
+      ...filters,
+      userLocation,
+    });
+  }, [competitionsWithDistance, filters, userLocation]);
 
   const handleFilterChange = (newFilters: SearchFiltersType) => {
     if (newFilters.isManualLocation !== filters.isManualLocation) {
