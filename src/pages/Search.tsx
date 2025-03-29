@@ -7,14 +7,11 @@ import SearchFilters from "@/components/SearchFilters";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
-import { X, Clock, Search as SearchIcon, Filter, Trash2, TrendingUp, List, Calendar, Map, ViewIcon } from "lucide-react";
+import { X, Sparkles, Clock, Search as SearchIcon, Filter, Trash2, TrendingUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import CompetitionCompactView from "@/components/CompetitionCompactView";
-import CompetitionListView from "@/components/CompetitionListView";
-import CompetitionCalendarView from "@/components/CompetitionCalendarView";
-import CompetitionMapView from "@/components/CompetitionMapView";
 import { isBefore, isAfter, isEqual, parseISO } from "date-fns";
 import { processNaturalLanguageQuery } from "@/utils/aiQueryProcessor";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -28,9 +25,6 @@ const popularSearches = [
   "Stafetter i södra Sverige",
   "Långdistans i fjällen",
 ];
-
-// View options for search results
-type ViewOption = "compact" | "list" | "calendar" | "map";
 
 const Search = () => {
   const location = useLocation();
@@ -48,7 +42,7 @@ const Search = () => {
   });
 
   const [searchInputValue, setSearchInputValue] = useState("");
-  const [viewOption, setViewOption] = useState<ViewOption>("compact");
+  const [activeTab, setActiveTab] = useState("ai");
   const [isProcessing, setIsProcessing] = useState(false);
   const [recentSearches, setRecentSearches] = useState<string[]>(() => {
     const saved = localStorage.getItem('recentAiSearches');
@@ -76,6 +70,7 @@ const Search = () => {
     }
     
     const searchQuery = searchParams.get('q') || "";
+    const aiMode = searchParams.get('mode') === 'ai';
     
     if (disciplines.length > 0 || levels.length > 0 || dateRange || searchQuery) {
       setFilters(prevFilters => ({
@@ -87,6 +82,18 @@ const Search = () => {
       }));
       
       setSearchInputValue(searchQuery);
+      
+      if (aiMode || searchQuery) {
+        setActiveTab("ai");
+        
+        if (aiMode) {
+          toast({
+            title: "Sökning från AI",
+            description: "Filtren har applicerats baserat på din AI-sökning",
+            duration: 3000,
+          });
+        }
+      }
     }
   }, [location.search, toast]);
 
@@ -221,6 +228,10 @@ const Search = () => {
     processQuery(searchInputValue);
   };
 
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+  };
+
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
@@ -229,57 +240,143 @@ const Search = () => {
         <h1 className="text-3xl font-bold mb-6">Sök tävlingar</h1>
         
         <div className="max-w-3xl mx-auto">
-          <div className="mb-6">
-            <SearchFilters 
-              filters={filters} 
-              onFilterChange={handleFilterChange} 
-              hasLocation={false}
-              hideSearchInput={true}
-            />
-          </div>
+          <Tabs value={activeTab} onValueChange={handleTabChange} className="mb-6">
+            <TabsList className="grid w-full grid-cols-2 mb-4">
+              <TabsTrigger value="ai">
+                <Sparkles className="mr-2 h-4 w-4" />
+                Sök med AI
+              </TabsTrigger>
+              <TabsTrigger value="manual">
+                <Filter className="mr-2 h-4 w-4" />
+                Klassisk sök
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="ai" className="space-y-4">
+              <div className="rounded-lg border bg-card p-4">
+                <div className="mb-4 text-sm text-muted-foreground">
+                  <p className="mb-2">Beskriv den tävling du letar efter med dina egna ord, så hjälper vår AI dig att hitta rätt.</p>
+                  <p>Exempel: "Nationella tävlingar nära Stockholm i juni" eller "Sprint för ungdomar på klubbnivå"</p>
+                </div>
+                
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="relative">
+                    <Input
+                      placeholder="Sök efter tävlingar med vanligt språk..."
+                      value={searchInputValue}
+                      onChange={(e) => handleSearchChange(e.target.value)}
+                      className="pr-8 text-base"
+                    />
+                    {searchInputValue && (
+                      <button
+                        type="button"
+                        onClick={handleClearSearch}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                        aria-label="Rensa sökning"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    )}
+                  </div>
+                  
+                  <Button 
+                    type="submit" 
+                    disabled={isProcessing || !searchInputValue.trim()}
+                    className="w-full"
+                  >
+                    {isProcessing ? (
+                      <>
+                        <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full mr-2"></div>
+                        Bearbetar sökning...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="mr-2 h-4 w-4" />
+                        Sök
+                      </>
+                    )}
+                  </Button>
+                </form>
+                
+                {recentSearches.length > 0 && (
+                  <div className="mt-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-muted-foreground" />
+                        <h3 className="text-sm font-medium">Senaste sökningar</h3>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleClearHistory}
+                        className="h-7 px-2 text-xs text-muted-foreground hover:text-destructive"
+                      >
+                        <Trash2 className="h-3 w-3 mr-1" />
+                        Rensa historik
+                      </Button>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      {recentSearches.map((search, index) => (
+                        <Button
+                          key={index}
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => processQuery(search)}
+                          className="text-xs justify-start h-auto py-1.5 text-muted-foreground hover:text-foreground"
+                        >
+                          <SearchIcon className="h-3 w-3 mr-2" />
+                          {search.length > 60 ? `${search.substring(0, 60)}...` : search}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                
+                <div className="mt-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <TrendingUp className="h-4 w-4 text-primary" />
+                    <h3 className="text-sm font-medium">Populära sökningar</h3>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    {popularSearches.map((search, index) => (
+                      <Button
+                        key={index}
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => processQuery(search)}
+                        className="text-xs justify-start h-auto py-1.5 text-muted-foreground hover:text-foreground"
+                      >
+                        <SearchIcon className="h-3 w-3 mr-2" />
+                        {search}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="manual">
+              <div className="mb-4">
+                <SearchFilters 
+                  filters={filters} 
+                  onFilterChange={handleFilterChange} 
+                  hasLocation={false}
+                  hideSearchInput={true}
+                />
+              </div>
+            </TabsContent>
+          </Tabs>
           
           <div className="bg-card rounded-lg border p-4 mb-6">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div className="flex justify-between items-center">
               <h2 className="font-semibold">
                 {filteredCompetitions.length} {filteredCompetitions.length === 1 ? 'tävling' : 'tävlingar'} hittades
               </h2>
-              
-              <div className="w-full sm:w-auto">
-                <Tabs 
-                  value={viewOption} 
-                  onValueChange={(value) => setViewOption(value as ViewOption)}
-                  className="w-full sm:w-auto"
-                >
-                  <TabsList className="grid grid-cols-4 w-full">
-                    <TabsTrigger value="compact" title="Kompakt vy">
-                      <ViewIcon className="h-4 w-4" />
-                      {!isMobile && <span className="ml-2">Kompakt</span>}
-                    </TabsTrigger>
-                    <TabsTrigger value="list" title="Listvy">
-                      <List className="h-4 w-4" />
-                      {!isMobile && <span className="ml-2">Lista</span>}
-                    </TabsTrigger>
-                    <TabsTrigger value="calendar" title="Kalendervy">
-                      <Calendar className="h-4 w-4" />
-                      {!isMobile && <span className="ml-2">Kalender</span>}
-                    </TabsTrigger>
-                    <TabsTrigger value="map" title="Kartvy">
-                      <Map className="h-4 w-4" />
-                      {!isMobile && <span className="ml-2">Karta</span>}
-                    </TabsTrigger>
-                  </TabsList>
-                </Tabs>
-              </div>
             </div>
           </div>
           
           {filteredCompetitions.length > 0 ? (
-            <>
-              {viewOption === "compact" && <CompetitionCompactView competitions={filteredCompetitions} />}
-              {viewOption === "list" && <CompetitionListView competitions={filteredCompetitions} />}
-              {viewOption === "calendar" && <CompetitionCalendarView competitions={filteredCompetitions} />}
-              {viewOption === "map" && <CompetitionMapView competitions={filteredCompetitions} />}
-            </>
+            <CompetitionCompactView competitions={filteredCompetitions} />
           ) : (
             <div className="bg-card rounded-lg border p-8 text-center">
               <h3 className="text-lg font-medium mb-2">Inga tävlingar hittades</h3>
@@ -288,67 +385,6 @@ const Search = () => {
               </p>
             </div>
           )}
-          
-          {recentSearches.length > 0 && (
-            <div className="mt-8 bg-card rounded-lg border p-4">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-muted-foreground" />
-                  <h3 className="text-sm font-medium">Senaste sökningar</h3>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleClearHistory}
-                  className="h-7 px-2 text-xs text-muted-foreground hover:text-destructive"
-                >
-                  <Trash2 className="h-3 w-3 mr-1" />
-                  Rensa historik
-                </Button>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {recentSearches.map((search, index) => (
-                  <Button
-                    key={index}
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setSearchInputValue(search);
-                      processQuery(search);
-                    }}
-                    className="text-xs"
-                  >
-                    <SearchIcon className="h-3 w-3 mr-2" />
-                    {search.length > 20 ? `${search.substring(0, 20)}...` : search}
-                  </Button>
-                ))}
-              </div>
-            </div>
-          )}
-          
-          <div className="mt-4 bg-card rounded-lg border p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <TrendingUp className="h-4 w-4 text-primary" />
-              <h3 className="text-sm font-medium">Populära sökningar</h3>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {popularSearches.map((search, index) => (
-                <Button
-                  key={index}
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setSearchInputValue(search);
-                    processQuery(search);
-                  }}
-                  className="text-xs"
-                >
-                  <SearchIcon className="h-3 w-3 mr-2" />
-                  {search}
-                </Button>
-              ))}
-            </div>
-          </div>
         </div>
       </main>
       
