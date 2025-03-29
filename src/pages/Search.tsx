@@ -7,7 +7,7 @@ import SearchFilters from "@/components/SearchFilters";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
-import { X, Sparkles, Clock, Search as SearchIcon, ArrowRight, SlidersHorizontal } from "lucide-react";
+import { X, Sparkles, Clock, Search as SearchIcon, ArrowRight, SlidersHorizontal, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -234,8 +234,14 @@ const Search = () => {
         <div className="max-w-3xl mx-auto">
           <Tabs value={activeTab} onValueChange={handleTabChange} className="mb-6">
             <TabsList className="grid w-full grid-cols-2 mb-4">
-              <TabsTrigger value="ai">AI-sökning</TabsTrigger>
-              <TabsTrigger value="manual">Manuella filter</TabsTrigger>
+              <TabsTrigger value="ai">
+                <Sparkles className="mr-2 h-4 w-4" />
+                AI-sökning
+              </TabsTrigger>
+              <TabsTrigger value="manual">
+                <Filter className="mr-2 h-4 w-4" />
+                Klassisk sök
+              </TabsTrigger>
             </TabsList>
             
             <TabsContent value="ai" className="space-y-4">
