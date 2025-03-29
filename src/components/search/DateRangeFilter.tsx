@@ -1,5 +1,6 @@
+
 import { useState, useMemo } from "react";
-import { format, addDays, addMonths, isEqual, isAfter, isBefore, isValid, nextSaturday, nextSunday } from "date-fns";
+import { format, addDays, isEqual, isBefore, isValid, endOfYear } from "date-fns";
 import { sv } from "date-fns/locale";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
@@ -9,7 +10,6 @@ import { cn } from "@/lib/utils";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { SelectSeparator } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 type DateRangeValue = {
   from: Date;
@@ -49,49 +49,32 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilterProps)
       })
     },
     {
-      label: "Två veckor",
+      label: "Nästa 14 dagar",
       value: () => ({
         from: today,
         to: addDays(today, 13)
       })
     },
     {
-      label: "1 månad",
+      label: "Nästa 30 dagar",
       value: () => ({
         from: today,
         to: addDays(today, 29)
       })
     },
     {
-      label: "Kommande helg",
-      value: () => {
-        const saturday = nextSaturday(today);
-        const sunday = nextSunday(today);
-        // If today is Sunday, we need the next weekend
-        if (format(today, 'EEEE', { locale: sv }) === 'söndag') {
-          const nextWeekSaturday = addDays(saturday, 7);
-          const nextWeekSunday = addDays(sunday, 7);
-          return {
-            from: nextWeekSaturday,
-            to: nextWeekSunday
-          };
-        }
-        return {
-          from: saturday,
-          to: sunday
-        };
-      }
+      label: "Nästa 90 dagar",
+      value: () => ({
+        from: today,
+        to: addDays(today, 89)
+      })
     },
     {
-      label: "Kommande två helger",
-      value: () => {
-        const saturday = nextSaturday(today);
-        const nextNextSunday = addDays(nextSunday(today), 7);
-        return {
-          from: saturday,
-          to: nextNextSunday
-        };
-      }
+      label: "I år",
+      value: () => ({
+        from: today,
+        to: endOfYear(today)
+      })
     }
   ], [today]);
 
