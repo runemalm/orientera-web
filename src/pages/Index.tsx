@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import FeaturedCompetitions from "@/components/FeaturedCompetitions";
 import WaitlistDialog from "@/components/WaitlistDialog";
+import AiSearch from "@/components/AiSearch";
 
 const Index = () => {
   const [waitlistOpen, setWaitlistOpen] = useState(false);
@@ -47,6 +48,20 @@ const Index = () => {
                 </Button>
               </div>
             </div>
+          </div>
+        </section>
+        
+        {/* AI Search Section */}
+        <section className="py-16 bg-orienteering-green/5">
+          <div className="container">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold mb-4">Sök med naturligt språk</h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                Beskriv vad du letar efter med dina egna ord, så hjälper vår AI dig att hitta rätt tävlingar.
+              </p>
+            </div>
+            
+            <AiSearch />
           </div>
         </section>
         

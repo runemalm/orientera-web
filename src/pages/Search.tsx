@@ -1,4 +1,6 @@
+
 import React, { useState, useEffect, useRef, useMemo } from "react";
+import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CompetitionCard from "@/components/CompetitionCard";
@@ -21,6 +23,8 @@ import CompetitionMapView from "@/components/CompetitionMapView";
 import { isBefore, isAfter, isEqual, parseISO } from "date-fns";
 
 const Search = () => {
+  const location = useLocation();
+  
   const {
     coords: userLocation,
     detectedLocationInfo,
@@ -49,6 +53,52 @@ const Search = () => {
   
   const [locationChangeCounter, setLocationChangeCounter] = useState(0);
   const [viewMode, setViewMode] = useState<"grid" | "list" | "compact" | "calendar" | "map">("grid");
+
+  // Parse query parameters from URL
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    
+    // Extract disciplines
+    const disciplinesParam = searchParams.get('disciplines');
+    const disciplines = disciplinesParam ? disciplinesParam.split(',') : [];
+    
+    // Extract levels
+    const levelsParam = searchParams.get('levels');
+    const levels = levelsParam ? levelsParam.split(',') : [];
+    
+    // Extract date range
+    const dateFrom = searchParams.get('dateFrom');
+    const dateTo = searchParams.get('dateTo');
+    let dateRange = undefined;
+    
+    if (dateFrom) {
+      dateRange = {
+        from: new Date(dateFrom),
+        to: dateTo ? new Date(dateTo) : undefined
+      };
+    }
+    
+    // Extract search query
+    const searchQuery = searchParams.get('q') || "";
+    
+    if (disciplines.length > 0 || levels.length > 0 || dateRange || searchQuery) {
+      setFilters(prevFilters => ({
+        ...prevFilters,
+        disciplines: disciplines as any[],
+        levels: levels as any[],
+        dateRange,
+        searchQuery
+      }));
+      
+      setSearchInputValue(searchQuery);
+      
+      toast({
+        title: "Sökning från AI",
+        description: "Filtren har applicerats baserat på din AI-sökning",
+        duration: 3000,
+      });
+    }
+  }, [location.search, toast]);
 
   useEffect(() => {
     console.log("Location changed, updating filters:", { userLocation, detectedLocationInfo, isManualLocation });
