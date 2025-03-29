@@ -1,4 +1,3 @@
-
 import { useParams, Link } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { Calendar, MapPin, Flag, Star, Users, Globe, ArrowUp } from "lucide-react";
@@ -37,11 +36,9 @@ const CompetitionDetails = () => {
     setWaitlistOpen(true);
   };
 
-  // Initialize map when component mounts or competition changes
   useEffect(() => {
     if (!competition || !mapRef.current) return;
     
-    // Create map if it doesn't exist
     if (!leafletMap.current) {
       leafletMap.current = L.map(mapRef.current, {
         center: [competition.coordinates.lat, competition.coordinates.lng],
@@ -49,15 +46,12 @@ const CompetitionDetails = () => {
         zoomControl: false
       });
       
-      // Add tile layer
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       }).addTo(leafletMap.current);
       
-      // Add zoom control to top-right
       L.control.zoom({ position: 'topright' }).addTo(leafletMap.current);
       
-      // Track user interaction to prevent auto-zoom
       leafletMap.current.on('zoomstart', () => {
         userInteractingRef.current = true;
       });
@@ -66,17 +60,14 @@ const CompetitionDetails = () => {
         userInteractingRef.current = true;
       });
     } else {
-      // Only update the map's center if user is not interacting
       if (!userInteractingRef.current) {
         leafletMap.current.setView([competition.coordinates.lat, competition.coordinates.lng], 13);
       }
     }
     
-    // Add marker for competition location
     const marker = L.marker([competition.coordinates.lat, competition.coordinates.lng])
       .addTo(leafletMap.current);
     
-    // Create popup content
     const popupContent = `
       <div style="padding: 5px; max-width: 200px">
         <h3 style="font-weight: bold; margin-bottom: 5px">${competition.name}</h3>
@@ -85,10 +76,8 @@ const CompetitionDetails = () => {
       </div>
     `;
     
-    // Bind popup to marker
     marker.bindPopup(popupContent);
     
-    // Clean up when component unmounts
     return () => {
       if (leafletMap.current) {
         leafletMap.current.remove();
@@ -96,6 +85,14 @@ const CompetitionDetails = () => {
       }
     };
   }, [competition]);
+
+  const openGoogleMapsDirections = () => {
+    if (!competition) return;
+    
+    const { coordinates } = competition;
+    const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${coordinates.lat},${coordinates.lng}`;
+    window.open(googleMapsUrl, '_blank', 'noopener,noreferrer');
+  };
 
   if (!competition) {
     return (
@@ -239,7 +236,7 @@ const CompetitionDetails = () => {
                 <Button 
                   variant="outline" 
                   className="w-full"
-                  onClick={() => window.open(`https://www.openstreetmap.org/?mlat=${competition.coordinates.lat}&mlon=${competition.coordinates.lng}&zoom=15`, '_blank')}
+                  onClick={openGoogleMapsDirections}
                 >
                   <MapPin className="mr-2 h-4 w-4" />
                   Visa vägbeskrivning
