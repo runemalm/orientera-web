@@ -35,35 +35,35 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilterProps)
   
   const quickOptions: QuickOptionType[] = useMemo(() => [
     {
-      label: "Bara idag",
+      label: "Idag",
       value: () => ({
         from: today,
         to: today
       })
     },
     {
-      label: "En vecka framåt",
+      label: "Nästa 7 dagar",
       value: () => ({
         from: today,
         to: addDays(today, 6)
       })
     },
     {
-      label: "Två veckor framåt",
+      label: "Nästa 14 dagar",
       value: () => ({
         from: today,
         to: addDays(today, 13)
       })
     },
     {
-      label: "En månad framåt",
+      label: "Nästa 30 dagar",
       value: () => ({
         from: today,
         to: addDays(today, 29)
       })
     },
     {
-      label: "Tre månader framåt",
+      label: "Nästa 90 dagar",
       value: () => ({
         from: today,
         to: addDays(today, 89)
