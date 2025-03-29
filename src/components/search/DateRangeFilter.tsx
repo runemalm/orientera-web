@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { sv } from "date-fns/locale";
 import { format } from "date-fns";
-import { CalendarRange } from "lucide-react";
+import { CalendarRange, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Calendar } from "@/components/ui/calendar";
@@ -22,6 +22,7 @@ interface DateRangeFilterProps {
 
 const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilterProps) => {
   const [date, setDate] = useState<DateRangeValue | undefined>(dateRange);
+  const [isOpen, setIsOpen] = useState(false);
   
   const handleSelect = (value: DateRangeValue | undefined) => {
     setDate(value);
@@ -53,6 +54,7 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilterProps)
   const clearDateRange = () => {
     setDate(undefined);
     onDateRangeChange(undefined);
+    setIsOpen(false);
   };
 
   return (
@@ -69,8 +71,8 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilterProps)
         </div>
       </AccordionTrigger>
       <AccordionContent>
-        <div className="pt-2">
-          <Popover>
+        <div className="pt-2 space-y-2">
+          <Popover open={isOpen} onOpenChange={setIsOpen}>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
@@ -92,18 +94,36 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilterProps)
                 initialFocus
                 className="pointer-events-auto"
               />
+              <div className="p-3 border-t border-border">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={clearDateRange}
+                  className="w-full text-sm justify-center"
+                >
+                  <X className="h-3.5 w-3.5 mr-1.5" />
+                  Rensa datumval
+                </Button>
+              </div>
             </PopoverContent>
           </Popover>
 
           {dateRange && (
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={clearDateRange} 
-              className="mt-2 w-full"
-            >
-              Rensa datumfilter
-            </Button>
+            <div className="flex flex-wrap gap-1">
+              <Badge 
+                variant="secondary" 
+                className="flex items-center gap-1 bg-muted hover:bg-muted/80"
+              >
+                {formatDateRange(dateRange)}
+                <button 
+                  onClick={clearDateRange} 
+                  className="ml-1 rounded-full"
+                  aria-label="Rensa datumfilter"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            </div>
           )}
         </div>
       </AccordionContent>
