@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { Calendar, MapPin, Flag, Star, Navigation } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,13 +34,16 @@ const CompetitionCard = ({ competition, featured = false }: CompetitionCardProps
           <MapPin className="h-4 w-4 mr-1 text-muted-foreground" />
           <span className="mr-2">{competition.location}</span>
           {competition.distance !== undefined && (
-            <Badge variant="outline" className="text-xs py-0">
-              <Navigation className="h-3 w-3 mr-1" />
-              <span>{formatDistance(competition.distance)}</span>
-            </Badge>
+            <span className="inline-flex items-center">
+              <Badge variant="outline" className="text-xs">
+                <Navigation className="h-3 w-3 mr-1" />
+                {formatDistance(competition.distance)}
+              </Badge>
+            </span>
           )}
         </CardDescription>
       </CardHeader>
+      
       <CardContent className="p-4 pt-0 pb-2">
         <div className="grid grid-cols-2 gap-2 mt-2 text-sm">
           <div className="flex items-center">

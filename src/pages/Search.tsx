@@ -41,6 +41,9 @@ const Search = () => {
   const [searchInputValue, setSearchInputValue] = useState("");
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  
+  // Force recomputation for each location change by using a key
+  const [locationChangeCounter, setLocationChangeCounter] = useState(0);
 
   // Update filters when geolocation changes
   useEffect(() => {
@@ -51,6 +54,9 @@ const Search = () => {
       detectedLocationInfo,
       isManualLocation
     }));
+    
+    // Force distance recalculation by incrementing the counter
+    setLocationChangeCounter(prev => prev + 1);
   }, [userLocation, detectedLocationInfo, isManualLocation]);
 
   // Use useMemo to calculate distances only when location or competitions change
@@ -75,7 +81,7 @@ const Search = () => {
       console.log(`Competition ${competition.name} - Distance: ${distance}m`);
       return { ...competition, distance };
     });
-  }, [userLocation]); // Only recalculate when userLocation changes
+  }, [userLocation, locationChangeCounter]); // Include locationChangeCounter to force recalculation
 
   // Apply filters to the competitions with calculated distances
   const filteredCompetitions = useMemo(() => {
@@ -104,6 +110,11 @@ const Search = () => {
 
     console.log("Filter changed:", newFilters);
     setFilters(newFilters);
+    
+    // Force distance recalculation for location changes
+    if (newFilters.userLocation !== filters.userLocation) {
+      setLocationChangeCounter(prev => prev + 1);
+    }
   };
 
   const handleSearchChange = (value: string) => {
@@ -194,7 +205,7 @@ const Search = () => {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {filteredCompetitions.map((competition) => (
                   <CompetitionCard 
-                    key={competition.id} 
+                    key={`${competition.id}-${locationChangeCounter}`} // Add location counter to force re-rendering
                     competition={competition} 
                     featured={competition.featured}
                   />
