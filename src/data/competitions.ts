@@ -738,4 +738,34 @@ const mayCompetitions: Competition[] = [
     discipline: 'Lång',
     level: 'Nationell',
     registrationDeadline: '2025-04-28',
-    description: 'Krävande långdistans genom Flemingsbergskogens naturreservat. Kuperad terräng med inslag av tekniska partier
+    description: 'Krävande långdistans genom Flemingsbergskogens naturreservat. Kuperad terräng med inslag av tekniska partier.'
+  }
+];
+
+// Småland Veteran-OL competitions
+const smalandVeteranCompetitions: Competition[] = [
+  {
+    id: '36',
+    name: 'Veteran-OL Torsås',
+    date: '2025-03-05',
+    organizer: 'Torsås OK',
+    region: 'kronoberg',
+    district: 'smaland',
+    location: 'Torsås Skogarna',
+    coordinates: {
+      lat: 56.4116,
+      lng: 16.1319
+    },
+    discipline: 'Medel',
+    level: 'Närtävling',
+    registrationDeadline: '2025-03-03',
+    description: 'Veteran-OL i Torsås skogar. Lättlöpta banor med varierande svårighetsgrad för alla veteraner.'
+  },
+  {
+    id: '37',
+    name: 'Veteran-OL Nybro',
+    date: '2025-03-19',
+    organizer: 'Nybro OK',
+    region: 'kalmar',
+    district: 'smaland',
+    location: 'Svartbäck
