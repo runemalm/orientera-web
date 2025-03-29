@@ -7,12 +7,14 @@ import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
 import { useGeolocation } from "@/hooks/useGeolocation";
-import { Search as SearchIcon, X } from "lucide-react";
+import { Search as SearchIcon, X, Grid, Calendar as CalendarIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Command } from "@/components/ui/command";
 import { useToast } from "@/hooks/use-toast";
 import { getDistance } from "@/lib/utils";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import CompetitionCalendarView from "@/components/CompetitionCalendarView";
 
 const Search = () => {
   const {
@@ -42,6 +44,7 @@ const Search = () => {
   const { toast } = useToast();
   
   const [locationChangeCounter, setLocationChangeCounter] = useState(0);
+  const [viewMode, setViewMode] = useState<"grid" | "calendar">("grid");
 
   useEffect(() => {
     console.log("Location changed, updating filters:", { userLocation, detectedLocationInfo, isManualLocation });
@@ -201,30 +204,60 @@ const Search = () => {
                 <h2 className="font-semibold">
                   {filteredCompetitions.length} {filteredCompetitions.length === 1 ? 'tävling' : 'tävlingar'} hittades
                 </h2>
-                <div className="text-sm text-muted-foreground">
-                  Visar alla kommande tävlingar
-                </div>
+                <Tabs
+                  value={viewMode}
+                  onValueChange={(value) => setViewMode(value as "grid" | "calendar")}
+                  className="w-auto"
+                >
+                  <TabsList className="grid w-[180px] grid-cols-2">
+                    <TabsTrigger value="grid" className="flex items-center">
+                      <Grid className="h-4 w-4 mr-2" />
+                      Lista
+                    </TabsTrigger>
+                    <TabsTrigger value="calendar" className="flex items-center">
+                      <CalendarIcon className="h-4 w-4 mr-2" />
+                      Kalender
+                    </TabsTrigger>
+                  </TabsList>
+                </Tabs>
               </div>
             </div>
             
-            {filteredCompetitions.length > 0 ? (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {filteredCompetitions.map((competition) => (
-                  <CompetitionCard 
-                    key={`${competition.id}-${locationChangeCounter}`}
-                    competition={competition} 
-                    featured={competition.featured}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="bg-card rounded-lg border p-8 text-center">
-                <h3 className="text-lg font-medium mb-2">Inga tävlingar hittades</h3>
-                <p className="text-muted-foreground mb-4">
-                  Det finns inga tävlingar som matchar dina filter. Prova att ändra dina sökkriterier.
-                </p>
-              </div>
-            )}
+            <Tabs value={viewMode} className="w-full">
+              <TabsContent value="grid" className="mt-0">
+                {filteredCompetitions.length > 0 ? (
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {filteredCompetitions.map((competition) => (
+                      <CompetitionCard 
+                        key={`${competition.id}-${locationChangeCounter}`}
+                        competition={competition} 
+                        featured={competition.featured}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="bg-card rounded-lg border p-8 text-center">
+                    <h3 className="text-lg font-medium mb-2">Inga tävlingar hittades</h3>
+                    <p className="text-muted-foreground mb-4">
+                      Det finns inga tävlingar som matchar dina filter. Prova att ändra dina sökkriterier.
+                    </p>
+                  </div>
+                )}
+              </TabsContent>
+              
+              <TabsContent value="calendar" className="mt-0">
+                {filteredCompetitions.length > 0 ? (
+                  <CompetitionCalendarView competitions={filteredCompetitions} />
+                ) : (
+                  <div className="bg-card rounded-lg border p-8 text-center">
+                    <h3 className="text-lg font-medium mb-2">Inga tävlingar hittades</h3>
+                    <p className="text-muted-foreground mb-4">
+                      Det finns inga tävlingar som matchar dina filter. Prova att ändra dina sökkriterier.
+                    </p>
+                  </div>
+                )}
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
       </main>
