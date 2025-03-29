@@ -20,6 +20,7 @@ import {
 import { Competition } from "@/types";
 import { formatDate } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
+import { Calendar as CalendarIcon, MapPin, Flag } from "lucide-react";
 
 interface CompetitionCalendarViewProps {
   competitions: Competition[];

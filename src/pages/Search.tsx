@@ -7,7 +7,7 @@ import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
 import { useGeolocation } from "@/hooks/useGeolocation";
-import { Search as SearchIcon, X, Grid, Calendar as CalendarIcon } from "lucide-react";
+import { Search as SearchIcon, X, Grid, Calendar as CalendarIcon, List, MenuSquare } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Command } from "@/components/ui/command";
@@ -15,6 +15,8 @@ import { useToast } from "@/hooks/use-toast";
 import { getDistance } from "@/lib/utils";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import CompetitionCalendarView from "@/components/CompetitionCalendarView";
+import CompetitionCompactView from "@/components/CompetitionCompactView";
+import CompetitionListView from "@/components/CompetitionListView";
 
 const Search = () => {
   const {
@@ -44,7 +46,7 @@ const Search = () => {
   const { toast } = useToast();
   
   const [locationChangeCounter, setLocationChangeCounter] = useState(0);
-  const [viewMode, setViewMode] = useState<"grid" | "calendar">("grid");
+  const [viewMode, setViewMode] = useState<"grid" | "list" | "compact" | "calendar">("grid");
 
   useEffect(() => {
     console.log("Location changed, updating filters:", { userLocation, detectedLocationInfo, isManualLocation });
@@ -206,13 +208,21 @@ const Search = () => {
                 </h2>
                 <Tabs
                   value={viewMode}
-                  onValueChange={(value) => setViewMode(value as "grid" | "calendar")}
+                  onValueChange={(value) => setViewMode(value as "grid" | "list" | "compact" | "calendar")}
                   className="w-auto"
                 >
-                  <TabsList className="grid w-[180px] grid-cols-2">
+                  <TabsList className="grid w-[330px] grid-cols-4">
                     <TabsTrigger value="grid" className="flex items-center">
                       <Grid className="h-4 w-4 mr-2" />
+                      Rutnät
+                    </TabsTrigger>
+                    <TabsTrigger value="list" className="flex items-center">
+                      <List className="h-4 w-4 mr-2" />
                       Lista
+                    </TabsTrigger>
+                    <TabsTrigger value="compact" className="flex items-center">
+                      <MenuSquare className="h-4 w-4 mr-2" />
+                      Kompakt
                     </TabsTrigger>
                     <TabsTrigger value="calendar" className="flex items-center">
                       <CalendarIcon className="h-4 w-4 mr-2" />
@@ -235,6 +245,32 @@ const Search = () => {
                       />
                     ))}
                   </div>
+                ) : (
+                  <div className="bg-card rounded-lg border p-8 text-center">
+                    <h3 className="text-lg font-medium mb-2">Inga tävlingar hittades</h3>
+                    <p className="text-muted-foreground mb-4">
+                      Det finns inga tävlingar som matchar dina filter. Prova att ändra dina sökkriterier.
+                    </p>
+                  </div>
+                )}
+              </TabsContent>
+              
+              <TabsContent value="list" className="mt-0">
+                {filteredCompetitions.length > 0 ? (
+                  <CompetitionListView competitions={filteredCompetitions} />
+                ) : (
+                  <div className="bg-card rounded-lg border p-8 text-center">
+                    <h3 className="text-lg font-medium mb-2">Inga tävlingar hittades</h3>
+                    <p className="text-muted-foreground mb-4">
+                      Det finns inga tävlingar som matchar dina filter. Prova att ändra dina sökkriterier.
+                    </p>
+                  </div>
+                )}
+              </TabsContent>
+              
+              <TabsContent value="compact" className="mt-0">
+                {filteredCompetitions.length > 0 ? (
+                  <CompetitionCompactView competitions={filteredCompetitions} />
                 ) : (
                   <div className="bg-card rounded-lg border p-8 text-center">
                     <h3 className="text-lg font-medium mb-2">Inga tävlingar hittades</h3>
