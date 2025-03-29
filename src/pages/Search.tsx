@@ -15,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { getDistance } from "@/lib/utils";
 
 const Search = () => {
+  const geolocationData = useGeolocation(true);
   const {
     coords: userLocation,
     detectedLocationInfo,
@@ -23,7 +24,7 @@ const Search = () => {
     setManualLocation,
     clearLocation,
     detectLocation
-  } = useGeolocation(true);
+  } = geolocationData;
 
   const [filters, setFilters] = useState<SearchFiltersType>({
     regions: [],
@@ -44,6 +45,24 @@ const Search = () => {
   const [locationChangeCounter, setLocationChangeCounter] = useState(0);
 
   useEffect(() => {
+    console.log("Geolocation data changed:", geolocationData);
+  }, [geolocationData]);
+
+  useEffect(() => {
+    if (userLocation) {
+      console.log("🚀 userLocation changed in Search:", userLocation);
+    }
+  }, [userLocation]);
+
+  useEffect(() => {
+    console.log("🚀 detectedLocationInfo changed in Search:", detectedLocationInfo);
+  }, [detectedLocationInfo]);
+
+  useEffect(() => {
+    console.log("🚀 isManualLocation changed in Search:", isManualLocation);
+  }, [isManualLocation]);
+
+  useEffect(() => {
     console.log("Location changed, updating filters:", { userLocation, detectedLocationInfo, isManualLocation });
     setFilters(prevFilters => ({
       ...prevFilters,
@@ -54,18 +73,6 @@ const Search = () => {
     
     setLocationChangeCounter(prev => prev + 1);
   }, [userLocation, detectedLocationInfo, isManualLocation]);
-
-  useEffect(() => {
-    console.log("🚀 userLocation changed in Search:", userLocation);
-  }, [userLocation]);
-
-  useEffect(() => {
-    console.log("🚀 detectedLocationInfo changed in Search:", detectedLocationInfo);
-  }, [detectedLocationInfo]);
-
-  useEffect(() => {
-    console.log("🚀 isManualLocation changed in Search:", isManualLocation);
-  }, [isManualLocation]);
 
   const competitionsWithDistance = useMemo(() => {
     console.log("Recalculating distances with userLocation:", userLocation);
@@ -98,6 +105,8 @@ const Search = () => {
   }, [competitionsWithDistance, filters, userLocation]);
 
   const handleFilterChange = (newFilters: SearchFiltersType) => {
+    const locationChanged = newFilters.userLocation !== filters.userLocation;
+    
     if (newFilters.isManualLocation !== filters.isManualLocation) {
       if (newFilters.isManualLocation === false && filters.isManualLocation === true) {
         clearLocation();
@@ -113,8 +122,6 @@ const Search = () => {
         duration: 2000,
       });
     }
-
-    const locationChanged = newFilters.userLocation !== filters.userLocation;
 
     console.log("Filter changed:", newFilters);
     setFilters(newFilters);

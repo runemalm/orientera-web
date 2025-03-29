@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 export type LocationInfo = {
@@ -26,6 +26,16 @@ export const useGeolocation = (autoDetect = true) => {
   });
   const [isManualLocation, setIsManualLocation] = useState(false);
 
+  // Add a change counter to ensure reference changes with state updates
+  const changeRef = useRef(0);
+  const [, setChangeCounter] = useState(0);
+
+  // Function to ensure reference equality changes when state updates
+  const triggerReferenceChange = useCallback(() => {
+    changeRef.current += 1;
+    setChangeCounter(changeRef.current);
+  }, []);
+
   const getLocationDetails = async (lat: number, lng: number): Promise<any> => {
     try {
       console.log("Fetching location details for coordinates:", lat, lng);
@@ -44,7 +54,7 @@ export const useGeolocation = (autoDetect = true) => {
     }
   };
 
-  const detectLocation = () => {
+  const detectLocation = useCallback(() => {
     // Reset the state completely before requesting a new location
     setState({
       coords: undefined,
@@ -53,11 +63,13 @@ export const useGeolocation = (autoDetect = true) => {
       error: null
     });
     setIsManualLocation(false);
+    triggerReferenceChange();
     
     console.log("Requesting geolocation...");
     
     if (!navigator.geolocation) {
       setState(prev => ({ ...prev, loading: false, error: "Geolocation is not supported by your browser" }));
+      triggerReferenceChange();
       toast({
         title: "Geolokalisering stöds inte",
         description: "Din webbläsare stöder inte geolokalisering. Prova att ange din position manuellt.",
@@ -75,6 +87,7 @@ export const useGeolocation = (autoDetect = true) => {
         if (state.loading) {
           console.warn("Geolocation request timed out in our custom timeout");
           setState(prev => ({ ...prev, loading: false, error: "Timeout" }));
+          triggerReferenceChange();
           toast({
             title: "Positionsbegäran tog för lång tid",
             description: "Det tog för lång tid att hämta din position. Prova att ange din position manuellt.",
@@ -101,6 +114,7 @@ export const useGeolocation = (autoDetect = true) => {
               coords: { lat: position.coords.latitude, lng: position.coords.longitude },
               loading: false
             }));
+            triggerReferenceChange();
             
             // Then try to get detailed location info
             getLocationDetails(coords.lat, coords.lng)
@@ -117,6 +131,7 @@ export const useGeolocation = (autoDetect = true) => {
                     display_name: data.display_name
                   }
                 }));
+                triggerReferenceChange();
                 
                 toast({
                   title: "Plats hittad",
@@ -133,6 +148,7 @@ export const useGeolocation = (autoDetect = true) => {
           } catch (error) {
             console.error("Error handling position:", error);
             setState(prev => ({ ...prev, loading: false, error: "Failed to process location" }));
+            triggerReferenceChange();
             toast({
               title: "Problem med att bearbeta position",
               description: "Ett fel uppstod när din position bearbetades.",
@@ -160,6 +176,7 @@ export const useGeolocation = (autoDetect = true) => {
             }
             
             setState(prev => ({ ...prev, loading: false, error: errorMessage }));
+            triggerReferenceChange();
             toast({
               title: "Kunde inte hitta din position",
               description: errorMessage,
@@ -168,6 +185,7 @@ export const useGeolocation = (autoDetect = true) => {
           } catch (callbackError) {
             console.error("Error in geolocation error callback:", callbackError);
             setState(prev => ({ ...prev, loading: false, error: "An unexpected error occurred" }));
+            triggerReferenceChange();
             toast({
               title: "Fel vid hämtning av position",
               description: "Ett oväntat fel uppstod när din position hämtades.",
@@ -184,16 +202,16 @@ export const useGeolocation = (autoDetect = true) => {
     } catch (geoError) {
       console.error("Fatal geolocation error:", geoError);
       setState(prev => ({ ...prev, loading: false, error: "Fatal geolocation error" }));
+      triggerReferenceChange();
       toast({
         title: "Problem med positionstjänsten",
         description: "Det uppstod ett allvarligt problem med positionstjänsten. Prova att ange din position manuellt.",
         variant: "destructive"
       });
     }
-  };
+  }, [toast, state.loading, triggerReferenceChange]);
 
-  const setManualLocation = async (cityName: string) => {
-
+  const setManualLocation = useCallback(async (cityName: string) => {
     try {
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cityName)}, Sweden&countrycodes=se&limit=1`
@@ -210,17 +228,19 @@ export const useGeolocation = (autoDetect = true) => {
           error: null
         });
         setIsManualLocation(true);
+        triggerReferenceChange();
         return true;
       }
       return false;
     } catch (error) {
       console.error("Error geocoding city:", error);
       setState(prev => ({ ...prev, error: "Failed to geocode city" }));
+      triggerReferenceChange();
       return false;
     }
-  };
+  }, [triggerReferenceChange]);
 
-  const clearLocation = () => {
+  const clearLocation = useCallback(() => {
     setState({
       coords: undefined,
       detectedLocationInfo: undefined,
@@ -228,14 +248,15 @@ export const useGeolocation = (autoDetect = true) => {
       error: null
     });
     setIsManualLocation(false);
-  };
+    triggerReferenceChange();
+  }, [triggerReferenceChange]);
 
   // Auto-detect location on mount if enabled
   useEffect(() => {
     if (autoDetect && !state.coords && !isManualLocation && !state.loading) {
       detectLocation();
     }
-  }, [autoDetect]); // Only depend on autoDetect to prevent re-runs when state changes
+  }, [autoDetect, state.coords, isManualLocation, state.loading, detectLocation]);
 
   return {
     ...state,
