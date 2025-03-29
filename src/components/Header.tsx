@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Compass } from "lucide-react";
+import { Compass, Sparkles } from "lucide-react";
 import WaitlistDialog from "./WaitlistDialog";
 
 const Header = () => {
@@ -25,6 +25,11 @@ const Header = () => {
           </Link>
           <Link to="/search" className="text-muted-foreground hover:text-foreground transition-colors">
             Sök tävlingar
+          </Link>
+          <Link to="/ai-search" className="text-muted-foreground hover:text-foreground transition-colors">
+            <span className="flex items-center">
+              <Sparkles className="h-4 w-4 mr-1" /> Sök med AI
+            </span>
           </Link>
           <Link to="/profil" className="text-muted-foreground hover:text-foreground transition-colors">
             Min profil
