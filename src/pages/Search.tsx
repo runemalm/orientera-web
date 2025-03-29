@@ -115,6 +115,12 @@ const Search = () => {
     }
   }, [location.search, toast]);
 
+  useEffect(() => {
+    if (Object.keys(filters).length > 0) {
+      localStorage.setItem(SEARCH_FILTERS_KEY, JSON.stringify(filters));
+    }
+  }, [filters]);
+
   const filteredCompetitions = useMemo(() => {
     let filtered = filterCompetitions(competitions, filters);
 

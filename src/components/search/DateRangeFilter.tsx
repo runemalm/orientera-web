@@ -1,14 +1,13 @@
 
 import { useState, useEffect } from "react";
 import { sv } from "date-fns/locale";
-import { format, isValid, isToday, isYesterday, isTomorrow, addDays, startOfMonth, endOfMonth } from "date-fns";
+import { format, isValid, isToday, isYesterday, isTomorrow, addDays, startOfMonth, endOfMonth, isSameDay } from "date-fns";
 import { X, Calendar as CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 type DateRangeValue = {
   from?: Date;
@@ -59,57 +58,67 @@ const DateRangeFilter = ({
   const checkAndSetPreset = (from: Date, to?: Date) => {
     // Check if the current range matches any preset
     const today = new Date();
+    today.setHours(0, 0, 0, 0); // Normalize today to start of day
     
-    if (isToday(from) && (!to || isToday(to))) {
-      setSelectedPreset('today');
-      return;
-    }
+    const isMatchingPreset = (presetId: string): boolean => {
+      let presetFrom: Date | undefined;
+      let presetTo: Date | undefined;
+      
+      switch (presetId) {
+        case 'today':
+          presetFrom = today;
+          presetTo = today;
+          break;
+          
+        case 'tomorrow':
+          presetFrom = addDays(today, 1);
+          presetTo = addDays(today, 1);
+          break;
+          
+        case 'thisWeekend':
+          presetFrom = addDays(today, (5 - today.getDay() + 7) % 7); // Next Friday
+          presetTo = addDays(presetFrom, 2); // Sunday
+          break;
+          
+        case 'next7days':
+          presetFrom = today;
+          presetTo = addDays(today, 6);
+          break;
+          
+        case 'next30days':
+          presetFrom = today;
+          presetTo = addDays(today, 29);
+          break;
+          
+        case 'thisMonth':
+          presetFrom = startOfMonth(today);
+          presetTo = endOfMonth(today);
+          break;
+          
+        case 'nextMonth':
+          presetFrom = startOfMonth(addDays(endOfMonth(today), 1));
+          presetTo = endOfMonth(presetFrom);
+          break;
+          
+        default:
+          return false;
+      }
+      
+      // Compare dates accurately
+      const fromMatches = presetFrom && from && isSameDay(from, presetFrom);
+      const toMatches = 
+        (presetTo && to && isSameDay(to, presetTo)) || 
+        (!presetTo && !to);
+        
+      return fromMatches && toMatches;
+    };
     
-    if (isTomorrow(from) && (!to || isTomorrow(to))) {
-      setSelectedPreset('tomorrow');
-      return;
-    }
-    
-    // Check for this weekend
-    const fridayOfWeek = addDays(today, (5 - today.getDay() + 7) % 7);
-    const sundayOfWeek = addDays(fridayOfWeek, 2);
-    
-    if (from.getTime() === fridayOfWeek.getTime() && 
-        to && to.getTime() === sundayOfWeek.getTime()) {
-      setSelectedPreset('thisWeekend');
-      return;
-    }
-    
-    // Check for next 7 days
-    const next7Days = addDays(today, 6);
-    if (isToday(from) && to && to.getTime() === next7Days.getTime()) {
-      setSelectedPreset('next7days');
-      return;
-    }
-    
-    // Check for next 30 days
-    const next30Days = addDays(today, 29);
-    if (isToday(from) && to && to.getTime() === next30Days.getTime()) {
-      setSelectedPreset('next30days');
-      return;
-    }
-    
-    // Check for this month
-    const thisMonthStart = startOfMonth(today);
-    const thisMonthEnd = endOfMonth(today);
-    if (from.getTime() === thisMonthStart.getTime() && 
-        to && to.getTime() === thisMonthEnd.getTime()) {
-      setSelectedPreset('thisMonth');
-      return;
-    }
-    
-    // Check for next month
-    const nextMonthStart = startOfMonth(addDays(thisMonthEnd, 1));
-    const nextMonthEnd = endOfMonth(nextMonthStart);
-    if (from.getTime() === nextMonthStart.getTime() && 
-        to && to.getTime() === nextMonthEnd.getTime()) {
-      setSelectedPreset('nextMonth');
-      return;
+    // Check each preset
+    for (const preset of PRESET_OPTIONS) {
+      if (isMatchingPreset(preset.id)) {
+        setSelectedPreset(preset.id);
+        return;
+      }
     }
     
     setSelectedPreset(undefined);
@@ -158,13 +167,15 @@ const DateRangeFilter = ({
   const handlePresetChange = (value: string) => {
     setSelectedPreset(value);
     const today = new Date();
+    today.setHours(0, 0, 0, 0); // Normalize today to start of day
+    
     let from: Date | undefined;
     let to: Date | undefined;
     
     switch (value) {
       case 'today':
-        from = today;
-        to = today;
+        from = new Date(today);
+        to = new Date(today);
         break;
         
       case 'tomorrow':
@@ -179,12 +190,12 @@ const DateRangeFilter = ({
         break;
         
       case 'next7days':
-        from = today;
+        from = new Date(today);
         to = addDays(today, 6);
         break;
         
       case 'next30days':
-        from = today;
+        from = new Date(today);
         to = addDays(today, 29);
         break;
         
