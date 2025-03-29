@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useRef } from 'react';
 import { Competition } from '@/types';
 import { toast } from 'sonner';
@@ -48,24 +49,24 @@ const createCustomMarkerIcon = (competition: Competition) => {
           transform: rotate(0deg);
           border: 1px solid rgba(0, 0, 0, 0.2);
         ">
-          <!-- Traditional orienteering control flag with diagonal split -->
+          <!-- Traditional orienteering control flag with diagonal split - COLORS SWAPPED -->
           <div style="
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: white;
+            background-color: ${orangeColor};
           "></div>
           <div style="
             position: absolute;
             top: 0;
-            right: 0;
+            left: 0;
             width: 0;
             height: 0;
             border-style: solid;
             border-width: 30px 30px 0 0;
-            border-color: ${orangeColor} transparent transparent transparent;
+            border-color: white transparent transparent transparent;
           "></div>
           <!-- Circle behind the flag for featured competitions -->
           ${competition.featured ? `
