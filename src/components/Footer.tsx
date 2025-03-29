@@ -54,14 +54,6 @@ const Footer = () => {
                   onClick={showWaitlist}
                   className="text-muted-foreground hover:text-foreground transition-colors text-sm text-left w-full"
                 >
-                  Tävlingskalender
-                </button>
-              </li>
-              <li>
-                <button 
-                  onClick={showWaitlist}
-                  className="text-muted-foreground hover:text-foreground transition-colors text-sm text-left w-full"
-                >
                   Resultat
                 </button>
               </li>
