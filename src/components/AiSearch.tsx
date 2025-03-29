@@ -99,7 +99,7 @@ const AiSearch: React.FC<AiSearchProps> = ({ className }) => {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="relative">
           <Textarea
-            placeholder="Beskriv den tävling du letar efter, t.ex. 'Nationella tävlingar i Skåne nästa månad'"
+            placeholder="Exempel: 'Jag letar efter nationella tävlingar i Skåne nästa månad' eller 'Medeldistans tävlingar för ungdomar på klubbnivå'"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="min-h-[120px] text-base resize-none p-4 pr-12 shadow-md"

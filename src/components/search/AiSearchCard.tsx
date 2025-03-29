@@ -95,7 +95,7 @@ const AiSearchCard = ({ onSearchComplete, initialQuery = "" }: AiSearchCardProps
           <CardTitle className="text-lg">Sök med AI</CardTitle>
         </div>
         <CardDescription>
-          Beskriv den typ av tävling du letar efter med dina egna ord, så hjälper AI dig att hitta rätt.
+          Beskriv den tävling du letar efter med dina egna ord, så hjälper vår AI dig att hitta rätt.
         </CardDescription>
       </CardHeader>
       
