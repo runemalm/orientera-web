@@ -1,10 +1,10 @@
-
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CompetitionCard from "@/components/CompetitionCard";
 import SearchFilters from "@/components/SearchFilters";
+import AiSearch from "@/components/AiSearch";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
@@ -54,19 +54,15 @@ const Search = () => {
   const [locationChangeCounter, setLocationChangeCounter] = useState(0);
   const [viewMode, setViewMode] = useState<"grid" | "list" | "compact" | "calendar" | "map">("grid");
 
-  // Parse query parameters from URL
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     
-    // Extract disciplines
     const disciplinesParam = searchParams.get('disciplines');
     const disciplines = disciplinesParam ? disciplinesParam.split(',') : [];
     
-    // Extract levels
     const levelsParam = searchParams.get('levels');
     const levels = levelsParam ? levelsParam.split(',') : [];
     
-    // Extract date range
     const dateFrom = searchParams.get('dateFrom');
     const dateTo = searchParams.get('dateTo');
     let dateRange = undefined;
@@ -78,7 +74,6 @@ const Search = () => {
       };
     }
     
-    // Extract search query
     const searchQuery = searchParams.get('q') || "";
     
     if (disciplines.length > 0 || levels.length > 0 || dateRange || searchQuery) {
@@ -233,6 +228,11 @@ const Search = () => {
       
       <main className="flex-1 container py-8">
         <h1 className="text-3xl font-bold mb-6">Sök tävlingar</h1>
+        
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-4">Sök med AI</h2>
+          <AiSearch className="w-full" />
+        </div>
         
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="md:col-span-1">
