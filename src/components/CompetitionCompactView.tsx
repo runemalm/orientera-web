@@ -24,9 +24,9 @@ const CompetitionCompactView: React.FC<CompetitionCompactViewProps> = ({
 }) => {
   const navigate = useNavigate();
   
-  // Sort competitions by date in descending order
+  // Sort competitions by date in ascending order
   const sortedCompetitions = [...competitions].sort((a, b) => 
-    new Date(b.date).getTime() - new Date(a.date).getTime()
+    new Date(a.date).getTime() - new Date(b.date).getTime()
   );
 
   return (
