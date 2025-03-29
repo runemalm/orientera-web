@@ -1,3 +1,4 @@
+
 import { useState, useMemo } from "react";
 import { format, addDays, isEqual, isBefore, isValid, endOfYear, endOfWeek, endOfMonth } from "date-fns";
 import { sv } from "date-fns/locale";
@@ -17,7 +18,7 @@ type DateRangeValue = {
 
 type QuickOptionType = {
   label: string;
-  value: () => DateRangeValue;
+  value: () => DateRangeValue | undefined;
 };
 
 interface DateRangeFilterProps {
@@ -34,6 +35,10 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilterProps)
   
   const quickOptions: QuickOptionType[] = useMemo(() => [
     {
+      label: "Alla",
+      value: () => undefined
+    },
+    {
       label: "Idag",
       value: () => ({
         from: today,
@@ -45,13 +50,6 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilterProps)
       value: () => ({
         from: today,
         to: endOfWeek(today, { locale: sv })
-      })
-    },
-    {
-      label: "Denna månad",
-      value: () => ({
-        from: today,
-        to: endOfMonth(today)
       })
     },
     {
@@ -68,9 +66,16 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilterProps)
   }, [dateRange]);
 
   const isQuickOptionActive = (option: QuickOptionType): boolean => {
+    // For "Alla" option
+    if (option.label === "Alla" && !dateRange?.from) {
+      return true;
+    }
+    
     if (!dateRange?.from) return false;
     
     const optionRange = option.value();
+    
+    if (!optionRange) return false;
     
     return isEqual(optionRange.from, dateRange.from) && 
            ((optionRange.to && dateRange.to && isEqual(optionRange.to, dateRange.to)) || 
