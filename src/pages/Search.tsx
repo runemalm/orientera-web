@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -7,7 +6,7 @@ import SearchFilters from "@/components/SearchFilters";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
-import { X, Sparkles, Clock, Search as SearchIcon, Filter, Trash2, TrendingUp, List, Map, Calendar } from "lucide-react";
+import { X, Sparkles, Clock, Search as SearchIcon, Filter, Trash2, TrendingUp, List, Map, Calendar, LayoutPanelLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -17,9 +16,10 @@ import CompetitionMapView from "@/components/CompetitionMapView";
 import CompetitionCalendarView from "@/components/CompetitionCalendarView";
 import { isBefore, isAfter, isEqual, parseISO } from "date-fns";
 import { processNaturalLanguageQuery } from "@/utils/aiQueryProcessor";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsMobile, useBreakpoint } from "@/hooks/use-mobile";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { cn } from "@/lib/utils";
 
 const popularSearches = [
   "Nationella tävlingar i sommar",
@@ -32,11 +32,14 @@ const popularSearches = [
 const SEARCH_ACTIVE_TAB_KEY = "search-active-tab";
 const SEARCH_RESULTS_VIEW_KEY = "search-results-view";
 const RECENT_AI_SEARCHES_KEY = "recentAiSearches";
+const SEARCH_SIDEBAR_OPEN_KEY = "search-sidebar-open";
 
 const Search = () => {
   const location = useLocation();
   const { toast } = useToast();
   const isMobile = useIsMobile();
+  const breakpoint = useBreakpoint();
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   
   const [filters, setFilters] = useState<SearchFiltersType>({
     regions: [],
@@ -70,12 +73,25 @@ const Search = () => {
   }, []);
 
   useEffect(() => {
+    const savedSidebarState = localStorage.getItem(SEARCH_SIDEBAR_OPEN_KEY);
+    if (savedSidebarState !== null) {
+      setSidebarOpen(savedSidebarState === "true");
+    } else {
+      setSidebarOpen(!isMobile);
+    }
+  }, [isMobile]);
+
+  useEffect(() => {
     localStorage.setItem(SEARCH_ACTIVE_TAB_KEY, activeTab);
   }, [activeTab]);
 
   useEffect(() => {
     localStorage.setItem(SEARCH_RESULTS_VIEW_KEY, resultsView);
   }, [resultsView]);
+
+  useEffect(() => {
+    localStorage.setItem(SEARCH_SIDEBAR_OPEN_KEY, sidebarOpen.toString());
+  }, [sidebarOpen]);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -276,6 +292,25 @@ const Search = () => {
     setActiveTab(value);
   };
 
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
+  const getContainerClassName = () => {
+    if (resultsView === "map" || resultsView === "calendar") {
+      return "w-full max-w-full";
+    }
+    
+    switch (breakpoint) {
+      case "desktop":
+        return "max-w-6xl mx-auto";
+      case "tablet":
+        return "max-w-4xl mx-auto";
+      default:
+        return "w-full";
+    }
+  };
+
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
@@ -283,197 +318,229 @@ const Search = () => {
       <main className="flex-1 container py-8">
         <h1 className="text-3xl font-bold mb-6">Hitta din nästa orienteringsutmaning</h1>
         
-        <div className="max-w-3xl mx-auto">
-          <Tabs value={activeTab} onValueChange={handleTabChange} className="mb-6">
-            <TabsList className="grid w-full grid-cols-2 mb-4">
-              <TabsTrigger value="ai">
-                <Sparkles className="mr-2 h-4 w-4" />
-                Smarta sökningar
-              </TabsTrigger>
-              <TabsTrigger value="manual">
-                <Filter className="mr-2 h-4 w-4" />
-                Filtrera tävlingar
-              </TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="ai" className="space-y-4">
-              <div className="rounded-lg border bg-card p-4">
-                <div className="mb-4 text-sm text-muted-foreground">
-                  <p className="mb-2">Beskriv tävlingen du söker med dina egna ord, så hjälper vår AI dig hitta den perfekta matchen.</p>
-                  <p>Testa att beskriva plats, disciplin, svårighetsgrad eller när du vill tävla!</p>
-                </div>
+        <div className={cn("flex flex-col md:flex-row gap-6", getContainerClassName())}>
+          {isMobile && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={toggleSidebar}
+              className="mb-4 flex items-center"
+            >
+              <LayoutPanelLeft className="mr-2 h-4 w-4" />
+              {sidebarOpen ? "Dölj filter" : "Visa filter"}
+            </Button>
+          )}
+          
+          {sidebarOpen && (
+            <div className="w-full md:w-80 flex-shrink-0">
+              <Tabs value={activeTab} onValueChange={handleTabChange} className="mb-6">
+                <TabsList className="grid w-full grid-cols-2 mb-4">
+                  <TabsTrigger value="ai">
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Smarta sökningar
+                  </TabsTrigger>
+                  <TabsTrigger value="manual">
+                    <Filter className="mr-2 h-4 w-4" />
+                    Filtrera tävlingar
+                  </TabsTrigger>
+                </TabsList>
                 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="relative">
-                    <Input
-                      placeholder="Till exempel: &quot;Sprinttävlingar i Skåne under våren&quot;..."
-                      value={searchInputValue}
-                      onChange={(e) => handleSearchChange(e.target.value)}
-                      className="pr-8 text-base"
-                    />
-                    {searchInputValue && (
-                      <button
-                        type="button"
-                        onClick={handleClearSearch}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                        aria-label="Rensa sökning"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    )}
-                  </div>
-                  
-                  <Button 
-                    type="submit" 
-                    disabled={isProcessing || !searchInputValue.trim()}
-                    className="w-full"
-                  >
-                    {isProcessing ? (
-                      <>
-                        <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full mr-2"></div>
-                        Letar efter tävlingar...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="mr-2 h-4 w-4" />
-                        Hitta tävlingar
-                      </>
-                    )}
-                  </Button>
-                </form>
-                
-                {recentSearches.length > 0 && (
-                  <div className="mt-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-muted-foreground" />
-                        <h3 className="text-sm font-medium">Dina senaste sökningar</h3>
+                <TabsContent value="ai" className="space-y-4">
+                  <div className="rounded-lg border bg-card p-4">
+                    <div className="mb-4 text-sm text-muted-foreground">
+                      <p className="mb-2">Beskriv tävlingen du söker med dina egna ord, så hjälper vår AI dig hitta den perfekta matchen.</p>
+                      <p>Testa att beskriva plats, disciplin, svårighetsgrad eller när du vill tävla!</p>
+                    </div>
+                    
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <div className="relative">
+                        <Input
+                          placeholder="Till exempel: &quot;Sprinttävlingar i Skåne under våren&quot;..."
+                          value={searchInputValue}
+                          onChange={(e) => handleSearchChange(e.target.value)}
+                          className="pr-8 text-base"
+                        />
+                        {searchInputValue && (
+                          <button
+                            type="button"
+                            onClick={handleClearSearch}
+                            className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                            aria-label="Rensa sökning"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        )}
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleClearHistory}
-                        className="h-7 px-2 text-xs text-muted-foreground hover:text-destructive"
+                      
+                      <Button 
+                        type="submit" 
+                        disabled={isProcessing || !searchInputValue.trim()}
+                        className="w-full"
                       >
-                        <Trash2 className="h-3 w-3 mr-1" />
-                        Rensa historik
+                        {isProcessing ? (
+                          <>
+                            <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full mr-2"></div>
+                            Letar efter tävlingar...
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="mr-2 h-4 w-4" />
+                            Hitta tävlingar
+                          </>
+                        )}
                       </Button>
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      {recentSearches.map((search, index) => (
-                        <Button
-                          key={index}
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => processQuery(search)}
-                          className="text-xs justify-start h-auto py-1.5 text-muted-foreground hover:text-foreground"
-                        >
-                          <SearchIcon className="h-3 w-3 mr-2" />
-                          {search.length > 60 ? `${search.substring(0, 60)}...` : search}
-                        </Button>
-                      ))}
+                    </form>
+                    
+                    {recentSearches.length > 0 && (
+                      <div className="mt-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <Clock className="h-4 w-4 text-muted-foreground" />
+                            <h3 className="text-sm font-medium">Dina senaste sökningar</h3>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleClearHistory}
+                            className="h-7 px-2 text-xs text-muted-foreground hover:text-destructive"
+                          >
+                            <Trash2 className="h-3 w-3 mr-1" />
+                            Rensa historik
+                          </Button>
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          {recentSearches.map((search, index) => (
+                            <Button
+                              key={index}
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => processQuery(search)}
+                              className="text-xs justify-start h-auto py-1.5 text-muted-foreground hover:text-foreground"
+                            >
+                              <SearchIcon className="h-3 w-3 mr-2" />
+                              {search.length > 60 ? `${search.substring(0, 60)}...` : search}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div className="mt-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <TrendingUp className="h-4 w-4 text-primary" />
+                        <h3 className="text-sm font-medium">Populära sökningar</h3>
+                      </div>
+                      <div className="flex flex-col gap-1">
+                        {popularSearches.map((search, index) => (
+                          <Button
+                            key={index}
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => processQuery(search)}
+                            className="text-xs justify-start h-auto py-1.5 text-muted-foreground hover:text-foreground"
+                          >
+                            <SearchIcon className="h-3 w-3 mr-2" />
+                            {search}
+                          </Button>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                )}
+                </TabsContent>
                 
-                <div className="mt-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <TrendingUp className="h-4 w-4 text-primary" />
-                    <h3 className="text-sm font-medium">Populära sökningar</h3>
+                <TabsContent value="manual">
+                  <div className="mb-4">
+                    <SearchFilters 
+                      filters={filters} 
+                      onFilterChange={handleFilterChange} 
+                      hasLocation={false}
+                      hideSearchInput={true}
+                    />
                   </div>
-                  <div className="flex flex-col gap-1">
-                    {popularSearches.map((search, index) => (
-                      <Button
-                        key={index}
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => processQuery(search)}
-                        className="text-xs justify-start h-auto py-1.5 text-muted-foreground hover:text-foreground"
-                      >
-                        <SearchIcon className="h-3 w-3 mr-2" />
-                        {search}
-                      </Button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="manual">
-              <div className="mb-4">
-                <SearchFilters 
-                  filters={filters} 
-                  onFilterChange={handleFilterChange} 
-                  hasLocation={false}
-                  hideSearchInput={true}
-                />
-              </div>
-            </TabsContent>
-          </Tabs>
-          
-          <div className="bg-card rounded-lg border p-4 mb-6">
-            <div className="flex justify-between items-center">
-              <h2 className="font-semibold">
-                {filteredCompetitions.length === 0 ? 'Inga tävlingar hittades' : 
-                 `${filteredCompetitions.length} ${filteredCompetitions.length === 1 ? 'tävling' : 'tävlingar'} matchar dina kriterier`}
-              </h2>
-              
-              {activeTab === "manual" && (
-                <ToggleGroup type="single" value={resultsView} onValueChange={(value) => value && setResultsView(value as "list" | "calendar" | "map")}>
-                  <ToggleGroupItem value="list" aria-label="Visa som lista">
-                    <List className="h-4 w-4 mr-1" />
-                    Lista
-                  </ToggleGroupItem>
-                  <ToggleGroupItem value="calendar" aria-label="Visa som kalender">
-                    <Calendar className="h-4 w-4 mr-1" />
-                    Kalender
-                  </ToggleGroupItem>
-                  <ToggleGroupItem value="map" aria-label="Visa på karta">
-                    <Map className="h-4 w-4 mr-1" />
-                    Karta
-                  </ToggleGroupItem>
-                </ToggleGroup>
-              )}
-            </div>
-          </div>
-          
-          {filteredCompetitions.length > 0 ? (
-            <>
-              {activeTab === "ai" && (
-                <CompetitionCompactView competitions={filteredCompetitions} />
-              )}
-              
-              {activeTab === "manual" && resultsView === "list" && (
-                <CompetitionListView competitions={filteredCompetitions} />
-              )}
-              
-              {activeTab === "manual" && resultsView === "calendar" && (
-                <CompetitionCalendarView competitions={filteredCompetitions} />
-              )}
-              
-              {activeTab === "manual" && resultsView === "map" && (
-                <CompetitionMapView competitions={filteredCompetitions} />
-              )}
-            </>
-          ) : (
-            <div className="bg-card rounded-lg border p-8 text-center">
-              <h3 className="text-lg font-medium mb-2">Inga matchande tävlingar</h3>
-              <p className="text-muted-foreground mb-4">
-                Vi hittade inga tävlingar som matchar dina kriterier. Prova att:
-              </p>
-              <ul className="text-left text-sm text-muted-foreground ml-6 mb-4 list-disc space-y-1">
-                <li>Ändra ditt datumintervall</li>
-                <li>Ta bort några filter</li>
-                <li>Bredda din sökning med färre söktermer</li>
-              </ul>
-              <Button
-                variant="outline"
-                onClick={handleClearAllFilters}
-              >
-                Rensa alla filter
-              </Button>
+                </TabsContent>
+              </Tabs>
             </div>
           )}
+          
+          <div className="flex-1">
+            <div className="bg-card rounded-lg border p-4 mb-6">
+              <div className="flex justify-between items-center">
+                <h2 className="font-semibold">
+                  {filteredCompetitions.length === 0 ? 'Inga tävlingar hittades' : 
+                  `${filteredCompetitions.length} ${filteredCompetitions.length === 1 ? 'tävling' : 'tävlingar'} matchar dina kriterier`}
+                </h2>
+                
+                <div className="flex items-center gap-2">
+                  {!isMobile && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={toggleSidebar}
+                      className="mr-2"
+                    >
+                      <LayoutPanelLeft className="h-4 w-4" />
+                      <span className="sr-only">{sidebarOpen ? "Dölj filter" : "Visa filter"}</span>
+                    </Button>
+                  )}
+                  
+                  {activeTab === "manual" && (
+                    <ToggleGroup type="single" value={resultsView} onValueChange={(value) => value && setResultsView(value as "list" | "calendar" | "map")}>
+                      <ToggleGroupItem value="list" aria-label="Visa som lista">
+                        <List className="h-4 w-4 mr-1" />
+                        Lista
+                      </ToggleGroupItem>
+                      <ToggleGroupItem value="calendar" aria-label="Visa som kalender">
+                        <Calendar className="h-4 w-4 mr-1" />
+                        Kalender
+                      </ToggleGroupItem>
+                      <ToggleGroupItem value="map" aria-label="Visa på karta">
+                        <Map className="h-4 w-4 mr-1" />
+                        Karta
+                      </ToggleGroupItem>
+                    </ToggleGroup>
+                  )}
+                </div>
+              </div>
+            </div>
+            
+            {filteredCompetitions.length > 0 ? (
+              <>
+                {activeTab === "ai" && (
+                  <CompetitionCompactView competitions={filteredCompetitions} />
+                )}
+                
+                {activeTab === "manual" && resultsView === "list" && (
+                  <CompetitionListView competitions={filteredCompetitions} />
+                )}
+                
+                {activeTab === "manual" && resultsView === "calendar" && (
+                  <CompetitionCalendarView competitions={filteredCompetitions} />
+                )}
+                
+                {activeTab === "manual" && resultsView === "map" && (
+                  <CompetitionMapView competitions={filteredCompetitions} />
+                )}
+              </>
+            ) : (
+              <div className="bg-card rounded-lg border p-8 text-center">
+                <h3 className="text-lg font-medium mb-2">Inga matchande tävlingar</h3>
+                <p className="text-muted-foreground mb-4">
+                  Vi hittade inga tävlingar som matchar dina kriterier. Prova att:
+                </p>
+                <ul className="text-left text-sm text-muted-foreground ml-6 mb-4 list-disc space-y-1">
+                  <li>Ändra ditt datumintervall</li>
+                  <li>Ta bort några filter</li>
+                  <li>Bredda din sökning med färre söktermer</li>
+                </ul>
+                <Button
+                  variant="outline"
+                  onClick={handleClearAllFilters}
+                >
+                  Rensa alla filter
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
       </main>
       
@@ -483,4 +550,3 @@ const Search = () => {
 };
 
 export default Search;
-
