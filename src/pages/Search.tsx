@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -42,10 +41,8 @@ const Search = () => {
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   
-  // Force recomputation for each location change by using a key
   const [locationChangeCounter, setLocationChangeCounter] = useState(0);
 
-  // Update filters when geolocation changes
   useEffect(() => {
     console.log("Location changed, updating filters:", { userLocation, isManualLocation });
     setFilters(prevFilters => ({
@@ -55,11 +52,9 @@ const Search = () => {
       isManualLocation
     }));
     
-    // Force distance recalculation by incrementing the counter
     setLocationChangeCounter(prev => prev + 1);
   }, [userLocation, detectedLocationInfo, isManualLocation]);
 
-  // Use useMemo to calculate distances only when location or competitions change
   const competitionsWithDistance = useMemo(() => {
     console.log("Recalculating distances with userLocation:", userLocation);
     
@@ -81,24 +76,20 @@ const Search = () => {
       console.log(`Competition ${competition.name} - Distance: ${distance}m`);
       return { ...competition, distance };
     });
-  }, [userLocation, locationChangeCounter]); // Include locationChangeCounter to force recalculation
+  }, [userLocation, locationChangeCounter]);
 
-  // Apply filters to the competitions with calculated distances
   const filteredCompetitions = useMemo(() => {
     return filterCompetitions(competitionsWithDistance, filters);
   }, [competitionsWithDistance, filters]);
 
   const handleFilterChange = (newFilters: SearchFiltersType) => {
-    // Handle special cases for location changes
     if (newFilters.isManualLocation !== filters.isManualLocation) {
       if (newFilters.isManualLocation === false && filters.isManualLocation === true) {
-        // User wants to switch from manual to auto detection
         clearLocation();
         detectLocation();
       }
     }
 
-    // If the searchQuery was cleared by the filters, update the searchInputValue too
     if (newFilters.searchQuery === "" && filters.searchQuery !== "") {
       setSearchInputValue("");
       toast({
@@ -108,11 +99,12 @@ const Search = () => {
       });
     }
 
+    const locationChanged = newFilters.userLocation !== filters.userLocation;
+
     console.log("Filter changed:", newFilters);
     setFilters(newFilters);
     
-    // Force distance recalculation for location changes
-    if (newFilters.userLocation !== filters.userLocation) {
+    if (locationChanged) {
       setLocationChangeCounter(prev => prev + 1);
     }
   };
@@ -120,7 +112,6 @@ const Search = () => {
   const handleSearchChange = (value: string) => {
     setSearchInputValue(value);
     
-    // Immediately update filters for real-time search
     setFilters({
       ...filters,
       searchQuery: value
@@ -205,7 +196,7 @@ const Search = () => {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {filteredCompetitions.map((competition) => (
                   <CompetitionCard 
-                    key={`${competition.id}-${locationChangeCounter}`} // Add location counter to force re-rendering
+                    key={`${competition.id}-${locationChangeCounter}`}
                     competition={competition} 
                     featured={competition.featured}
                   />
