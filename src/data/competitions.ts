@@ -78,7 +78,8 @@ const oringenResources: CompetitionResource[] = [
   }
 ];
 
-export const competitions: Competition[] = [
+// The original 12 competitions remain
+const originalCompetitions: Competition[] = [
   {
     id: '1',
     name: 'Stockholms Vårsprinten',
@@ -303,3 +304,1344 @@ export const competitions: Competition[] = [
     website: 'https://jok.se/vintercupen2025'
   }
 ];
+
+// New competitions - January 2025 (additional)
+const januaryCompetitions: Competition[] = [
+  {
+    id: '13',
+    name: 'Vintercupen Etapp 1',
+    date: '2025-01-05',
+    organizer: 'Järfälla OK',
+    region: 'stockholm',
+    district: 'stockholm',
+    location: 'Järvafältet, Stockholm',
+    coordinates: {
+      lat: 59.4231,
+      lng: 17.8371
+    },
+    discipline: 'Sprint',
+    level: 'Distrikt',
+    registrationDeadline: '2024-12-28',
+    description: 'Årets första sprinttävling. Perfekt tillfälle att starta det nya året med en fartfylld tävling.',
+    website: 'https://jok.se/vintercupen2025'
+  },
+  {
+    id: '14',
+    name: 'Vintergaloppen',
+    date: '2025-01-12',
+    organizer: 'Tullinge SK',
+    region: 'stockholm',
+    district: 'stockholm',
+    location: 'Lida, Botkyrka',
+    coordinates: {
+      lat: 59.1750,
+      lng: 17.8340
+    },
+    discipline: 'Lång',
+    level: 'Nationell',
+    registrationDeadline: '2025-01-07',
+    description: 'Klassisk långdistans i vinterterräng. Möjlighet för att använda dubbskor om isigt.',
+    website: 'https://tullingesk.se/vintergaloppen'
+  },
+  {
+    id: '15',
+    name: 'Sundsvalls Vinternatt',
+    date: '2025-01-18',
+    organizer: 'Sundsvalls OK',
+    region: 'vasternorrland',
+    district: 'vasternorrland',
+    location: 'Södra Berget, Sundsvall',
+    coordinates: {
+      lat: 62.3875,
+      lng: 17.3078
+    },
+    discipline: 'Natt',
+    level: 'Distrikt',
+    registrationDeadline: '2025-01-13',
+    description: 'Utmanande nattorientering i kuperad terräng. Extra kraftig pannlampa rekommenderas!',
+    website: 'https://sundsvallsok.se/vinternatt'
+  },
+  {
+    id: '16',
+    name: 'Dalarna Vinterträffen',
+    date: '2025-01-25',
+    organizer: 'Stora Tuna OK',
+    region: 'dalarna',
+    district: 'dalarna',
+    location: 'Romme, Borlänge',
+    coordinates: {
+      lat: 60.4826,
+      lng: 15.4630
+    },
+    discipline: 'Medel',
+    level: 'Distrikt',
+    registrationDeadline: '2025-01-20',
+    description: 'Medeldistans på vinterkartan. Välpreparerade spår.',
+    website: 'https://storatuna.se/vinter2025'
+  },
+  {
+    id: '17',
+    name: 'Göteborgs Vinterrace',
+    date: '2025-01-26',
+    organizer: 'Göteborg-Majorna OK',
+    region: 'vastra-gotaland',
+    district: 'goteborg',
+    location: 'Slottsskogen, Göteborg',
+    coordinates: {
+      lat: 57.6851,
+      lng: 11.9418
+    },
+    discipline: 'Sprint',
+    level: 'Nationell',
+    registrationDeadline: '2025-01-21',
+    description: 'Urban sprinttävling genom Slottsskogens vindlande gångar. Publikvänlig avslutning.',
+    website: 'https://gmok.se/vinterrace'
+  }
+];
+
+// February 2025
+const februaryCompetitions: Competition[] = [
+  {
+    id: '18',
+    name: 'Gävle Vinterlänga',
+    date: '2025-02-02',
+    organizer: 'Gävle OK',
+    region: 'gavleborg',
+    district: 'gavleborg',
+    location: 'Hemlingby, Gävle',
+    coordinates: {
+      lat: 60.6465,
+      lng: 17.1851
+    },
+    discipline: 'Lång',
+    level: 'Nationell',
+    registrationDeadline: '2025-01-27',
+    description: 'Traditionell långdistans med extra långa banor. Uthållighet testas till max.',
+    website: 'https://gavleok.se/vinterlanga'
+  },
+  {
+    id: '19',
+    name: 'Skåne Indoor Sprint',
+    date: '2025-02-08',
+    organizer: 'Malmö OK',
+    region: 'skane',
+    district: 'skane',
+    location: 'Malmö Mässan, Malmö',
+    coordinates: {
+      lat: 55.5631,
+      lng: 12.9772
+    },
+    discipline: 'Sprint',
+    level: 'Nationell',
+    registrationDeadline: '2025-02-03',
+    description: 'Unik inomhussprint i mässhallarna. Tekniskt utmanande med många vägvalsmöjligheter.',
+    website: 'https://malmook.se/indoor2025',
+    featured: true
+  },
+  {
+    id: '20',
+    name: 'Värmlands Vintertrofé',
+    date: '2025-02-15',
+    organizer: 'Karlskoga OK',
+    region: 'varmland',
+    district: 'varmland',
+    location: 'Rävåsen, Karlskoga',
+    coordinates: {
+      lat: 59.3265,
+      lng: 14.5168
+    },
+    discipline: 'Medel',
+    level: 'Distrikt',
+    registrationDeadline: '2025-02-10',
+    description: 'Medeldistans med kreativa banor. Löpning på både skidspår och i terräng.',
+    website: 'https://karlskogaok.se/vinter'
+  },
+  {
+    id: '21',
+    name: 'Stockholm Indoor Cup',
+    date: '2025-02-22',
+    organizer: 'OK Södertörn',
+    region: 'stockholm',
+    district: 'stockholm',
+    location: 'Globen, Stockholm',
+    coordinates: {
+      lat: 59.2935,
+      lng: 18.0834
+    },
+    discipline: 'Sprint',
+    level: 'Internationell',
+    registrationDeadline: '2025-02-15',
+    description: 'Prestigefylld inomhussprint med internationella löpare. Flervåningsbanor med höga krav på kartläsning.',
+    website: 'https://indoorcup.se',
+    featured: true
+  },
+  {
+    id: '22',
+    name: 'Göteborg Nattsprint',
+    date: '2025-02-28',
+    organizer: 'IFK Göteborg Orientering',
+    region: 'vastra-gotaland',
+    district: 'goteborg',
+    location: 'Hisingen, Göteborg',
+    coordinates: {
+      lat: 57.7284,
+      lng: 11.9472
+    },
+    discipline: 'Natt',
+    level: 'Nationell',
+    registrationDeadline: '2025-02-23',
+    description: 'Nattsprinttävling genom Hisingens urbana miljö. Utmanande vägval och begränsad sikt.',
+    website: 'https://ifkgoteborg.se/nattsprint'
+  }
+];
+
+// March 2025
+const marchCompetitions: Competition[] = [
+  {
+    id: '23',
+    name: 'Motala Vårtävling',
+    date: '2025-03-01',
+    organizer: 'Motala AIF',
+    region: 'ostergotland',
+    district: 'ostergotland',
+    location: 'Fålehagen, Motala',
+    coordinates: {
+      lat: 58.5374,
+      lng: 15.0366
+    },
+    discipline: 'Medel',
+    level: 'Nationell',
+    registrationDeadline: '2025-02-24',
+    description: 'Vårens första större tävling i Östergötland. Snabba banor med tekniska inslag.',
+    website: 'https://motalaorientering.se/vartavling'
+  },
+  {
+    id: '24',
+    name: 'Uppsala Vårsprint',
+    date: '2025-03-08',
+    organizer: 'OK Linné',
+    region: 'uppsala',
+    district: 'uppland',
+    location: 'Polacksbacken, Uppsala',
+    coordinates: {
+      lat: 59.8399,
+      lng: 17.6469
+    },
+    discipline: 'Sprint',
+    level: 'Nationell',
+    registrationDeadline: '2025-03-03',
+    description: 'Sprintorientering genom Uppsalas historiska universitetsområde. Snabba vägval och hög fart.',
+    website: 'https://oklinne.se/varsprint'
+  },
+  {
+    id: '25',
+    name: 'Västkustens Vårlöp',
+    date: '2025-03-22',
+    organizer: 'OK Nackhe',
+    region: 'halland',
+    district: 'halland',
+    location: 'Åsa, Kungsbacka',
+    coordinates: {
+      lat: 57.3562,
+      lng: 12.1163
+    },
+    discipline: 'Lång',
+    level: 'Nationell',
+    registrationDeadline: '2025-03-17',
+    description: 'Härlig kustnära långdistans genom Hallands skogar och längs strandkanten.',
+    website: 'https://oknackhe.se/varlop'
+  },
+  {
+    id: '26',
+    name: 'Smålandskavlen Vårupplagan',
+    date: '2025-03-29',
+    organizer: 'Jönköpings OK',
+    region: 'jonkoping',
+    district: 'smaland',
+    location: 'Huskvarna, Jönköping',
+    coordinates: {
+      lat: 57.7893,
+      lng: 14.2862
+    },
+    discipline: 'Stafett',
+    level: 'Nationell',
+    registrationDeadline: '2025-03-22',
+    description: 'Prestigefylld stafett med blandlag. Fem sträckor genom varierande terräng.',
+    website: 'https://jonkopingsok.se/smalandskavlen',
+    featured: true
+  },
+  {
+    id: '27',
+    name: 'Gävle Vårmönstring',
+    date: '2025-03-30',
+    organizer: 'Gävle OK',
+    region: 'gavleborg',
+    district: 'gavleborg',
+    location: 'Hemlingby, Gävle',
+    coordinates: {
+      lat: 60.6465,
+      lng: 17.1851
+    },
+    discipline: 'Medel',
+    level: 'Distrikt',
+    registrationDeadline: '2025-03-25',
+    description: 'Medeldistans för att testa vårformen. Varierad banläggning för alla nivåer.',
+    website: 'https://gavleok.se/varmonstring'
+  }
+];
+
+// April 2025
+const aprilCompetitions: Competition[] = [
+  {
+    id: '28',
+    name: 'Linköpings Vårdubbel, dag 1',
+    date: '2025-04-05',
+    organizer: 'Linköpings OK',
+    region: 'ostergotland',
+    district: 'ostergotland',
+    location: 'Vidingsjö, Linköping',
+    coordinates: {
+      lat: 58.3882,
+      lng: 15.6322
+    },
+    discipline: 'Medel',
+    level: 'Nationell',
+    registrationDeadline: '2025-03-31',
+    description: 'Första dagen av vårdubbeln. Medeldistans i detaljrik terräng kring Vidingsjö.',
+    website: 'https://lok.se/vardubbel'
+  },
+  {
+    id: '29',
+    name: 'Linköpings Vårdubbel, dag 2',
+    date: '2025-04-06',
+    organizer: 'Linköpings OK',
+    region: 'ostergotland',
+    district: 'ostergotland',
+    location: 'Tinnerö, Linköping',
+    coordinates: {
+      lat: 58.3773,
+      lng: 15.6455
+    },
+    discipline: 'Lång',
+    level: 'Nationell',
+    registrationDeadline: '2025-03-31',
+    description: 'Andra dagen av vårdubbeln. Långdistans i eklandskapet i Tinnerö.',
+    website: 'https://lok.se/vardubbel'
+  },
+  {
+    id: '30',
+    name: 'Örebros Vårserie, etapp 1',
+    date: '2025-04-13',
+    organizer: 'OK Alferna',
+    region: 'orebro',
+    district: 'orebro',
+    location: 'Karlslund, Örebro',
+    coordinates: {
+      lat: 59.2921,
+      lng: 15.1871
+    },
+    discipline: 'Medel',
+    level: 'Distrikt',
+    registrationDeadline: '2025-04-08',
+    description: 'Första etappen i Örebros populära vårserie. Medeldistans genom lättlöpt terräng.',
+    website: 'https://okalferna.se/varserie'
+  },
+  {
+    id: '31',
+    name: 'Svenska Cupen, deltävling 1',
+    date: '2025-04-19',
+    organizer: 'Uddevalla OK',
+    region: 'vastra-gotaland',
+    district: 'bohuslan-dal',
+    location: 'Herrestadsfjället, Uddevalla',
+    coordinates: {
+      lat: 58.3359,
+      lng: 11.9432
+    },
+    discipline: 'Lång',
+    level: 'Nationell',
+    registrationDeadline: '2025-04-12',
+    description: 'Första deltävlingen i Svenska Cupen. Långdistans i tekniskt svår bohuslänsk terräng.',
+    website: 'https://svenskacupen.se/deltavling1',
+    featured: true
+  },
+  {
+    id: '32',
+    name: 'Svenska Cupen, deltävling 2',
+    date: '2025-04-20',
+    organizer: 'Uddevalla OK',
+    region: 'vastra-gotaland',
+    district: 'bohuslan-dal',
+    location: 'Uddevalla Centrum',
+    coordinates: {
+      lat: 58.3498,
+      lng: 11.9351
+    },
+    discipline: 'Sprint',
+    level: 'Nationell',
+    registrationDeadline: '2025-04-12',
+    description: 'Andra deltävlingen i Svenska Cupen. Stadssprint genom Uddevallas centrala delar.',
+    website: 'https://svenskacupen.se/deltavling2',
+    featured: true
+  },
+  {
+    id: '33',
+    name: 'Örebros Vårserie, etapp 2',
+    date: '2025-04-27',
+    organizer: 'Almby IK',
+    region: 'orebro',
+    district: 'orebro',
+    location: 'Markaskogen, Örebro',
+    coordinates: {
+      lat: 59.2534,
+      lng: 15.2628
+    },
+    discipline: 'Lång',
+    level: 'Distrikt',
+    registrationDeadline: '2025-04-22',
+    description: 'Andra etappen i Örebros populära vårserie. Långdistans genom varierande terräng i Markaskogen.',
+    website: 'https://almbyik.se/varserie'
+  }
+];
+
+// May 2025
+const mayCompetitions: Competition[] = [
+  {
+    id: '34',
+    name: 'Södertälje City Race',
+    date: '2025-05-03',
+    organizer: 'Södertälje-Nykvarn Orientering',
+    region: 'stockholm',
+    district: 'stockholm',
+    location: 'Södertälje Centrum',
+    coordinates: {
+      lat: 59.1962,
+      lng: 17.6264
+    },
+    discipline: 'Sprint',
+    level: 'Nationell',
+    registrationDeadline: '2025-04-28',
+    description: 'Urban sprint genom Södertäljes centrala delar. Snabba vägval och många kontroller.',
+    website: 'https://snoracing.se/cityrace'
+  },
+  {
+    id: '35',
+    name: 'Stockholms Vårlångdistans',
+    date: '2025-05-04',
+    organizer: 'Snättringe SK',
+    region: 'stockholm',
+    district: 'stockholm',
+    location: 'Flemingsberg, Huddinge',
+    coordinates: {
+      lat: 59.2199,
+      lng: 17.9436
+    },
+    discipline: 'Lång',
+    level: 'Nationell',
+    registrationDeadline: '2025-04-28',
+    description: 'Krävande långdistans genom Flemingsbergskogens naturreservat. Kuperad terräng med inslag av tekniska partier.',
+    website: 'https://snattringe.se/varlang'
+  },
+  {
+    id: '36',
+    name: 'Umeå Midnattsol',
+    date: '2025-05-10',
+    organizer: 'Umeå OK',
+    region: 'vasterbotten',
+    district: 'vasterbotten',
+    location: 'Nydala, Umeå',
+    coordinates: {
+      lat: 63.8275,
+      lng: 20.3337
+    },
+    discipline: 'Natt',
+    level: 'Nationell',
+    registrationDeadline: '2025-05-05',
+    description: 'Unikt lopp som startar i skymningen och avslutas i ljusa norrländska sommarnätter. Speciell upplevelse!',
+    website: 'https://umeaok.se/midnattsol',
+    featured: true
+  },
+  {
+    id: '37',
+    name: 'Hälsinglands 2-dagars, dag 1',
+    date: '2025-05-17',
+    organizer: 'Söderhamns OK',
+    region: 'gavleborg',
+    district: 'gavleborg',
+    location: 'Mohed, Söderhamn',
+    coordinates: {
+      lat: 61.2690,
+      lng: 16.8318
+    },
+    discipline: 'Medel',
+    level: 'Nationell',
+    registrationDeadline: '2025-05-10',
+    description: 'Första dagen av Hälsinglands 2-dagars. Medeldistans i gammal hälsingsk skogsmark.',
+    website: 'https://soderok.se/2dagars'
+  },
+  {
+    id: '38',
+    name: 'Hälsinglands 2-dagars, dag 2',
+    date: '2025-05-18',
+    organizer: 'Söderhamns OK',
+    region: 'gavleborg',
+    district: 'gavleborg',
+    location: 'Söderala, Söderhamn',
+    coordinates: {
+      lat: 61.2995,
+      lng: 17.0471
+    },
+    discipline: 'Lång',
+    level: 'Nationell',
+    registrationDeadline: '2025-05-10',
+    description: 'Andra dagen av Hälsinglands 2-dagars. Långdistans med jaktstart baserat på resultaten från dag 1.',
+    website: 'https://soderok.se/2dagars'
+  },
+  {
+    id: '39',
+    name: 'Roslagsvåren',
+    date: '2025-05-25',
+    organizer: 'Roslagens OK',
+    region: 'stockholm',
+    district: 'stockholm',
+    location: 'Rimbo, Norrtälje',
+    coordinates: {
+      lat: 59.7489,
+      lng: 18.3542
+    },
+    discipline: 'Lång',
+    level: 'Nationell',
+    registrationDeadline: '2025-05-19',
+    description: 'Långdistans genom lättlöpta roslagsskogar. Perfekt tillfälle att testa formen inför sommarsäsongen.',
+    website: 'https://rok.nu/roslagsvaren'
+  },
+  {
+    id: '40',
+    name: 'Sigtuna Urban Sprint',
+    date: '2025-05-31',
+    organizer: 'Sigtuna OK',
+    region: 'stockholm',
+    district: 'uppland',
+    location: 'Sigtuna Gamla Stan',
+    coordinates: {
+      lat: 59.6173,
+      lng: 17.7236
+    },
+    discipline: 'Sprint',
+    level: 'Nationell',
+    registrationDeadline: '2025-05-26',
+    description: 'Spännande sprint genom Sigtunas historiska kvarter, en av Sveriges äldsta städer.',
+    website: 'https://sigtunaok.se/urbansprint'
+  }
+];
+
+// June 2025
+const juneCompetitions: Competition[] = [
+  {
+    id: '41',
+    name: 'Gotland Ultra',
+    date: '2025-06-01',
+    organizer: 'Gotlands Bro OK',
+    region: 'gotland',
+    district: 'gotland',
+    location: 'Tofta, Gotland',
+    coordinates: {
+      lat: 57.4923,
+      lng: 18.1326
+    },
+    discipline: 'Ultralång',
+    level: 'Nationell',
+    registrationDeadline: '2025-05-25',
+    description: 'Ultralång distans längs Gotlands vackra västkust. Kombinerar strand, skog och alvarmark.',
+    website: 'https://gotlandsbrook.se/ultra2025'
+  },
+  {
+    id: '42',
+    name: 'Norrköpingsnatten',
+    date: '2025-06-07',
+    organizer: 'OK Denseln',
+    region: 'ostergotland',
+    district: 'ostergotland',
+    location: 'Vrinnevi, Norrköping',
+    coordinates: {
+      lat: 58.5677,
+      lng: 16.1571
+    },
+    discipline: 'Natt',
+    level: 'Nationell',
+    registrationDeadline: '2025-06-02',
+    description: 'Unik nattorientering under sommarens ljusa kvällar. Tekniskt utmanande i stadsnära skogar.',
+    website: 'https://okdenseln.se/natten'
+  },
+  {
+    id: '43',
+    name: 'Sundsvall City Challenge',
+    date: '2025-06-14',
+    organizer: 'Sundsvalls OK',
+    region: 'vasternorrland',
+    district: 'vasternorrland',
+    location: 'Sundsvall Centrum',
+    coordinates: {
+      lat: 62.3908,
+      lng: 17.3069
+    },
+    discipline: 'Sprint',
+    level: 'Nationell',
+    registrationDeadline: '2025-06-09',
+    description: 'Urban sprinttävling genom Sundsvalls centrum med inslag av trappor och passager.',
+    website: 'https://sok.se/citychallenge'
+  },
+  {
+    id: '44',
+    name: 'Midsommardubbeln, dag 1',
+    date: '2025-06-20',
+    organizer: 'IK Hakarpspojkarna',
+    region: 'jonkoping',
+    district: 'smaland',
+    location: 'Hakarp, Huskvarna',
+    coordinates: {
+      lat: 57.8245,
+      lng: 14.3023
+    },
+    discipline: 'Medel',
+    level: 'Nationell',
+    registrationDeadline: '2025-06-15',
+    description: 'Traditionell midsommartävling med medeldistans. Perfekt mix av utmaning och fest.',
+    website: 'https://hakarpspojkarna.se/midsommar'
+  },
+  {
+    id: '45',
+    name: 'Midsommardubbeln, dag 2',
+    date: '2025-06-21',
+    organizer: 'IK Hakarpspojkarna',
+    region: 'jonkoping',
+    district: 'smaland',
+    location: 'Hakarp, Huskvarna',
+    coordinates: {
+      lat: 57.8245,
+      lng: 14.3023
+    },
+    discipline: 'Lång',
+    level: 'Nationell',
+    registrationDeadline: '2025-06-15',
+    description: 'Traditionell midsommartävling med långdistans. Jaktstart baserad på dag 1:s resultat.',
+    website: 'https://hakarpspojkarna.se/midsommar'
+  },
+  {
+    id: '46',
+    name: 'Värmlandsdubbeln, dag 1',
+    date: '2025-06-28',
+    organizer: 'OK Tyr',
+    region: 'varmland',
+    district: 'varmland',
+    location: 'Karlstad',
+    coordinates: {
+      lat: 59.4022,
+      lng: 13.5115
+    },
+    discipline: 'Sprint',
+    level: 'Nationell',
+    registrationDeadline: '2025-06-23',
+    description: 'Första dagen av Värmlandsdubbeln. Snabb sprintorientering genom Karlstads centrum.',
+    website: 'https://oktyr.se/varmland2025'
+  },
+  {
+    id: '47',
+    name: 'Värmlandsdubbeln, dag 2',
+    date: '2025-06-29',
+    organizer: 'OK Tyr',
+    region: 'varmland',
+    district: 'varmland',
+    location: 'Karlstad',
+    coordinates: {
+      lat: 59.4022,
+      lng: 13.5115
+    },
+    discipline: 'Medel',
+    level: 'Nationell',
+    registrationDeadline: '2025-06-23',
+    description: 'Andra dagen av Värmlandsdubbeln. Medeldistans i teknisk terräng utanför Karlstad.',
+    website: 'https://oktyr.se/varmland2025'
+  }
+];
+
+// July 2025
+const julyCompetitions: Competition[] = [
+  {
+    id: '48',
+    name: 'Hallands 3-dagars, dag 2',
+    date: '2025-07-06',
+    organizer: 'Falkenbergs OK',
+    region: 'halland',
+    district: 'halland',
+    location: 'Ullared, Falkenberg',
+    coordinates: {
+      lat: 57.1134,
+      lng: 12.7199
+    },
+    discipline: 'Lång',
+    level: 'Nationell',
+    registrationDeadline: '2025-06-25',
+    description: 'Andra dagen av Hallands 3-dagars. Långdistans genom kuperad halländsk terräng.',
+    website: 'https://hallands3dagars.se'
+  },
+  {
+    id: '49',
+    name: 'Hallands 3-dagars, dag 3',
+    date: '2025-07-07',
+    organizer: 'Falkenbergs OK',
+    region: 'halland',
+    district: 'halland',
+    location: 'Ullared, Falkenberg',
+    coordinates: {
+      lat: 57.1134,
+      lng: 12.7199
+    },
+    discipline: 'Medel',
+    level: 'Nationell',
+    registrationDeadline: '2025-06-25',
+    description: 'Tredje och sista dagen av Hallands 3-dagars. Medeldistans med jaktstart baserat på tidigare dagar.',
+    website: 'https://hallands3dagars.se'
+  },
+  {
+    id: '50',
+    name: 'Idre Fjällvecka - Prologen',
+    date: '2025-07-19',
+    organizer: 'Särna SK',
+    region: 'dalarna',
+    district: 'dalarna',
+    location: 'Idre Fjäll, Älvdalen',
+    coordinates: {
+      lat: 61.8903,
+      lng: 12.7243
+    },
+    discipline: 'Sprint',
+    level: 'Nationell',
+    registrationDeadline: '2025-07-10',
+    description: 'Inledande sprinttävling för Idre Fjällvecka. Orientering på kalfjället med imponerande utsikt.',
+    website: 'https://idrefjallvecka.se'
+  },
+  {
+    id: '51',
+    name: 'O-Ringen Etapp 2',
+    date: '2025-07-23',
+    organizer: 'O-Ringen',
+    region: 'dalarna',
+    district: 'dalarna',
+    location: 'Idre, Älvdalen',
+    coordinates: {
+      lat: 61.8579,
+      lng: 12.7250
+    },
+    discipline: 'Lång',
+    level: 'Internationell',
+    registrationDeadline: '2025-06-30',
+    description: 'Andra etappen av O-Ringen. Långdistans med tekniska moment och höjdskillnader.',
+    website: 'https://oringen.se/2025',
+    featured: true
+  },
+  {
+    id: '52',
+    name: 'O-Ringen Etapp 3',
+    date: '2025-07-24',
+    organizer: 'O-Ringen',
+    region: 'dalarna',
+    district: 'dalarna',
+    location: 'Idre, Älvdalen',
+    coordinates: {
+      lat: 61.8589,
+      lng: 12.7260
+    },
+    discipline: 'Medel',
+    level: 'Internationell',
+    registrationDeadline: '2025-06-30',
+    description: 'Tredje etappen av O-Ringen. Medeldistans med extra teknisk utmaning.',
+    website: 'https://oringen.se/2025',
+    featured: true
+  },
+  {
+    id: '53',
+    name: 'O-Ringen Etapp 4',
+    date: '2025-07-25',
+    organizer: 'O-Ringen',
+    region: 'dalarna',
+    district: 'dalarna',
+    location: 'Idre, Älvdalen',
+    coordinates: {
+      lat: 61.8599,
+      lng: 12.7270
+    },
+    discipline: 'Lång',
+    level: 'Internationell',
+    registrationDeadline: '2025-06-30',
+    description: 'Fjärde etappen av O-Ringen. Långdistans med delvis öppen fjällterräng.',
+    website: 'https://oringen.se/2025',
+    featured: true
+  },
+  {
+    id: '54',
+    name: 'O-Ringen Etapp 5',
+    date: '2025-07-26',
+    organizer: 'O-Ringen',
+    region: 'dalarna',
+    district: 'dalarna',
+    location: 'Idre, Älvdalen',
+    coordinates: {
+      lat: 61.8609,
+      lng: 12.7280
+    },
+    discipline: 'Lång',
+    level: 'Internationell',
+    registrationDeadline: '2025-06-30',
+    description: 'Femte och avslutande etappen av O-Ringen. Jaktstart baserat på tidigare etappers resultat.',
+    website: 'https://oringen.se/2025',
+    featured: true
+  }
+];
+
+// August 2025
+const augustCompetitions: Competition[] = [
+  {
+    id: '55',
+    name: 'Göteborg O-Meeting, dag 1',
+    date: '2025-08-02',
+    organizer: 'IFK Göteborg Orientering',
+    region: 'vastra-gotaland',
+    district: 'goteborg',
+    location: 'Delsjön, Göteborg',
+    coordinates: {
+      lat: 57.6885,
+      lng: 12.0459
+    },
+    discipline: 'Sprint',
+    level: 'Nationell',
+    registrationDeadline: '2025-07-28',
+    description: 'Första dagen av Göteborg O-Meeting. Stadssprint genom centrala Göteborg.',
+    website: 'https://ifkgoteborg.se/omeeting'
+  },
+  {
+    id: '56',
+    name: 'Göteborg O-Meeting, dag 2',
+    date: '2025-08-03',
+    organizer: 'IFK Göteborg Orientering',
+    region: 'vastra-gotaland',
+    district: 'goteborg',
+    location: 'Änggårdsbergen, Göteborg',
+    coordinates: {
+      lat: 57.6792,
+      lng: 11.9336
+    },
+    discipline: 'Medel',
+    level: 'Nationell',
+    registrationDeadline: '2025-07-28',
+    description: 'Andra dagen av Göteborg O-Meeting. Medeldistans i den tekniska terrängen i Änggårdsbergen.',
+    website: 'https://ifkgoteborg.se/omeeting'
+  },
+  {
+    id: '57',
+    name: 'DM Lång Stockholm',
+    date: '2025-08-17',
+    organizer: 'Järfälla OK',
+    region: 'stockholm',
+    district: 'stockholm',
+    location: 'Järvafältet, Stockholm',
+    coordinates: {
+      lat: 59.4231,
+      lng: 17.8371
+    },
+    discipline: 'Lång',
+    level: 'Distrikt',
+    registrationDeadline: '2025-08-11',
+    description: 'Distriktsmästerskap långdistans för Stockholm. Krävande terräng och fysiskt utmanande banor.',
+    website: 'https://stockholmsorientering.se/dm2025'
+  },
+  {
+    id: '58',
+    name: 'DM Medel Uppsala',
+    date: '2025-08-23',
+    organizer: 'OK Linné',
+    region: 'uppsala',
+    district: 'uppland',
+    location: 'Lunsen, Uppsala',
+    coordinates: {
+      lat: 59.7965,
+      lng: 17.6435
+    },
+    discipline: 'Medel',
+    level: 'Distrikt',
+    registrationDeadline: '2025-08-18',
+    description: 'Distriktsmästerskap medeldistans för Uppsala län. Teknisk orientering i detaljrik terräng.',
+    website: 'https://oklinne.se/dmmedel'
+  },
+  {
+    id: '59',
+    name: 'DM Stafett Uppsala',
+    date: '2025-08-24',
+    organizer: 'OK Linné',
+    region: 'uppsala',
+    district: 'uppland',
+    location: 'Lunsen, Uppsala',
+    coordinates: {
+      lat: 59.7965,
+      lng: 17.6435
+    },
+    discipline: 'Stafett',
+    level: 'Distrikt',
+    registrationDeadline: '2025-08-18',
+    description: 'Distriktsmästerskap stafett för Uppsala län. Spännande lagmätning som ofta avgörs på upploppet.',
+    website: 'https://oklinne.se/dmstafett'
+  },
+  {
+    id: '60',
+    name: 'Swedish League Final',
+    date: '2025-08-30',
+    organizer: 'Stora Tuna OK',
+    region: 'dalarna',
+    district: 'dalarna',
+    location: 'Borlänge',
+    coordinates: {
+      lat: 60.4843,
+      lng: 15.4353
+    },
+    discipline: 'Lång',
+    level: 'Nationell',
+    registrationDeadline: '2025-08-24',
+    description: 'Avslutande deltävling i Swedish League. Här avgörs säsongens totalsegrare.',
+    website: 'https://swedishleague.se/final',
+    featured: true
+  },
+  {
+    id: '61',
+    name: 'Swedish League Sprint Final',
+    date: '2025-08-31',
+    organizer: 'Stora Tuna OK',
+    region: 'dalarna',
+    district: 'dalarna',
+    location: 'Borlänge Centrum',
+    coordinates: {
+      lat: 60.4843,
+      lng: 15.4353
+    },
+    discipline: 'Sprint',
+    level: 'Nationell',
+    registrationDeadline: '2025-08-24',
+    description: 'Avslutande sprinttävling i Swedish League. Urban sprintorientering genom Borlänge centrum.',
+    website: 'https://swedishleague.se/sprintfinal',
+    featured: true
+  }
+];
+
+// September 2025
+const septemberCompetitions: Competition[] = [
+  {
+    id: '62',
+    name: 'DM Sprint Stockholm',
+    date: '2025-09-06',
+    organizer: 'Sundbybergs IK',
+    region: 'stockholm',
+    district: 'stockholm',
+    location: 'Sundbyberg Centrum',
+    coordinates: {
+      lat: 59.3613,
+      lng: 17.9718
+    },
+    discipline: 'Sprint',
+    level: 'Distrikt',
+    registrationDeadline: '2025-09-01',
+    description: 'Distriktsmästerskap sprint för Stockholm. Fartfylld tävling genom stadsmiljö.',
+    website: 'https://sik.se/dmsprint'
+  },
+  {
+    id: '63',
+    name: 'DM Stafett Stockholm',
+    date: '2025-09-07',
+    organizer: 'Sundbybergs IK',
+    region: 'stockholm',
+    district: 'stockholm',
+    location: 'Ursvik, Sundbyberg',
+    coordinates: {
+      lat: 59.3799,
+      lng: 17.9565
+    },
+    discipline: 'Stafett',
+    level: 'Distrikt',
+    registrationDeadline: '2025-09-01',
+    description: 'Distriktsmästerskap stafett för Stockholm. Spännande avslutning på DM-helgen.',
+    website: 'https://sik.se/dmstafett'
+  },
+  {
+    id: '64',
+    name: 'Höstöppet Skåne',
+    date: '2025-09-13',
+    organizer: 'Lunds OK',
+    region: 'skane',
+    district: 'skane',
+    location: 'Dalby, Lund',
+    coordinates: {
+      lat: 55.6705,
+      lng: 13.3509
+    },
+    discipline: 'Medel',
+    level: 'Nationell',
+    registrationDeadline: '2025-09-08',
+    description: 'Traditionell hösttävling i Skåne. Medeldistans i den vackra bokskogen.',
+    website: 'https://lundsok.se/hostoppet'
+  },
+  {
+    id: '65',
+    name: 'SM Medel',
+    date: '2025-09-20',
+    organizer: 'Malmö OK',
+    region: 'skane',
+    district: 'skane',
+    location: 'Torups Bokskog, Malmö',
+    coordinates: {
+      lat: 55.5597,
+      lng: 13.2125
+    },
+    discipline: 'Medel',
+    level: 'Nationell',
+    registrationDeadline: '2025-09-10',
+    description: 'Svenska Mästerskapen i medeldistans. Eliten samlas för årlig kraftmätning.',
+    website: 'https://svenskorientering.se/sm2025',
+    featured: true
+  },
+  {
+    id: '66',
+    name: 'SM Stafett',
+    date: '2025-09-21',
+    organizer: 'Malmö OK',
+    region: 'skane',
+    district: 'skane',
+    location: 'Torups Bokskog, Malmö',
+    coordinates: {
+      lat: 55.5597,
+      lng: 13.2125
+    },
+    discipline: 'Stafett',
+    level: 'Nationell',
+    registrationDeadline: '2025-09-10',
+    description: 'Svenska Mästerskapen i stafett. Klubbarnas viktigaste tävling där allt kan hända.',
+    website: 'https://svenskorientering.se/sm2025',
+    featured: true
+  },
+  {
+    id: '67',
+    name: 'Östgötaklassikern',
+    date: '2025-09-27',
+    organizer: 'OK Roxen',
+    region: 'ostergotland',
+    district: 'ostergotland',
+    location: 'Stjärnorp, Linköping',
+    coordinates: {
+      lat: 58.5075,
+      lng: 15.5346
+    },
+    discipline: 'Lång',
+    level: 'Nationell',
+    registrationDeadline: '2025-09-22',
+    description: 'Klassisk långdistans i östgötsk terräng. Kuperat och tekniskt krävande.',
+    website: 'https://okroxen.se/klassikern'
+  },
+  {
+    id: '68',
+    name: 'Gävle Höstmeeting',
+    date: '2025-09-28',
+    organizer: 'Gävle OK',
+    region: 'gavleborg',
+    district: 'gavleborg',
+    location: 'Hemlingby, Gävle',
+    coordinates: {
+      lat: 60.6465,
+      lng: 17.1851
+    },
+    discipline: 'Medel',
+    level: 'Nationell',
+    registrationDeadline: '2025-09-22',
+    description: 'Säsongsavslutande medeldistans med spännande och varierade banor.',
+    website: 'https://gavleok.se/hostmeeting'
+  }
+];
+
+// October 2025
+const octoberCompetitions: Competition[] = [
+  {
+    id: '69',
+    name: 'Uppsala Mörkertävling',
+    date: '2025-10-04',
+    organizer: 'OK Linné',
+    region: 'uppsala',
+    district: 'uppland',
+    location: 'Fjällnora, Uppsala',
+    coordinates: {
+      lat: 59.8394,
+      lng: 17.9115
+    },
+    discipline: 'Natt',
+    level: 'Nationell',
+    registrationDeadline: '2025-09-29',
+    description: 'Säsongspremiär för nattävlingar. Utmanande orientering i totalt mörker.',
+    website: 'https://oklinne.se/morker'
+  },
+  {
+    id: '70',
+    name: 'Stockholm City Cup, etapp 1',
+    date: '2025-10-11',
+    organizer: 'Järla Orientering',
+    region: 'stockholm',
+    district: 'stockholm',
+    location: 'Södermalm, Stockholm',
+    coordinates: {
+      lat: 59.3139,
+      lng: 18.0753
+    },
+    discipline: 'Sprint',
+    level: 'Nationell',
+    registrationDeadline: '2025-10-06',
+    description: 'Första etappen av populära Stockholm City Cup. Urban sprint genom Södermalms gator och gränder.',
+    website: 'https://stockholmcitycup.se'
+  },
+  {
+    id: '71',
+    name: 'Stockholm City Cup, etapp 2',
+    date: '2025-10-18',
+    organizer: 'Järla Orientering',
+    region: 'stockholm',
+    district: 'stockholm',
+    location: 'Gamla Stan, Stockholm',
+    coordinates: {
+      lat: 59.3253,
+      lng: 18.0713
+    },
+    discipline: 'Sprint',
+    level: 'Nationell',
+    registrationDeadline: '2025-10-13',
+    description: 'Andra etappen av Stockholm City Cup. Historisk sprint genom Gamla Stans medeltida gatunät.',
+    website: 'https://stockholmcitycup.se'
+  },
+  {
+    id: '72',
+    name: 'Smålandskavlen',
+    date: '2025-10-25',
+    organizer: 'Växjö OK',
+    region: 'kronoberg',
+    district: 'smaland',
+    location: 'Teleborg, Växjö',
+    coordinates: {
+      lat: 56.8570,
+      lng: 14.8359
+    },
+    discipline: 'Stafett',
+    level: 'Nationell',
+    registrationDeadline: '2025-10-15',
+    description: 'Klassisk höststafett med natt- och dagsträckor. En av Sveriges äldsta och mest prestigefyllda stafetter.',
+    website: 'https://smalandskavlen.se',
+    featured: true
+  },
+  {
+    id: '73',
+    name: 'Stockholm City Cup, etapp 3',
+    date: '2025-10-26',
+    organizer: 'Järla Orientering',
+    region: 'stockholm',
+    district: 'stockholm',
+    location: 'Kungsholmen, Stockholm',
+    coordinates: {
+      lat: 59.3307,
+      lng: 18.0284
+    },
+    discipline: 'Sprint',
+    level: 'Nationell',
+    registrationDeadline: '2025-10-20',
+    description: 'Tredje och avslutande etappen av Stockholm City Cup. Final med jaktstart baserat på tidigare etapper.',
+    website: 'https://stockholmcitycup.se'
+  }
+];
+
+// November 2025
+const novemberCompetitions: Competition[] = [
+  {
+    id: '74',
+    name: 'Novembersprinten',
+    date: '2025-11-01',
+    organizer: 'OK Södertörn',
+    region: 'stockholm',
+    district: 'stockholm',
+    location: 'Flemingsberg, Huddinge',
+    coordinates: {
+      lat: 59.2199,
+      lng: 17.9436
+    },
+    discipline: 'Sprint',
+    level: 'Nationell',
+    registrationDeadline: '2025-10-27',
+    description: 'Inledande vintersäsongstävling. Sprint i dagsljus med tekniska utmaningar.',
+    website: 'https://oksodertorn.se/november'
+  },
+  {
+    id: '75',
+    name: 'Norrköpings Nattcup, etapp 1',
+    date: '2025-11-08',
+    organizer: 'OK Denseln',
+    region: 'ostergotland',
+    district: 'ostergotland',
+    location: 'Vrinnevi, Norrköping',
+    coordinates: {
+      lat: 58.5677,
+      lng: 16.1571
+    },
+    discipline: 'Natt',
+    level: 'Distrikt',
+    registrationDeadline: '2025-11-03',
+    description: 'Första etappen av Norrköpings Nattcup. Orienteringsutmaning i kompakt stadsnära skog.',
+    website: 'https://okdenseln.se/nattcup'
+  },
+  {
+    id: '76',
+    name: 'Göteborg By Night, etapp 1',
+    date: '2025-11-15',
+    organizer: 'Göteborg-Majorna OK',
+    region: 'vastra-gotaland',
+    district: 'goteborg',
+    location: 'Slottsskogen, Göteborg',
+    coordinates: {
+      lat: 57.6851,
+      lng: 11.9418
+    },
+    discipline: 'Natt',
+    level: 'Distrikt',
+    registrationDeadline: '2025-11-10',
+    description: 'Första etappen av Göteborgs populära nattserie. Sprint genom Slottsskogens mörka gångar.',
+    website: 'https://gmok.se/bynight'
+  },
+  {
+    id: '77',
+    name: 'Norrköpings Nattcup, etapp 2',
+    date: '2025-11-22',
+    organizer: 'OK Denseln',
+    region: 'ostergotland',
+    district: 'ostergotland',
+    location: 'Folkparken, Norrköping',
+    coordinates: {
+      lat: 58.5882,
+      lng: 16.1728
+    },
+    discipline: 'Natt',
+    level: 'Distrikt',
+    registrationDeadline: '2025-11-17',
+    description: 'Andra etappen av Norrköpings Nattcup. Parkorientering med många kontroller.',
+    website: 'https://okdenseln.se/nattcup'
+  },
+  {
+    id: '78',
+    name: 'Göteborg By Night, etapp 2',
+    date: '2025-11-29',
+    organizer: 'Göteborg-Majorna OK',
+    region: 'vastra-gotaland',
+    district: 'goteborg',
+    location: 'Änggårdsbergen, Göteborg',
+    coordinates: {
+      lat: 57.6792,
+      lng: 11.9336
+    },
+    discipline: 'Natt',
+    level: 'Distrikt',
+    registrationDeadline: '2025-11-24',
+    description: 'Andra etappen av Göteborgs populära nattserie. Teknisk nattorientering i kuperad terräng.',
+    website: 'https://gmok.se/bynight'
+  }
+];
+
+// December 2025
+const decemberCompetitions: Competition[] = [
+  {
+    id: '79',
+    name: 'Luciatävlingen',
+    date: '2025-12-13',
+    organizer: 'IFK Lidingö SOK',
+    region: 'stockholm',
+    district: 'stockholm',
+    location: 'Lidingö',
+    coordinates: {
+      lat: 59.3662,
+      lng: 18.1333
+    },
+    discipline: 'Natt',
+    level: 'Distrikt',
+    registrationDeadline: '2025-12-08',
+    description: 'Traditionell luciafirande med orienteringstävling. Facklor och lyktor lyser upp kontrollerna.',
+    website: 'https://ifklsok.se/lucia2025'
+  },
+  {
+    id: '80',
+    name: 'Vintercupen Etapp 1',
+    date: '2025-12-06',
+    organizer: 'Järfälla OK',
+    region: 'stockholm',
+    district: 'stockholm',
+    location: 'Järvafältet, Stockholm',
+    coordinates: {
+      lat: 59.4231,
+      lng: 17.8371
+    },
+    discipline: 'Sprint',
+    level: 'Distrikt',
+    registrationDeadline: '2025-12-01',
+    description: 'Första etappen av årets Vintercup. Sprint med kreativa inslag och överraskningar.',
+    website: 'https://jok.se/vintercupen2025'
+  },
+  {
+    id: '81',
+    name: 'Julavslutningen',
+    date: '2025-12-20',
+    organizer: 'Sundbybergs IK',
+    region: 'stockholm',
+    district: 'stockholm',
+    location: 'Ursvik, Sundbyberg',
+    coordinates: {
+      lat: 59.3799,
+      lng: 17.9565
+    },
+    discipline: 'Lång',
+    level: 'Distrikt',
+    registrationDeadline: '2025-12-15',
+    description: 'Traditionell julavslutning med glögg och pepparkakor vid målet. Tävling i skämtsam anda.',
+    website: 'https://sik.se/julavslutning'
+  },
+  {
+    id: '82',
+    name: 'Nyårsraketen',
+    date: '2025-12-31',
+    organizer: 'Tullinge SK',
+    region: 'stockholm',
+    district: 'stockholm',
+    location: 'Lida, Botkyrka',
+    coordinates: {
+      lat: 59.1750,
+      lng: 17.8340
+    },
+    discipline: 'Sprint',
+    level: 'Klubb',
+    registrationDeadline: '2025-12-28',
+    description: 'Avsluta året med en fartfylld sprint. Mål innan tolvslaget och gemensamt nyårsfirande efteråt.',
+    website: 'https://tullingesk.se/nyarsraket'
+  }
+];
+
+// Combine all competitions
+export const competitions: Competition[] = [
+  ...originalCompetitions,
+  ...januaryCompetitions,
+  ...februaryCompetitions,
+  ...marchCompetitions,
+  ...aprilCompetitions,
+  ...mayCompetitions,
+  ...juneCompetitions,
+  ...julyCompetitions,
+  ...augustCompetitions,
+  ...septemberCompetitions,
+  ...octoberCompetitions,
+  ...novemberCompetitions,
+  ...decemberCompetitions
+];
+
