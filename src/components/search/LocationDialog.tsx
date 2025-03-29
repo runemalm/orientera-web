@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { MapPinOff, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -82,6 +82,7 @@ const LocationDialog = ({ open, onOpenChange, onCitySelect }: LocationDialogProp
         saveLocationHistory({ name: cityName, display: displayName });
         setLocationHistory(getLocationHistory());
       }
+      onOpenChange(false);
       setCitySearchValue("");
     }
   };
