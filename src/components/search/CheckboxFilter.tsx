@@ -14,7 +14,7 @@ import { useMemo, useState } from "react";
 
 interface CheckboxFilterProps {
   title: string;
-  items: { id: string; name: string }[];
+  items: { id: string; name: string; count?: number }[];
   selectedItems: string[];
   onItemChange: (itemId: string, checked: boolean) => void;
   accordionValue: string;
@@ -111,6 +111,11 @@ const CheckboxFilter = ({
                 >
                   {item.name}
                 </Label>
+                {item.count !== undefined && (
+                  <span className="text-xs text-muted-foreground">
+                    {item.count}
+                  </span>
+                )}
               </div>
             ))
           )}
