@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
+import { X, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useMemo, useState } from "react";
 
@@ -46,9 +46,9 @@ const CheckboxFilter = ({
   };
   
   return (
-    <AccordionItem value={accordionValue} className="border rounded-md bg-background overflow-hidden">
-      <AccordionTrigger className="px-3 py-2 hover:no-underline">
-        <div className="flex items-center justify-between w-full">
+    <AccordionItem value={accordionValue} className="border rounded-md bg-background overflow-hidden shadow-sm">
+      <AccordionTrigger className="px-3 py-2 hover:no-underline group">
+        <div className="flex items-center justify-between w-full group-hover:text-primary transition-colors">
           <span className="text-sm font-medium">
             {title}
           </span>
@@ -61,13 +61,24 @@ const CheckboxFilter = ({
       </AccordionTrigger>
       <AccordionContent className="px-3 pb-3 border-t pt-3">
         {items.length > 6 && (
-          <div className="mb-3">
+          <div className="mb-3 relative">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
             <Input
-              placeholder="Sök..."
+              placeholder={`Sök ${title.toLowerCase()}...`}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-8 text-sm"
+              className="h-8 text-sm pl-8 pr-8"
             />
+            {searchQuery && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setSearchQuery("")}
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 p-0"
+              >
+                <X className="h-3 w-3" />
+              </Button>
+            )}
           </div>
         )}
         
@@ -77,25 +88,25 @@ const CheckboxFilter = ({
               variant="ghost" 
               size="sm" 
               onClick={clearAllSelected}
-              className="h-7 text-xs px-2"
+              className="h-7 text-xs px-2 text-muted-foreground hover:text-foreground"
             >
               <X className="h-3 w-3 mr-1" />
-              Rensa {title.toLowerCase()}
+              Rensa {selectedCount} {selectedCount === 1 ? 'val' : 'val'}
             </Button>
           </div>
         )}
         
         <div className="max-h-48 overflow-y-auto pr-1 space-y-1">
           {filteredItems.length === 0 ? (
-            <p className="text-sm text-muted-foreground p-2 text-center">
-              Inga matchande alternativ
-            </p>
+            <div className="text-sm text-muted-foreground p-3 text-center bg-muted/30 rounded-md">
+              Inga matchande {title.toLowerCase()} hittades
+            </div>
           ) : (
             filteredItems.map((item) => (
               <div 
                 className={`flex items-center gap-2 px-2 py-1.5 rounded-sm ${
                   selectedItems.includes(item.id) ? 'bg-muted/50' : ''
-                }`} 
+                } hover:bg-muted/30 transition-colors`} 
                 key={item.id}
               >
                 <Checkbox 
@@ -107,7 +118,7 @@ const CheckboxFilter = ({
                 />
                 <Label 
                   htmlFor={`${accordionValue}-${item.id}`}
-                  className="text-sm cursor-pointer flex-1"
+                  className="text-sm cursor-pointer flex-1 select-none"
                 >
                   {item.name}
                 </Label>

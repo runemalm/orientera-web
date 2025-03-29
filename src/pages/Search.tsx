@@ -6,15 +6,17 @@ import SearchFilters from "@/components/SearchFilters";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
-import { Filter, Trash2, Map, Calendar, LayoutPanelLeft } from "lucide-react";
+import { Filter, Trash2, Map, Calendar, LayoutPanelLeft, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import CompetitionMapView from "@/components/CompetitionMapView";
 import CompetitionCalendarView from "@/components/CompetitionCalendarView";
+import CompetitionListView from "@/components/CompetitionListView";
 import { useIsMobile, useBreakpoint } from "@/hooks/use-mobile";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
 
 const SEARCH_RESULTS_VIEW_KEY = "search-results-view";
 const SEARCH_SIDEBAR_OPEN_KEY = "search-sidebar-open";
@@ -39,7 +41,7 @@ const Search = () => {
     showMap: false
   });
 
-  const [resultsView, setResultsView] = useState<"calendar">("calendar");
+  const [resultsView, setResultsView] = useState<"calendar" | "list">("calendar");
 
   useEffect(() => {
     const savedFilters = localStorage.getItem(SEARCH_FILTERS_KEY);
@@ -84,6 +86,13 @@ const Search = () => {
       setSidebarOpen(!isMobile);
     }
   }, [isMobile]);
+
+  useEffect(() => {
+    const savedView = localStorage.getItem(SEARCH_RESULTS_VIEW_KEY);
+    if (savedView === "list" || savedView === "calendar") {
+      setResultsView(savedView);
+    }
+  }, []);
 
   useEffect(() => {
     localStorage.setItem(SEARCH_RESULTS_VIEW_KEY, resultsView);
@@ -139,7 +148,6 @@ const Search = () => {
     newFilters.types = Array.isArray(newFilters.types) ? newFilters.types : [];
     newFilters.branches = Array.isArray(newFilters.branches) ? newFilters.branches : [];
     
-    console.log("Filter changed:", newFilters);
     setFilters(newFilters);
   };
 
@@ -175,6 +183,12 @@ const Search = () => {
     }));
   };
 
+  const toggleResultsView = (value: string) => {
+    if (value === "list" || value === "calendar") {
+      setResultsView(value);
+    }
+  };
+
   const typesArray = Array.isArray(filters.types) ? filters.types : [];
   const branchesArray = Array.isArray(filters.branches) ? filters.branches : [];
   
@@ -187,13 +201,6 @@ const Search = () => {
                           filters.dateRange?.from !== undefined;
 
   const filteredCompetitions = useMemo(() => {
-    console.log("Filtering with:", { 
-      typesLength: typesArray.length, 
-      types: typesArray,
-      branchesLength: branchesArray.length,
-      branches: branchesArray
-    });
-    
     return filterCompetitions(competitions, filters);
   }, [competitions, filters, typesArray, branchesArray]);
 
@@ -202,7 +209,10 @@ const Search = () => {
       <Header />
       
       <main className="flex-1 container py-8">
-        <h1 className="text-3xl font-bold mb-6">Hitta din nästa orienteringsutmaning</h1>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2">Hitta tävlingar</h1>
+          <p className="text-muted-foreground">Upptäck orienteringsutmaningar baserat på datum, plats och disciplin</p>
+        </div>
         
         <div className="flex flex-col md:flex-row gap-6 w-full max-w-full">
           {isMobile && (
@@ -214,6 +224,11 @@ const Search = () => {
             >
               <Filter className="mr-2 h-4 w-4" />
               {sidebarOpen ? "Dölj filter" : "Visa filter"}
+              {hasActiveFilters && !sidebarOpen && (
+                <Badge variant="secondary" className="ml-2 h-5 px-1.5">
+                  {filters.disciplines.length + filters.districts.length + typesArray.length + branchesArray.length + (filters.dateRange ? 1 : 0)}
+                </Badge>
+              )}
             </Button>
           )}
           
@@ -231,43 +246,66 @@ const Search = () => {
           )}
           
           <div className="flex-1">
-            <div className="bg-card rounded-lg border p-4 mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-              <div className="flex flex-col">
-                <h2 className="font-semibold text-lg">
-                  {filteredCompetitions.length === 0 ? 'Inga tävlingar hittades' : 
-                  `${filteredCompetitions.length} ${filteredCompetitions.length === 1 ? 'tävling' : 'tävlingar'}`}
-                </h2>
-                {hasActiveFilters && (
-                  <p className="text-muted-foreground text-sm">Filtrerade resultat</p>
-                )}
-              </div>
-              
-              <div className="flex items-center gap-2">
-                {!isMobile && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={toggleSidebar}
-                    className="mr-2"
-                    title={sidebarOpen ? "Dölj filter" : "Visa filter"}
-                  >
-                    <LayoutPanelLeft className="h-4 w-4" />
-                    <span className="sr-only">{sidebarOpen ? "Dölj filter" : "Visa filter"}</span>
-                  </Button>
-                )}
+            <div className="bg-card rounded-lg border p-4 mb-6">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div className="flex flex-col">
+                  <h2 className="font-semibold text-lg">
+                    {filteredCompetitions.length === 0 ? 'Inga tävlingar hittades' : 
+                    `${filteredCompetitions.length} ${filteredCompetitions.length === 1 ? 'tävling' : 'tävlingar'}`}
+                  </h2>
+                  {hasActiveFilters && (
+                    <p className="text-muted-foreground text-sm">Anpassade resultat baserat på dina val</p>
+                  )}
+                </div>
                 
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1.5 bg-muted p-1.5 rounded-md">
-                    <Switch 
-                      id="map-toggle"
-                      checked={filters.showMap}
-                      onCheckedChange={toggleMapVisibility}
-                      className="data-[state=checked]:bg-primary"
-                    />
-                    <label htmlFor="map-toggle" className="text-xs font-medium cursor-pointer">
-                      <Map className="h-3.5 w-3.5 mr-1 inline-block" />
-                      Visa karta
-                    </label>
+                <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                  {!isMobile && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={toggleSidebar}
+                      className="h-9"
+                      title={sidebarOpen ? "Dölj filter" : "Visa filter"}
+                    >
+                      <LayoutPanelLeft className="h-4 w-4 mr-2" />
+                      <span>{sidebarOpen ? "Dölj filter" : "Visa filter"}</span>
+                      {hasActiveFilters && !sidebarOpen && (
+                        <Badge variant="secondary" className="ml-2">
+                          {filters.disciplines.length + filters.districts.length + typesArray.length + branchesArray.length + (filters.dateRange ? 1 : 0)}
+                        </Badge>
+                      )}
+                    </Button>
+                  )}
+                  
+                  <div className="flex items-center space-x-2">
+                    <div className="flex items-center gap-1.5 bg-muted p-1.5 rounded-md">
+                      <Switch 
+                        id="map-toggle"
+                        checked={filters.showMap}
+                        onCheckedChange={toggleMapVisibility}
+                        className="data-[state=checked]:bg-primary"
+                      />
+                      <label htmlFor="map-toggle" className="text-xs font-medium cursor-pointer flex items-center">
+                        <Map className="h-3.5 w-3.5 mr-1" />
+                        Karta
+                      </label>
+                    </div>
+                    
+                    <ToggleGroup 
+                      type="single" 
+                      value={resultsView} 
+                      onValueChange={toggleResultsView}
+                      className="bg-muted p-1 rounded-md h-9"
+                    >
+                      <ToggleGroupItem value="calendar" aria-label="Visa kalendervy" className="h-7 px-2.5 data-[state=on]:bg-background">
+                        <Calendar className="h-3.5 w-3.5" />
+                        <span className="sr-only md:not-sr-only md:ml-2 text-xs">Kalender</span>
+                      </ToggleGroupItem>
+                      <ToggleGroupItem value="list" aria-label="Visa listvy" className="h-7 px-2.5 data-[state=on]:bg-background">
+                        <MapPin className="h-3.5 w-3.5" />
+                        <span className="sr-only md:not-sr-only md:ml-2 text-xs">Lista</span>
+                      </ToggleGroupItem>
+                    </ToggleGroup>
                   </div>
                 </div>
               </div>
@@ -281,21 +319,41 @@ const Search = () => {
                   </div>
                 )}
                 
-                <CompetitionCalendarView competitions={filteredCompetitions} />
+                {resultsView === "calendar" ? (
+                  <CompetitionCalendarView competitions={filteredCompetitions} />
+                ) : (
+                  <CompetitionListView competitions={filteredCompetitions} />
+                )}
               </div>
             ) : (
               <div className="bg-card rounded-lg border p-8 text-center">
-                <h3 className="text-lg font-medium mb-2">Inga matchande tävlingar</h3>
-                <p className="text-muted-foreground mb-4">
-                  Vi hittade inga tävlingar som matchar dina kriterier. Prova att:
+                <h3 className="text-lg font-medium mb-2">Vi hittade inga tävlingar</h3>
+                <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+                  Inga tävlingar matchar dina nuvarande filter. Prova att justera dem för att se fler resultat.
                 </p>
-                <ul className="text-left text-sm text-muted-foreground ml-6 mb-4 list-disc space-y-1">
-                  <li>Ändra ditt datumintervall</li>
-                  <li>Ta bort några filter</li>
+                <ul className="text-left text-sm text-muted-foreground max-w-xs mx-auto mb-6 space-y-2">
+                  <li className="flex items-start">
+                    <span className="bg-muted rounded-full p-1 mr-2 mt-0.5">
+                      <Calendar className="h-3 w-3" />
+                    </span>
+                    <span>Välj ett bredare datumintervall</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="bg-muted rounded-full p-1 mr-2 mt-0.5">
+                      <MapPin className="h-3 w-3" />
+                    </span>
+                    <span>Inkludera fler distrikt</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="bg-muted rounded-full p-1 mr-2 mt-0.5">
+                      <Filter className="h-3 w-3" />
+                    </span>
+                    <span>Minska antalet aktiva filter</span>
+                  </li>
                 </ul>
                 <Button
-                  variant="outline"
                   onClick={handleClearAllFilters}
+                  className="bg-primary hover:bg-primary/90"
                 >
                   <Trash2 className="mr-2 h-4 w-4" />
                   Rensa alla filter

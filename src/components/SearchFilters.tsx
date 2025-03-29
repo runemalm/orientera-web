@@ -1,5 +1,5 @@
 
-import { FilterIcon, X } from "lucide-react";
+import { FilterIcon, X, SearchIcon, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Accordion
@@ -12,6 +12,7 @@ import { districts } from "@/data/districts";
 import { useState, useEffect } from "react";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 
 const disciplines = ['Sprint', 'Medel', 'Lång', 'Natt', 'Stafett', 'Ultralång'];
 const competitionTypes: CompetitionType[] = ['Värdetävlingar', 'Nationella tävlingar', 'Distriktstävlingar', 'Närtävlingar', 'Veckans bana'];
@@ -34,6 +35,7 @@ const SearchFiltersComponent = ({
 }: SearchFiltersProps) => {
   const { toast } = useToast();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  const [searchValue, setSearchValue] = useState("");
   
   // Ensure types and branches are always arrays
   const typesArray = Array.isArray(filters.types) ? filters.types : [];
@@ -57,6 +59,10 @@ const SearchFiltersComponent = ({
       localStorage.setItem(EXPANDED_FILTERS_KEY, JSON.stringify(expandedItems));
     }
   }, [expandedItems]);
+
+  useEffect(() => {
+    setSearchValue(filters.searchQuery || "");
+  }, [filters.searchQuery]);
   
   const handleDisciplineChange = (discipline: string, checked: boolean) => {
     let updatedDisciplines = [...filters.disciplines];
@@ -79,7 +85,6 @@ const SearchFiltersComponent = ({
       updatedTypes = updatedTypes.filter(t => t !== type);
     }
     
-    console.log("Type filter changed:", type, checked, updatedTypes);
     onFilterChange({ ...filters, types: updatedTypes });
   };
 
@@ -94,7 +99,6 @@ const SearchFiltersComponent = ({
       updatedBranches = updatedBranches.filter(b => b !== branch);
     }
     
-    console.log("Branch filter changed:", branch, checked, updatedBranches);
     onFilterChange({ ...filters, branches: updatedBranches });
   };
 
@@ -112,6 +116,15 @@ const SearchFiltersComponent = ({
     onFilterChange({ ...filters, dateRange });
   };
 
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(event.target.value);
+  };
+
+  const handleSearchSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    onFilterChange({ ...filters, searchQuery: searchValue });
+  };
+
   const handleClearAllFilters = () => {
     const resetFilters: SearchFiltersType = {
       regions: [],
@@ -126,6 +139,7 @@ const SearchFiltersComponent = ({
     };
     
     onFilterChange(resetFilters);
+    setSearchValue("");
     
     toast({
       title: "Filtren har återställts",
@@ -133,14 +147,23 @@ const SearchFiltersComponent = ({
     });
   };
 
-  const handleClearFilter = (filterType: 'districts' | 'disciplines' | 'types' | 'branches') => {
+  const handleClearFilter = (filterType: 'districts' | 'disciplines' | 'types' | 'branches' | 'search' | 'date') => {
     const updatedFilters = {...filters};
-    updatedFilters[filterType] = [];
+    
+    if (filterType === 'search') {
+      updatedFilters.searchQuery = "";
+      setSearchValue("");
+    } else if (filterType === 'date') {
+      updatedFilters.dateRange = undefined;
+    } else {
+      updatedFilters[filterType] = [];
+    }
+    
     onFilterChange(updatedFilters);
     
     toast({
       title: `${getFilterGroupName(filterType)} har rensats`,
-      description: `Alla valda ${getFilterGroupName(filterType).toLowerCase()} har rensats`
+      description: `Filtret för ${getFilterGroupName(filterType).toLowerCase()} har tagits bort`
     });
   };
   
@@ -150,16 +173,21 @@ const SearchFiltersComponent = ({
       case 'disciplines': return 'Discipliner';
       case 'types': return 'Tävlingstyper';
       case 'branches': return 'Orienteringsgrenar';
+      case 'search': return 'Sökord';
+      case 'date': return 'Datumintervall';
       default: return 'Filter';
     }
   };
 
   const hasActiveDateFilter = Boolean(filters.dateRange?.from || filters.dateRange?.to);
+  const hasSearchQuery = Boolean(filters.searchQuery && filters.searchQuery.trim() !== '');
+  
   const hasActiveFilters = filters.districts.length > 0 || 
                            filters.disciplines.length > 0 || 
                            typesArray.length > 0 || 
                            branchesArray.length > 0 ||
-                           hasActiveDateFilter;
+                           hasActiveDateFilter ||
+                           hasSearchQuery;
 
   return (
     <div className="rounded-lg border bg-card">
@@ -167,14 +195,14 @@ const SearchFiltersComponent = ({
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <FilterIcon className="h-4 w-4" />
-            <h3 className="font-medium">Filtrera tävlingar</h3>
+            <h3 className="font-medium">Filtrera</h3>
           </div>
           {hasActiveFilters && (
             <Button 
               variant="ghost" 
               size="sm"
               onClick={handleClearAllFilters}
-              className="text-xs h-7 px-2"
+              className="text-xs h-7 px-2 text-muted-foreground hover:text-foreground"
             >
               <X className="h-3 w-3 mr-1" />
               Rensa alla
@@ -182,44 +210,89 @@ const SearchFiltersComponent = ({
           )}
         </div>
 
+        {!hideSearchInput && (
+          <form onSubmit={handleSearchSubmit} className="mb-4">
+            <div className="relative">
+              <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Sök tävlingar..."
+                value={searchValue}
+                onChange={handleSearchChange}
+                className="pl-9 pr-10"
+              />
+              {searchValue && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0"
+                  onClick={() => {
+                    setSearchValue("");
+                    if (filters.searchQuery) {
+                      onFilterChange({ ...filters, searchQuery: "" });
+                    }
+                  }}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+            <button type="submit" className="sr-only">Sök</button>
+          </form>
+        )}
+
         {hasActiveFilters && (
           <div className="bg-muted/50 rounded-md p-2 mb-4 flex flex-wrap gap-1.5">
+            {hasSearchQuery && (
+              <Badge variant="outline" className="flex items-center gap-1 px-1.5 py-1 h-6 bg-background">
+                <span className="text-xs">Sökord: {filters.searchQuery}</span>
+                <Button variant="ghost" size="sm" onClick={() => handleClearFilter('search')} className="h-4 w-4 p-0">
+                  <X className="h-3 w-3" />
+                </Button>
+              </Badge>
+            )}
+            
             {filters.districts.length > 0 && (
               <Badge variant="outline" className="flex items-center gap-1 px-1.5 py-1 h-6 bg-background">
-                <span className="text-xs">{filters.districts.length} distrikt</span>
+                <span className="text-xs">{filters.districts.length} {filters.districts.length === 1 ? 'distrikt' : 'distrikt'}</span>
                 <Button variant="ghost" size="sm" onClick={() => handleClearFilter('districts')} className="h-4 w-4 p-0">
                   <X className="h-3 w-3" />
                 </Button>
               </Badge>
             )}
+            
             {filters.disciplines.length > 0 && (
               <Badge variant="outline" className="flex items-center gap-1 px-1.5 py-1 h-6 bg-background">
-                <span className="text-xs">{filters.disciplines.length} discipliner</span>
+                <span className="text-xs">{filters.disciplines.length} {filters.disciplines.length === 1 ? 'disciplin' : 'discipliner'}</span>
                 <Button variant="ghost" size="sm" onClick={() => handleClearFilter('disciplines')} className="h-4 w-4 p-0">
                   <X className="h-3 w-3" />
                 </Button>
               </Badge>
             )}
+            
             {typesArray.length > 0 && (
               <Badge variant="outline" className="flex items-center gap-1 px-1.5 py-1 h-6 bg-background">
-                <span className="text-xs">{typesArray.length} tävlingstyper</span>
+                <span className="text-xs">{typesArray.length} {typesArray.length === 1 ? 'tävlingstyp' : 'tävlingstyper'}</span>
                 <Button variant="ghost" size="sm" onClick={() => handleClearFilter('types')} className="h-4 w-4 p-0">
                   <X className="h-3 w-3" />
                 </Button>
               </Badge>
             )}
+            
             {branchesArray.length > 0 && (
               <Badge variant="outline" className="flex items-center gap-1 px-1.5 py-1 h-6 bg-background">
-                <span className="text-xs">{branchesArray.length} grenar</span>
+                <span className="text-xs">{branchesArray.length} {branchesArray.length === 1 ? 'gren' : 'grenar'}</span>
                 <Button variant="ghost" size="sm" onClick={() => handleClearFilter('branches')} className="h-4 w-4 p-0">
                   <X className="h-3 w-3" />
                 </Button>
               </Badge>
             )}
+            
             {hasActiveDateFilter && (
               <Badge variant="outline" className="flex items-center gap-1 px-1.5 py-1 h-6 bg-background">
                 <span className="text-xs">Datumfilter</span>
-                <Button variant="ghost" size="sm" onClick={() => handleDateRangeChange(undefined)} className="h-4 w-4 p-0">
+                <Button variant="ghost" size="sm" onClick={() => handleClearFilter('date')} className="h-4 w-4 p-0">
                   <X className="h-3 w-3" />
                 </Button>
               </Badge>
@@ -228,7 +301,7 @@ const SearchFiltersComponent = ({
         )}
 
         <div className="mb-4">
-          <h4 className="text-sm font-medium mb-2">Datum</h4>
+          <h4 className="text-sm font-medium mb-2">Tävlingsperiod</h4>
           <div className="bg-background rounded-md border p-3">
             <DateRangeFilter 
               dateRange={filters.dateRange} 
@@ -246,7 +319,7 @@ const SearchFiltersComponent = ({
           className="space-y-2"
         >
           <CheckboxFilter
-            title="Typ av tävling"
+            title="Tävlingstyp"
             items={competitionTypes.map(t => ({ id: t, name: t }))}
             selectedItems={typesArray}
             onItemChange={handleTypeChange}
