@@ -108,10 +108,10 @@ const CompetitionMapView: React.FC<CompetitionMapViewProps> = ({ competitions })
       <div className="w-full h-[600px] rounded-lg border border-border shadow-sm">
         {/* The map container */}
         <MapContainer 
-          center={swedenCenter} 
-          zoom={4.5} 
           style={{ height: '100%', width: '100%', borderRadius: '0.5rem' }}
+          zoom={4.5}
           zoomControl={false}
+          center={swedenCenter}
         >
           {/* Add zoom control to top-right */}
           <div className="leaflet-top leaflet-right">
@@ -123,8 +123,8 @@ const CompetitionMapView: React.FC<CompetitionMapViewProps> = ({ competitions })
           
           {/* Add OpenStreetMap tile layer */}
           <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
           
           {/* Add competition markers */}
@@ -132,7 +132,6 @@ const CompetitionMapView: React.FC<CompetitionMapViewProps> = ({ competitions })
             <Marker 
               key={competition.id}
               position={[competition.coordinates!.lat, competition.coordinates!.lng]}
-              icon={createCustomMarkerIcon(competition)}
               eventHandlers={{
                 click: () => {
                   navigate(`/competition/${competition.id}`);
