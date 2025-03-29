@@ -1,4 +1,6 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -15,6 +17,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
+import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WaitlistDialog from "@/components/WaitlistDialog";
@@ -28,9 +31,30 @@ const formSchema = z.object({
   emailUpdates: z.boolean().default(true),
 });
 
+// This would typically come from an auth provider
+const isAuthenticated = () => {
+  // For now, always return false to simulate not being logged in
+  return false;
+};
+
 const ProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [waitlistOpen, setWaitlistOpen] = useState(false);
+  const navigate = useNavigate();
+  const { toast: showToast } = useToast();
+  
+  useEffect(() => {
+    if (!isAuthenticated()) {
+      showToast({
+        title: "Du måste logga in",
+        description: "Du måste vara inloggad för att visa din profil.",
+        variant: "destructive",
+      });
+      
+      // Optional: you can uncomment this to redirect to home page after the notification
+      // setTimeout(() => navigate("/"), 2000);
+    }
+  }, [showToast, navigate]);
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -68,6 +92,9 @@ const ProfilePage = () => {
     { id: 6, name: "Nattugglan", date: "18 februari 2024", location: "Linköping", result: "DNF" },
   ];
 
+  // If not authenticated, we could show a different UI, but for now we'll just show the toast
+  // and display the normal profile page (which in a real app would have no real data)
+  
   return (
     <>
       <Header />
