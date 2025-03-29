@@ -1,6 +1,5 @@
-
 import { useState, useMemo } from "react";
-import { format, addDays, isEqual, isBefore, isValid, endOfYear } from "date-fns";
+import { format, addDays, isEqual, isBefore, isValid, endOfYear, endOfWeek, endOfMonth } from "date-fns";
 import { sv } from "date-fns/locale";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
@@ -42,35 +41,21 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilterProps)
       })
     },
     {
-      label: "Nästa 7 dagar",
+      label: "Denna vecka",
       value: () => ({
         from: today,
-        to: addDays(today, 6)
+        to: endOfWeek(today, { locale: sv })
       })
     },
     {
-      label: "Nästa 14 dagar",
+      label: "Denna månad",
       value: () => ({
         from: today,
-        to: addDays(today, 13)
+        to: endOfMonth(today)
       })
     },
     {
-      label: "Nästa 30 dagar",
-      value: () => ({
-        from: today,
-        to: addDays(today, 29)
-      })
-    },
-    {
-      label: "Nästa 90 dagar",
-      value: () => ({
-        from: today,
-        to: addDays(today, 89)
-      })
-    },
-    {
-      label: "Hela året",
+      label: "Resten av året",
       value: () => ({
         from: today,
         to: endOfYear(today)
