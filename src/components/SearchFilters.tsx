@@ -1,4 +1,3 @@
-
 import { FilterIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,7 +8,7 @@ import CheckboxFilter from "./search/CheckboxFilter";
 import DateRangeFilter from "./search/DateRangeFilter";
 import { useToast } from "@/hooks/use-toast";
 import { districts } from "@/data/districts";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Separator } from "@/components/ui/separator";
 
 const disciplines = ['Sprint', 'Medel', 'Lång', 'Natt', 'Stafett', 'Ultralång'];
@@ -23,6 +22,8 @@ interface SearchFiltersProps {
   hideSearchInput?: boolean;
 }
 
+const EXPANDED_FILTERS_KEY = "search-expanded-filters";
+
 const SearchFiltersComponent = ({ 
   filters, 
   onFilterChange, 
@@ -30,7 +31,28 @@ const SearchFiltersComponent = ({
   hideSearchInput = false
 }: SearchFiltersProps) => {
   const { toast } = useToast();
-  const [expandedItems, setExpandedItems] = useState<string[]>(["date-range", "district", "type", "discipline", "branch"]);
+  const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  
+  useEffect(() => {
+    const savedExpandedItems = localStorage.getItem(EXPANDED_FILTERS_KEY);
+    if (savedExpandedItems) {
+      try {
+        const parsed = JSON.parse(savedExpandedItems);
+        setExpandedItems(parsed);
+      } catch (error) {
+        console.error("Failed to parse saved expanded filters", error);
+        setExpandedItems(["date-range", "district", "type", "discipline", "branch"]);
+      }
+    } else {
+      setExpandedItems(["date-range", "district", "type", "discipline", "branch"]);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (expandedItems.length > 0) {
+      localStorage.setItem(EXPANDED_FILTERS_KEY, JSON.stringify(expandedItems));
+    }
+  }, [expandedItems]);
   
   const handleDisciplineChange = (discipline: string, checked: boolean) => {
     let updatedDisciplines = [...filters.disciplines];
@@ -96,7 +118,6 @@ const SearchFiltersComponent = ({
     });
   };
 
-  // Determine if any date filters are active
   const hasActiveDateFilter = Boolean(filters.dateRange?.from || filters.dateRange?.to);
 
   return (
@@ -116,7 +137,6 @@ const SearchFiltersComponent = ({
           </Button>
         </div>
 
-        {/* Date Range Filter with separators */}
         <div className="mb-4">
           <Separator className="mb-4" />
           <div className="py-2">

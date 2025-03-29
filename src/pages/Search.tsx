@@ -28,6 +28,10 @@ const popularSearches = [
   "Långdistans i fjällen",
 ];
 
+const SEARCH_ACTIVE_TAB_KEY = "search-active-tab";
+const SEARCH_RESULTS_VIEW_KEY = "search-results-view";
+const RECENT_AI_SEARCHES_KEY = "recentAiSearches";
+
 const Search = () => {
   const location = useLocation();
   const { toast } = useToast();
@@ -44,13 +48,33 @@ const Search = () => {
   });
 
   const [searchInputValue, setSearchInputValue] = useState("");
-  const [activeTab, setActiveTab] = useState("ai");
+  const [activeTab, setActiveTab] = useState<string>("ai");
   const [isProcessing, setIsProcessing] = useState(false);
   const [resultsView, setResultsView] = useState<"list" | "calendar" | "map">("list");
   const [recentSearches, setRecentSearches] = useState<string[]>(() => {
-    const saved = localStorage.getItem('recentAiSearches');
+    const saved = localStorage.getItem(RECENT_AI_SEARCHES_KEY);
     return saved ? JSON.parse(saved) : [];
   });
+
+  useEffect(() => {
+    const savedTab = localStorage.getItem(SEARCH_ACTIVE_TAB_KEY);
+    if (savedTab) {
+      setActiveTab(savedTab);
+    }
+
+    const savedView = localStorage.getItem(SEARCH_RESULTS_VIEW_KEY) as "list" | "calendar" | "map" | null;
+    if (savedView && ["list", "calendar", "map"].includes(savedView)) {
+      setResultsView(savedView);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(SEARCH_ACTIVE_TAB_KEY, activeTab);
+  }, [activeTab]);
+
+  useEffect(() => {
+    localStorage.setItem(SEARCH_RESULTS_VIEW_KEY, resultsView);
+  }, [resultsView]);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -171,7 +195,7 @@ const Search = () => {
 
   const handleClearHistory = () => {
     setRecentSearches([]);
-    localStorage.removeItem('recentAiSearches');
+    localStorage.removeItem(RECENT_AI_SEARCHES_KEY);
     toast({
       title: "Historik rensad",
       description: "Alla tidigare sökningar har tagits bort",
@@ -197,7 +221,7 @@ const Search = () => {
       
       const updatedSearches = [query, ...recentSearches.filter(s => s !== query)].slice(0, 5);
       setRecentSearches(updatedSearches);
-      localStorage.setItem('recentAiSearches', JSON.stringify(updatedSearches));
+      localStorage.setItem(RECENT_AI_SEARCHES_KEY, JSON.stringify(updatedSearches));
       
       setFilters({
         ...filters,
