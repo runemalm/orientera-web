@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { getLocationDetails, geocodeCity, parseLocationDetails, getGeolocationErrorMessage } from "@/utils/locationUtils";
 
 export type LocationInfo = {
   city?: string;
@@ -25,24 +26,6 @@ export const useGeolocation = (autoDetect = true) => {
     error: null
   });
   const [isManualLocation, setIsManualLocation] = useState(false);
-
-  const getLocationDetails = async (lat: number, lng: number): Promise<any> => {
-    try {
-      console.log("Fetching location details for coordinates:", lat, lng);
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`
-      );
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      return await response.json();
-    } catch (error) {
-      console.error("Error fetching location details:", error);
-      throw error;
-    }
-  };
 
   const detectLocation = () => {
     // Reset the state completely before requesting a new location
@@ -85,7 +68,7 @@ export const useGeolocation = (autoDetect = true) => {
       
       nativeGeolocation.getCurrentPosition(
         // Success handler
-        (position) => {
+        async (position) => {
           clearTimeout(geoLocationTimeout);
           try {
             const coords = {
@@ -103,33 +86,26 @@ export const useGeolocation = (autoDetect = true) => {
             }));
             
             // Then try to get detailed location info
-            getLocationDetails(coords.lat, coords.lng)
-              .then(data => {
-                const address = data.address || {};
-                const city = address.city || address.town || address.village || address.hamlet;
-                
-                setState(prev => ({
-                  ...prev,
-                  detectedLocationInfo: {
-                    city: city,
-                    municipality: address.municipality,
-                    county: address.county,
-                    display_name: data.display_name
-                  }
-                }));
-                
-                toast({
-                  title: "Plats hittad",
-                  description: `Din position (${city || 'Okänd plats'}) används nu för distansfiltrering.`,
-                });
-              })
-              .catch(detailsError => {
-                console.error("Could not get location details, using coordinates only:", detailsError);
-                toast({
-                  title: "Plats delvis hittad",
-                  description: "Din position används nu för distansfiltrering, men vi kunde inte hämta detaljerad platsinformation.",
-                });
+            try {
+              const data = await getLocationDetails(coords.lat, coords.lng);
+              const locationInfo = parseLocationDetails(data);
+              
+              setState(prev => ({
+                ...prev,
+                detectedLocationInfo: locationInfo
+              }));
+              
+              toast({
+                title: "Plats hittad",
+                description: `Din position (${locationInfo.city || 'Okänd plats'}) används nu för distansfiltrering.`,
               });
+            } catch (detailsError) {
+              console.error("Could not get location details, using coordinates only:", detailsError);
+              toast({
+                title: "Plats delvis hittad",
+                description: "Din position används nu för distansfiltrering, men vi kunde inte hämta detaljerad platsinformation.",
+              });
+            }
           } catch (error) {
             console.error("Error handling position:", error);
             setState(prev => ({ ...prev, loading: false, error: "Failed to process location" }));
@@ -145,19 +121,7 @@ export const useGeolocation = (autoDetect = true) => {
           clearTimeout(geoLocationTimeout);
           try {
             console.error("Geolocation error:", error);
-            let errorMessage = "Prova att ange din position manuellt för distansfiltrering.";
-            
-            switch (error.code) {
-              case error.PERMISSION_DENIED:
-                errorMessage = "Du har blockerat åtkomst till din position. Aktivera platstjänster i din webbläsare.";
-                break;
-              case error.POSITION_UNAVAILABLE:
-                errorMessage = "Din position är inte tillgänglig just nu. Prova igen senare.";
-                break;
-              case error.TIMEOUT:
-                errorMessage = "Det tog för lång tid att hämta din position. Prova igen eller ange manuellt.";
-                break;
-            }
+            const errorMessage = getGeolocationErrorMessage(error.code);
             
             setState(prev => ({ ...prev, loading: false, error: errorMessage }));
             toast({
@@ -176,8 +140,8 @@ export const useGeolocation = (autoDetect = true) => {
           }
         },
         {
-          enableHighAccuracy: true, // Changed to true for better accuracy
-          timeout: 10000, // Reduced from 30000 to 10000 for faster response
+          enableHighAccuracy: true,
+          timeout: 10000,
           maximumAge: 0
         }
       );
@@ -194,16 +158,11 @@ export const useGeolocation = (autoDetect = true) => {
 
   const setManualLocation = async (cityName: string) => {
     try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cityName)}, Sweden&countrycodes=se&limit=1`
-      );
+      const coords = await geocodeCity(cityName);
       
-      const data = await response.json();
-      
-      if (data && data.length > 0) {
-        const { lat, lon } = data[0];
+      if (coords) {
         setState({
-          coords: { lat: parseFloat(lat), lng: parseFloat(lon) },
+          coords,
           detectedLocationInfo: { city: cityName },
           loading: false,
           error: null
