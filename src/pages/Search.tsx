@@ -7,7 +7,7 @@ import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
 import { useGeolocation } from "@/hooks/useGeolocation";
-import { Search as SearchIcon, X, Grid, Calendar as CalendarIcon, List, MenuSquare } from "lucide-react";
+import { Search as SearchIcon, X, Grid, Calendar as CalendarIcon, List, MenuSquare, Map as MapIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Command } from "@/components/ui/command";
@@ -17,6 +17,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import CompetitionCalendarView from "@/components/CompetitionCalendarView";
 import CompetitionCompactView from "@/components/CompetitionCompactView";
 import CompetitionListView from "@/components/CompetitionListView";
+import CompetitionMapView from "@/components/CompetitionMapView";
 import { isBefore, isAfter, isEqual, parseISO } from "date-fns";
 
 const Search = () => {
@@ -47,7 +48,7 @@ const Search = () => {
   const { toast } = useToast();
   
   const [locationChangeCounter, setLocationChangeCounter] = useState(0);
-  const [viewMode, setViewMode] = useState<"grid" | "list" | "compact" | "calendar">("grid");
+  const [viewMode, setViewMode] = useState<"grid" | "list" | "compact" | "calendar" | "map">("grid");
 
   useEffect(() => {
     console.log("Location changed, updating filters:", { userLocation, detectedLocationInfo, isManualLocation });
@@ -229,10 +230,10 @@ const Search = () => {
                 </h2>
                 <Tabs
                   value={viewMode}
-                  onValueChange={(value) => setViewMode(value as "grid" | "list" | "compact" | "calendar")}
+                  onValueChange={(value) => setViewMode(value as typeof viewMode)}
                   className="w-auto"
                 >
-                  <TabsList className="grid w-[330px] grid-cols-4">
+                  <TabsList className="grid w-[400px] grid-cols-5">
                     <TabsTrigger value="grid" className="flex items-center">
                       <Grid className="h-4 w-4 mr-2" />
                       Rutnät
@@ -248,6 +249,10 @@ const Search = () => {
                     <TabsTrigger value="calendar" className="flex items-center">
                       <CalendarIcon className="h-4 w-4 mr-2" />
                       Kalender
+                    </TabsTrigger>
+                    <TabsTrigger value="map" className="flex items-center">
+                      <MapIcon className="h-4 w-4 mr-2" />
+                      Karta
                     </TabsTrigger>
                   </TabsList>
                 </Tabs>
@@ -305,6 +310,19 @@ const Search = () => {
               <TabsContent value="calendar" className="mt-0">
                 {filteredCompetitions.length > 0 ? (
                   <CompetitionCalendarView competitions={filteredCompetitions} />
+                ) : (
+                  <div className="bg-card rounded-lg border p-8 text-center">
+                    <h3 className="text-lg font-medium mb-2">Inga tävlingar hittades</h3>
+                    <p className="text-muted-foreground mb-4">
+                      Det finns inga tävlingar som matchar dina filter. Prova att ändra dina sökkriterier.
+                    </p>
+                  </div>
+                )}
+              </TabsContent>
+              
+              <TabsContent value="map" className="mt-0">
+                {filteredCompetitions.length > 0 ? (
+                  <CompetitionMapView competitions={filteredCompetitions} />
                 ) : (
                   <div className="bg-card rounded-lg border p-8 text-center">
                     <h3 className="text-lg font-medium mb-2">Inga tävlingar hittades</h3>
