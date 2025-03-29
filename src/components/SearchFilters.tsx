@@ -41,11 +41,9 @@ const SearchFiltersComponent = ({
         setExpandedItems(parsed);
       } catch (error) {
         console.error("Failed to parse saved expanded filters", error);
-        setExpandedItems(["date-range", "district", "type", "discipline", "branch"]);
+        setExpandedItems([]);
       }
-    } else {
-      setExpandedItems(["date-range", "district", "type", "discipline", "branch"]);
-    }
+    } 
   }, []);
 
   useEffect(() => {
