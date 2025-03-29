@@ -80,6 +80,10 @@
   h1, h2, h3, h4, h5, h6 {
     @apply font-bold text-orienteering-dark;
   }
+  
+  input:focus-visible {
+    @apply ring-2 ring-primary ring-offset-2 border-primary outline-none transition-colors;
+  }
 }
 
 .map-background {

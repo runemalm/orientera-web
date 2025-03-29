@@ -83,7 +83,7 @@ const DistanceFilter = ({
               placeholder="Sök ort i Sverige..."
               value={cityInput}
               onChange={(e) => setCityInput(e.target.value)}
-              className="flex-1"
+              className="flex-1 focus-visible:ring-primary"
             />
             <Button 
               type="submit" 
