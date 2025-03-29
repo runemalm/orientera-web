@@ -6,7 +6,7 @@ import SearchFilters from "@/components/SearchFilters";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
-import { X, Sparkles, Clock, Search as SearchIcon, Filter } from "lucide-react";
+import { X, Sparkles, Clock, Search as SearchIcon, Filter, Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -156,6 +156,16 @@ const Search = () => {
     });
   };
 
+  const handleClearHistory = () => {
+    setRecentSearches([]);
+    localStorage.removeItem('recentAiSearches');
+    toast({
+      title: "Historik rensad",
+      description: "Alla tidigare sökningar har tagits bort",
+      duration: 2000,
+    });
+  };
+
   const processQuery = (query: string) => {
     if (!query.trim()) {
       toast({
@@ -277,9 +287,20 @@ const Search = () => {
                 
                 {recentSearches.length > 0 && (
                   <div className="mt-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Clock className="h-4 w-4 text-muted-foreground" />
-                      <h3 className="text-sm font-medium">Senaste sökningar</h3>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4 text-muted-foreground" />
+                        <h3 className="text-sm font-medium">Senaste sökningar</h3>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleClearHistory}
+                        className="h-7 px-2 text-xs text-muted-foreground hover:text-destructive"
+                      >
+                        <Trash2 className="h-3 w-3 mr-1" />
+                        Rensa historik
+                      </Button>
                     </div>
                     <div className="flex flex-col gap-1">
                       {recentSearches.map((search, index) => (
