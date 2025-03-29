@@ -108,7 +108,12 @@ const SearchFiltersComponent = ({
           </Button>
         </div>
 
-        <Accordion type="multiple" defaultValue={["district", "type", "discipline", "branch", "date-range"]} className="space-y-2">
+        <Accordion type="multiple" defaultValue={["date-range", "district", "type", "discipline", "branch"]} className="space-y-2">
+          <DateRangeFilter 
+            dateRange={filters.dateRange} 
+            onDateRangeChange={handleDateRangeChange}
+          />
+          
           <CheckboxFilter
             title="Distrikt"
             items={districts.map(d => ({ id: d.id, name: d.name }))}
@@ -139,11 +144,6 @@ const SearchFiltersComponent = ({
             selectedItems={filters.branches || []}
             onItemChange={handleBranchChange}
             accordionValue="branch"
-          />
-          
-          <DateRangeFilter 
-            dateRange={filters.dateRange} 
-            onDateRangeChange={handleDateRangeChange}
           />
         </Accordion>
       </div>
