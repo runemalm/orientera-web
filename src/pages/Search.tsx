@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -7,17 +6,19 @@ import SearchFilters from "@/components/SearchFilters";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
-import { X, Sparkles, Clock, Search as SearchIcon, Filter, Trash2, TrendingUp } from "lucide-react";
+import { X, Sparkles, Clock, Search as SearchIcon, Filter, Trash2, TrendingUp, List, Map } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import CompetitionCompactView from "@/components/CompetitionCompactView";
+import CompetitionListView from "@/components/CompetitionListView";
+import CompetitionMapView from "@/components/CompetitionMapView";
 import { isBefore, isAfter, isEqual, parseISO } from "date-fns";
 import { processNaturalLanguageQuery } from "@/utils/aiQueryProcessor";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
-// Array of popular searches to display when no recent searches exist
 const popularSearches = [
   "Nationella tävlingar i sommar",
   "Sprinttävlingar i Stockholm",
@@ -44,6 +45,7 @@ const Search = () => {
   const [searchInputValue, setSearchInputValue] = useState("");
   const [activeTab, setActiveTab] = useState("ai");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [resultsView, setResultsView] = useState<"list" | "map">("list");
   const [recentSearches, setRecentSearches] = useState<string[]>(() => {
     const saved = localStorage.getItem('recentAiSearches');
     return saved ? JSON.parse(saved) : [];
@@ -104,13 +106,11 @@ const Search = () => {
       filtered = filtered.filter(competition => {
         const competitionDate = parseISO(competition.date);
         
-        // Check from date if it exists
         if (filters.dateRange?.from && isBefore(competitionDate, filters.dateRange.from) && 
             !isEqual(competitionDate, filters.dateRange.from)) {
           return false;
         }
         
-        // Check to date if it exists
         if (filters.dateRange?.to && isAfter(competitionDate, filters.dateRange.to) && 
             !isEqual(competitionDate, filters.dateRange.to)) {
           return false;
@@ -189,7 +189,7 @@ const Search = () => {
     }
 
     setIsProcessing(true);
-    setSearchInputValue(query); // Update the search input value when processing a query
+    setSearchInputValue(query);
 
     try {
       const newFilters = processNaturalLanguageQuery(query);
@@ -372,11 +372,36 @@ const Search = () => {
               <h2 className="font-semibold">
                 {filteredCompetitions.length} {filteredCompetitions.length === 1 ? 'tävling' : 'tävlingar'} hittades
               </h2>
+              
+              {activeTab === "manual" && (
+                <ToggleGroup type="single" value={resultsView} onValueChange={(value) => value && setResultsView(value as "list" | "map")}>
+                  <ToggleGroupItem value="list" aria-label="Visa som lista">
+                    <List className="h-4 w-4 mr-1" />
+                    Lista
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="map" aria-label="Visa på karta">
+                    <Map className="h-4 w-4 mr-1" />
+                    Karta
+                  </ToggleGroupItem>
+                </ToggleGroup>
+              )}
             </div>
           </div>
           
           {filteredCompetitions.length > 0 ? (
-            <CompetitionCompactView competitions={filteredCompetitions} />
+            <>
+              {activeTab === "ai" && (
+                <CompetitionCompactView competitions={filteredCompetitions} />
+              )}
+              
+              {activeTab === "manual" && resultsView === "list" && (
+                <CompetitionListView competitions={filteredCompetitions} />
+              )}
+              
+              {activeTab === "manual" && resultsView === "map" && (
+                <CompetitionMapView competitions={filteredCompetitions} />
+              )}
+            </>
           ) : (
             <div className="bg-card rounded-lg border p-8 text-center">
               <h3 className="text-lg font-medium mb-2">Inga tävlingar hittades</h3>
