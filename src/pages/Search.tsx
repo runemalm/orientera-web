@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -40,7 +39,6 @@ const Search = () => {
     return saved ? JSON.parse(saved) : [];
   });
 
-  // Vanliga sökningar som fördefinierade snabbval
   const quickSearches = [
     { id: 'upcoming', label: 'Kommande tävlingar', query: 'Tävlingar de närmaste 30 dagarna' },
     { id: 'national', label: 'Nationella tävlingar', query: 'Nationella tävlingar' },
@@ -196,7 +194,6 @@ const Search = () => {
     try {
       const newFilters = processNaturalLanguageQuery(query);
       
-      // Spara sökningen i historiken
       const updatedSearches = [query, ...recentSearches.filter(s => s !== query)].slice(0, 5);
       setRecentSearches(updatedSearches);
       localStorage.setItem('recentAiSearches', JSON.stringify(updatedSearches));
@@ -254,7 +251,7 @@ const Search = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="relative">
                 <Input
-                  placeholder="Beskriv med egna ord vad du letar efter..."
+                  placeholder="Sök efter tävlingar, t.ex. 'Nationella tävlingar nära Stockholm i juni'"
                   value={searchInputValue}
                   onChange={(e) => handleSearchChange(e.target.value)}
                   className="pr-8 text-base"
