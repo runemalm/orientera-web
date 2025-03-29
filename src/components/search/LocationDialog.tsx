@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { MapPinOff, X } from "lucide-react";
+import { MapPinOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { 
@@ -8,7 +8,8 @@ import {
   DialogContent, 
   DialogHeader, 
   DialogTitle, 
-  DialogTrigger 
+  DialogTrigger,
+  DialogDescription
 } from "@/components/ui/dialog";
 import {
   Command,
@@ -112,11 +113,14 @@ const LocationDialog = ({ open, onOpenChange, onCitySelect }: LocationDialogProp
             <span className="truncate">Ange ort</span>
           </Button>
         </DialogTrigger>
-        <DialogContent>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Ange stad eller ort i Sverige</DialogTitle>
+            <DialogDescription className="text-sm text-muted-foreground">
+              Sök efter en plats för att visa tävlingar i närheten
+            </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 pt-4">
+          <div className="space-y-4 pt-2">
             <div className="space-y-2">
               <Label htmlFor="city-search">Stad eller ort</Label>
               <Command className="rounded-lg border shadow-md">
@@ -127,7 +131,7 @@ const LocationDialog = ({ open, onOpenChange, onCitySelect }: LocationDialogProp
                   onValueChange={setCitySearchValue}
                   className="border-0"
                 />
-                <CommandList>
+                <CommandList className="max-h-[250px] h-full overflow-auto">
                   <LocationHistoryList 
                     locations={locationHistory}
                     onSelectLocation={handleSelectCity}
@@ -145,7 +149,7 @@ const LocationDialog = ({ open, onOpenChange, onCitySelect }: LocationDialogProp
                 </CommandList>
               </Command>
             </div>
-            <div className="flex justify-end space-x-2">
+            <div className="flex justify-end gap-2 mt-4">
               <Button 
                 type="button" 
                 variant="outline" 

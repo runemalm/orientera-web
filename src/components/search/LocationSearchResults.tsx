@@ -43,11 +43,11 @@ const LocationSearchResults = ({
               key={index}
               value={city.name}
               onSelect={() => onSelectLocation(city.name, city.display)}
-              className="cursor-pointer"
+              className="cursor-pointer flex items-start py-2"
             >
-              <div className="text-sm">
+              <div className="text-sm w-full">
                 <div className="font-medium">{city.name}</div>
-                <div className="text-xs text-muted-foreground truncate max-w-[260px]">
+                <div className="text-xs text-muted-foreground truncate max-w-full">
                   {city.display}
                 </div>
               </div>

@@ -44,10 +44,10 @@ const LocationHistoryList = ({
             key={`history-${index}`}
             value={`history-${city.name}`}
             onSelect={() => onSelectLocation(city.name, city.display)}
-            className="cursor-pointer flex items-center justify-between"
+            className="cursor-pointer flex items-center justify-between py-2"
           >
-            <div className="flex items-center space-x-2">
-              <History className="h-4 w-4 opacity-50" />
+            <div className="flex items-center gap-2">
+              <History className="h-4 w-4 opacity-50 flex-shrink-0" />
               <div className="text-sm">
                 <div className="font-medium">{city.name}</div>
                 <div className="text-xs text-muted-foreground truncate max-w-[200px]">
@@ -58,7 +58,7 @@ const LocationHistoryList = ({
             <Button
               variant="ghost"
               size="icon"
-              className="h-6 w-6 opacity-50 hover:opacity-100"
+              className="h-6 w-6 opacity-50 hover:opacity-100 flex-shrink-0"
               onClick={(e) => onRemoveLocation(e, city.name)}
             >
               <X className="h-3 w-3" />
