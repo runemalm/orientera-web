@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { sv } from "date-fns/locale";
 import { format } from "date-fns";
-import { CalendarRange, X } from "lucide-react";
+import { X } from "lucide-react";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -68,10 +68,9 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange, hasActiveFilter = false
 
   return (
     <AccordionItem value="date-range" defaultValue="date-range">
-      <AccordionTrigger className="py-3">
+      <AccordionTrigger className="py-2 hover:no-underline">
         <div className="flex items-center gap-2">
-          <CalendarRange className="h-4 w-4" />
-          <span>
+          <span className="text-sm font-medium">
             Datum
           </span>
         </div>
