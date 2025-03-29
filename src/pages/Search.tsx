@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -245,10 +244,8 @@ const Search = () => {
     setIsAiProcessing(true);
 
     try {
-      // Process the natural language query
       const newFilters = processNaturalLanguageQuery(aiQuery);
       
-      // Merge with existing filters to preserve location settings
       setFilters(prevFilters => ({
         ...prevFilters,
         disciplines: newFilters.disciplines,
@@ -265,7 +262,6 @@ const Search = () => {
         duration: 3000,
       });
       
-      // Hide AI assistant after successful query
       setShowAiAssistant(false);
     } catch (error) {
       console.error("Error processing AI query:", error);
@@ -314,33 +310,6 @@ const Search = () => {
       </div>
     );
   };
-
-  const filteredCompetitions = useMemo(() => {
-    let filtered = filterCompetitions(competitionsWithDistance, {
-      ...filters,
-      userLocation,
-    });
-
-    if (filters.dateRange?.from) {
-      filtered = filtered.filter(competition => {
-        const competitionDate = parseISO(competition.date);
-        
-        if (filters.dateRange?.from && isBefore(competitionDate, filters.dateRange.from) && 
-            !isEqual(competitionDate, filters.dateRange.from)) {
-          return false;
-        }
-        
-        if (filters.dateRange?.to && isAfter(competitionDate, filters.dateRange.to) && 
-            !isEqual(competitionDate, filters.dateRange.to)) {
-          return false;
-        }
-        
-        return true;
-      });
-    }
-    
-    return filtered;
-  }, [competitionsWithDistance, filters, userLocation]);
 
   const renderSearchResults = () => (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
