@@ -113,7 +113,7 @@ const SearchFiltersComponent = ({
           </Button>
         </div>
 
-        <Accordion type="multiple" className="space-y-2">
+        <Accordion type="multiple" defaultValue={["date-range"]} className="space-y-2">
           <DateRangeFilter 
             dateRange={filters.dateRange} 
             onDateRangeChange={handleDateRangeChange}

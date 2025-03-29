@@ -67,14 +67,16 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange, hasActiveFilter = false
   const activeFilterCount = (dateRange?.from ? 1 : 0) + (dateRange?.to ? 1 : 0);
 
   return (
-    <AccordionItem value="date-range">
+    <AccordionItem value="date-range" defaultValue="date-range">
       <AccordionTrigger className="py-3">
         <div className="flex items-center gap-2">
           <CalendarRange className="h-4 w-4" />
           <span>
             Datum
             {activeFilterCount > 0 && (
-              <span className="ml-1 text-muted-foreground">({activeFilterCount})</span>
+              <span className="ml-1 text-muted-foreground">
+                ({activeFilterCount} {activeFilterCount === 1 ? 'valt' : 'valda'})
+              </span>
             )}
           </span>
         </div>

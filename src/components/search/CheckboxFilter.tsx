@@ -32,7 +32,7 @@ const CheckboxFilter = ({
           <span className="text-sm font-medium">
             {title}
             {selectedCount > 0 && (
-              <span className="ml-1 text-muted-foreground">({selectedCount})</span>
+              <span className="ml-1 text-muted-foreground">({selectedCount} valda)</span>
             )}
           </span>
         </div>
