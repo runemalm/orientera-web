@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Sparkles, Loader2, Search, Clock, Zap, TrendingUp } from "lucide-react";
+import { Sparkles, Loader2, Search, Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { SearchFilters } from "@/types";
 import { processNaturalLanguageQuery } from "@/utils/aiQueryProcessor";
@@ -10,7 +10,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -20,7 +19,7 @@ interface AiSearchCardProps {
   initialQuery?: string;
 }
 
-// Vanliga sökningar som fördefinierade snabbval
+// Quick searches that users can select directly
 const quickSearches = [
   { id: 'upcoming', label: 'Kommande tävlingar', query: 'Tävlingar de närmaste 30 dagarna' },
   { id: 'national', label: 'Nationella tävlingar', query: 'Nationella tävlingar' },
@@ -28,20 +27,10 @@ const quickSearches = [
   { id: 'sprint', label: 'Sprinttävlingar', query: 'Sprint tävlingar' },
 ];
 
-// Lista på populära sökningar som visas alltid
-const popularSearches = [
-  "Nationella tävlingar i sommar",
-  "Sprinttävlingar i Stockholm",
-  "Ungdomstävlingar nästa månad",
-  "Stafetter i södra Sverige",
-  "Tävlingar inom 50 km från Stockholm",
-];
-
 const AiSearchCard = ({ onSearchComplete, initialQuery = "" }: AiSearchCardProps) => {
   const [aiQuery, setAiQuery] = useState(initialQuery);
   const [isProcessing, setIsProcessing] = useState(false);
   const [recentSearches, setRecentSearches] = useState<string[]>(() => {
-    // Hämta tidigare sökningar från localStorage om de finns
     const saved = localStorage.getItem('recentAiSearches');
     return saved ? JSON.parse(saved) : [];
   });
@@ -62,7 +51,7 @@ const AiSearchCard = ({ onSearchComplete, initialQuery = "" }: AiSearchCardProps
     try {
       const newFilters = processNaturalLanguageQuery(query);
       
-      // Spara sökningen i historiken
+      // Save the search to history
       const updatedSearches = [query, ...recentSearches.filter(s => s !== query)].slice(0, 5);
       setRecentSearches(updatedSearches);
       localStorage.setItem('recentAiSearches', JSON.stringify(updatedSearches));
@@ -70,7 +59,7 @@ const AiSearchCard = ({ onSearchComplete, initialQuery = "" }: AiSearchCardProps
       onSearchComplete(newFilters);
       
       toast({
-        title: "AI-sökning bearbetad",
+        title: "Sökning genomförd",
         description: "Filtren har uppdaterats baserat på din sökning",
         duration: 3000,
       });
@@ -92,7 +81,7 @@ const AiSearchCard = ({ onSearchComplete, initialQuery = "" }: AiSearchCardProps
   };
 
   const handleQuickSearch = (query: string) => {
-    setAiQuery(query); // Update the AI query input when a quick search is selected
+    setAiQuery(query);
     processQuery(query);
   };
 
@@ -104,18 +93,18 @@ const AiSearchCard = ({ onSearchComplete, initialQuery = "" }: AiSearchCardProps
           <CardTitle className="text-lg">Sök med AI</CardTitle>
         </div>
         <CardDescription>
-          Beskriv den tävling du letar efter med dina egna ord, så hjälper vår AI dig att hitta rätt.
+          Beskriv tävlingen du letar efter med egna ord
         </CardDescription>
       </CardHeader>
       
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="relative">
+          <div>
             <Textarea
-              placeholder="Exempel: 'Jag letar efter nationella tävlingar i Skåne nästa månad' eller 'Medeldistans tävlingar för ungdomar på klubbnivå'"
+              placeholder="Exempel: 'Nationella tävlingar i Skåne nästa månad' eller 'Sprinttävlingar för ungdomar'"
               value={aiQuery}
               onChange={(e) => setAiQuery(e.target.value)}
-              className="min-h-[100px] text-base resize-none"
+              className="min-h-[80px] text-base resize-none"
             />
           </div>
           
@@ -127,7 +116,7 @@ const AiSearchCard = ({ onSearchComplete, initialQuery = "" }: AiSearchCardProps
             {isProcessing ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Bearbetar sökning...
+                Bearbetar...
               </>
             ) : (
               <>
@@ -138,11 +127,8 @@ const AiSearchCard = ({ onSearchComplete, initialQuery = "" }: AiSearchCardProps
           </Button>
         </form>
         
-        <div className="mt-6">
-          <div className="flex items-center gap-2 mb-2">
-            <Zap className="h-4 w-4 text-primary" />
-            <h3 className="text-sm font-medium">Snabbval</h3>
-          </div>
+        <div className="mt-4">
+          <h3 className="text-sm font-medium mb-2">Snabbval</h3>
           <div className="flex flex-wrap gap-2">
             {quickSearches.map((search) => (
               <Button
@@ -180,28 +166,6 @@ const AiSearchCard = ({ onSearchComplete, initialQuery = "" }: AiSearchCardProps
             </div>
           </div>
         )}
-        
-        {/* Always show popular searches */}
-        <div className="mt-4">
-          <div className="flex items-center gap-2 mb-2">
-            <TrendingUp className="h-4 w-4 text-primary" />
-            <h3 className="text-sm font-medium">Populära sökningar</h3>
-          </div>
-          <div className="flex flex-col gap-1">
-            {popularSearches.map((search, index) => (
-              <Button
-                key={index}
-                variant="ghost"
-                size="sm"
-                onClick={() => handleQuickSearch(search)}
-                className="text-xs justify-start h-auto py-1.5 text-muted-foreground hover:text-foreground"
-              >
-                <Search className="h-3 w-3 mr-2" />
-                {search}
-              </Button>
-            ))}
-          </div>
-        </div>
       </CardContent>
     </Card>
   );

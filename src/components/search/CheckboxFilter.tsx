@@ -46,9 +46,9 @@ const CheckboxFilter = ({
   };
   
   return (
-    <AccordionItem value={accordionValue} className="border rounded-md bg-background overflow-hidden shadow-sm">
-      <AccordionTrigger className="px-3 py-2 hover:no-underline group">
-        <div className="flex items-center justify-between w-full group-hover:text-primary transition-colors">
+    <AccordionItem value={accordionValue} className="border rounded-md bg-background shadow-sm">
+      <AccordionTrigger className="px-3 py-2 hover:no-underline">
+        <div className="flex items-center justify-between w-full">
           <span className="text-sm font-medium">
             {title}
           </span>
@@ -67,7 +67,7 @@ const CheckboxFilter = ({
               placeholder={`Sök ${title.toLowerCase()}...`}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-8 text-sm pl-8 pr-8"
+              className="h-8 text-sm pl-8"
             />
             {searchQuery && (
               <Button
@@ -98,15 +98,13 @@ const CheckboxFilter = ({
         
         <div className="max-h-48 overflow-y-auto pr-1 space-y-1">
           {filteredItems.length === 0 ? (
-            <div className="text-sm text-muted-foreground p-3 text-center bg-muted/30 rounded-md">
+            <div className="text-sm text-muted-foreground p-2 text-center bg-muted/30 rounded-md">
               Inga matchande {title.toLowerCase()} hittades
             </div>
           ) : (
             filteredItems.map((item) => (
               <div 
-                className={`flex items-center gap-2 px-2 py-1.5 rounded-sm ${
-                  selectedItems.includes(item.id) ? 'bg-muted/50' : ''
-                } hover:bg-muted/30 transition-colors`} 
+                className="flex items-center gap-2 px-2 py-1.5 rounded-sm hover:bg-muted/30" 
                 key={item.id}
               >
                 <Checkbox 
@@ -118,7 +116,7 @@ const CheckboxFilter = ({
                 />
                 <Label 
                   htmlFor={`${accordionValue}-${item.id}`}
-                  className="text-sm cursor-pointer flex-1 select-none"
+                  className="text-sm cursor-pointer flex-1"
                 >
                   {item.name}
                 </Label>

@@ -1,18 +1,16 @@
 
-import { FilterIcon, X, SearchIcon, ChevronDown } from "lucide-react";
+import { FilterIcon, X, SearchIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Accordion
-} from "@/components/ui/accordion";
+import { Accordion } from "@/components/ui/accordion";
 import { SearchFilters as SearchFiltersType, CompetitionType, CompetitionBranch } from "@/types";
 import CheckboxFilter from "./search/CheckboxFilter";
 import DateRangeFilter from "./search/DateRangeFilter";
 import { useToast } from "@/hooks/use-toast";
 import { districts } from "@/data/districts";
 import { useState, useEffect } from "react";
-import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 const disciplines = ['Sprint', 'Medel', 'Lång', 'Natt', 'Stafett', 'Ultralång'];
 const competitionTypes: CompetitionType[] = ['Värdetävlingar', 'Nationella tävlingar', 'Distriktstävlingar', 'Närtävlingar', 'Veckans bana'];
@@ -36,6 +34,7 @@ const SearchFiltersComponent = ({
   const { toast } = useToast();
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [searchValue, setSearchValue] = useState("");
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   
   // Ensure types and branches are always arrays
   const typesArray = Array.isArray(filters.types) ? filters.types : [];
@@ -51,7 +50,7 @@ const SearchFiltersComponent = ({
         console.error("Failed to parse saved expanded filters", error);
         setExpandedItems([]);
       }
-    } 
+    }
   }, []);
 
   useEffect(() => {
@@ -75,7 +74,6 @@ const SearchFiltersComponent = ({
   };
 
   const handleTypeChange = (type: string, checked: boolean) => {
-    // Ensure types array exists before modifying
     const currentTypes = typesArray;
     let updatedTypes = [...currentTypes];
     
@@ -89,7 +87,6 @@ const SearchFiltersComponent = ({
   };
 
   const handleBranchChange = (branch: string, checked: boolean) => {
-    // Ensure branches array exists before modifying
     const currentBranches = branchesArray;
     let updatedBranches = [...currentBranches];
     
@@ -143,7 +140,7 @@ const SearchFiltersComponent = ({
     
     toast({
       title: "Filtren har återställts",
-      description: "Alla valda filter har rensats - nu visas alla tävlingar"
+      description: "Alla valda filter har rensats"
     });
   };
 
@@ -162,8 +159,8 @@ const SearchFiltersComponent = ({
     onFilterChange(updatedFilters);
     
     toast({
-      title: `${getFilterGroupName(filterType)} har rensats`,
-      description: `Filtret för ${getFilterGroupName(filterType).toLowerCase()} har tagits bort`
+      title: `${getFilterGroupName(filterType)} borttaget`,
+      description: `Filtret har tagits bort`
     });
   };
   
@@ -189,6 +186,152 @@ const SearchFiltersComponent = ({
                            hasActiveDateFilter ||
                            hasSearchQuery;
 
+  // On mobile, show a collapsible filter section
+  const filterContent = (
+    <>
+      {!hideSearchInput && (
+        <form onSubmit={handleSearchSubmit} className="mb-4">
+          <div className="relative">
+            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Sök tävlingar..."
+              value={searchValue}
+              onChange={handleSearchChange}
+              className="pl-9 pr-10"
+            />
+            {searchValue && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0"
+                onClick={() => {
+                  setSearchValue("");
+                  if (filters.searchQuery) {
+                    onFilterChange({ ...filters, searchQuery: "" });
+                  }
+                }}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+          <button type="submit" className="sr-only">Sök</button>
+        </form>
+      )}
+
+      {hasActiveFilters && (
+        <div className="bg-muted/50 rounded-md p-2 mb-4 flex flex-wrap gap-1.5">
+          {hasSearchQuery && (
+            <Badge variant="outline" className="flex items-center gap-1 px-1.5 py-1 h-6 bg-background">
+              <span className="text-xs">Sökord: {filters.searchQuery}</span>
+              <Button variant="ghost" size="sm" onClick={() => handleClearFilter('search')} className="h-4 w-4 p-0">
+                <X className="h-3 w-3" />
+              </Button>
+            </Badge>
+          )}
+          
+          {filters.districts.length > 0 && (
+            <Badge variant="outline" className="flex items-center gap-1 px-1.5 py-1 h-6 bg-background">
+              <span className="text-xs">{filters.districts.length} {filters.districts.length === 1 ? 'distrikt' : 'distrikt'}</span>
+              <Button variant="ghost" size="sm" onClick={() => handleClearFilter('districts')} className="h-4 w-4 p-0">
+                <X className="h-3 w-3" />
+              </Button>
+            </Badge>
+          )}
+          
+          {filters.disciplines.length > 0 && (
+            <Badge variant="outline" className="flex items-center gap-1 px-1.5 py-1 h-6 bg-background">
+              <span className="text-xs">{filters.disciplines.length} {filters.disciplines.length === 1 ? 'disciplin' : 'discipliner'}</span>
+              <Button variant="ghost" size="sm" onClick={() => handleClearFilter('disciplines')} className="h-4 w-4 p-0">
+                <X className="h-3 w-3" />
+              </Button>
+            </Badge>
+          )}
+          
+          {typesArray.length > 0 && (
+            <Badge variant="outline" className="flex items-center gap-1 px-1.5 py-1 h-6 bg-background">
+              <span className="text-xs">{typesArray.length} {typesArray.length === 1 ? 'tävlingstyp' : 'tävlingstyper'}</span>
+              <Button variant="ghost" size="sm" onClick={() => handleClearFilter('types')} className="h-4 w-4 p-0">
+                <X className="h-3 w-3" />
+              </Button>
+            </Badge>
+          )}
+          
+          {branchesArray.length > 0 && (
+            <Badge variant="outline" className="flex items-center gap-1 px-1.5 py-1 h-6 bg-background">
+              <span className="text-xs">{branchesArray.length} {branchesArray.length === 1 ? 'gren' : 'grenar'}</span>
+              <Button variant="ghost" size="sm" onClick={() => handleClearFilter('branches')} className="h-4 w-4 p-0">
+                <X className="h-3 w-3" />
+              </Button>
+            </Badge>
+          )}
+          
+          {hasActiveDateFilter && (
+            <Badge variant="outline" className="flex items-center gap-1 px-1.5 py-1 h-6 bg-background">
+              <span className="text-xs">Datumfilter</span>
+              <Button variant="ghost" size="sm" onClick={() => handleClearFilter('date')} className="h-4 w-4 p-0">
+                <X className="h-3 w-3" />
+              </Button>
+            </Badge>
+          )}
+        </div>
+      )}
+
+      <div className="mb-4">
+        <h4 className="text-sm font-medium mb-2">Tävlingsperiod</h4>
+        <div className="bg-background rounded-md border p-3">
+          <DateRangeFilter 
+            dateRange={filters.dateRange} 
+            onDateRangeChange={handleDateRangeChange}
+            hasActiveFilter={hasActiveDateFilter}
+            removeHeader={true}
+          />
+        </div>
+      </div>
+
+      <Accordion 
+        type="multiple" 
+        value={expandedItems}
+        onValueChange={setExpandedItems}
+        className="space-y-2"
+      >
+        <CheckboxFilter
+          title="Tävlingstyp"
+          items={competitionTypes.map(t => ({ id: t, name: t }))}
+          selectedItems={typesArray}
+          onItemChange={handleTypeChange}
+          accordionValue="type"
+        />
+
+        <CheckboxFilter
+          title="Disciplin"
+          items={disciplines.map(d => ({ id: d, name: d }))}
+          selectedItems={filters.disciplines}
+          onItemChange={handleDisciplineChange}
+          accordionValue="discipline"
+        />
+
+        <CheckboxFilter
+          title="Distrikt"
+          items={districts.map(d => ({ id: d.id, name: d.name }))}
+          selectedItems={filters.districts}
+          onItemChange={handleDistrictChange}
+          accordionValue="district"
+        />
+
+        <CheckboxFilter
+          title="Orienteringsgren"
+          items={competitionBranches.map(b => ({ id: b, name: b }))}
+          selectedItems={branchesArray}
+          onItemChange={handleBranchChange}
+          accordionValue="branch"
+        />
+      </Accordion>
+    </>
+  );
+
   return (
     <div className="rounded-lg border bg-card">
       <div className="p-4">
@@ -196,6 +339,12 @@ const SearchFiltersComponent = ({
           <div className="flex items-center gap-2">
             <FilterIcon className="h-4 w-4" />
             <h3 className="font-medium">Filtrera</h3>
+            {hasActiveFilters && (
+              <Badge variant="secondary" className="ml-1">
+                {(filters.disciplines.length + filters.districts.length + typesArray.length + branchesArray.length) + 
+                (hasActiveDateFilter ? 1 : 0) + (hasSearchQuery ? 1 : 0)}
+              </Badge>
+            )}
           </div>
           {hasActiveFilters && (
             <Button 
@@ -210,146 +359,36 @@ const SearchFiltersComponent = ({
           )}
         </div>
 
-        {!hideSearchInput && (
-          <form onSubmit={handleSearchSubmit} className="mb-4">
-            <div className="relative">
-              <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder="Sök tävlingar..."
-                value={searchValue}
-                onChange={handleSearchChange}
-                className="pl-9 pr-10"
-              />
-              {searchValue && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7 p-0"
-                  onClick={() => {
-                    setSearchValue("");
-                    if (filters.searchQuery) {
-                      onFilterChange({ ...filters, searchQuery: "" });
-                    }
-                  }}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
-            <button type="submit" className="sr-only">Sök</button>
-          </form>
-        )}
-
-        {hasActiveFilters && (
-          <div className="bg-muted/50 rounded-md p-2 mb-4 flex flex-wrap gap-1.5">
-            {hasSearchQuery && (
-              <Badge variant="outline" className="flex items-center gap-1 px-1.5 py-1 h-6 bg-background">
-                <span className="text-xs">Sökord: {filters.searchQuery}</span>
-                <Button variant="ghost" size="sm" onClick={() => handleClearFilter('search')} className="h-4 w-4 p-0">
-                  <X className="h-3 w-3" />
-                </Button>
-              </Badge>
-            )}
-            
-            {filters.districts.length > 0 && (
-              <Badge variant="outline" className="flex items-center gap-1 px-1.5 py-1 h-6 bg-background">
-                <span className="text-xs">{filters.districts.length} {filters.districts.length === 1 ? 'distrikt' : 'distrikt'}</span>
-                <Button variant="ghost" size="sm" onClick={() => handleClearFilter('districts')} className="h-4 w-4 p-0">
-                  <X className="h-3 w-3" />
-                </Button>
-              </Badge>
-            )}
-            
-            {filters.disciplines.length > 0 && (
-              <Badge variant="outline" className="flex items-center gap-1 px-1.5 py-1 h-6 bg-background">
-                <span className="text-xs">{filters.disciplines.length} {filters.disciplines.length === 1 ? 'disciplin' : 'discipliner'}</span>
-                <Button variant="ghost" size="sm" onClick={() => handleClearFilter('disciplines')} className="h-4 w-4 p-0">
-                  <X className="h-3 w-3" />
-                </Button>
-              </Badge>
-            )}
-            
-            {typesArray.length > 0 && (
-              <Badge variant="outline" className="flex items-center gap-1 px-1.5 py-1 h-6 bg-background">
-                <span className="text-xs">{typesArray.length} {typesArray.length === 1 ? 'tävlingstyp' : 'tävlingstyper'}</span>
-                <Button variant="ghost" size="sm" onClick={() => handleClearFilter('types')} className="h-4 w-4 p-0">
-                  <X className="h-3 w-3" />
-                </Button>
-              </Badge>
-            )}
-            
-            {branchesArray.length > 0 && (
-              <Badge variant="outline" className="flex items-center gap-1 px-1.5 py-1 h-6 bg-background">
-                <span className="text-xs">{branchesArray.length} {branchesArray.length === 1 ? 'gren' : 'grenar'}</span>
-                <Button variant="ghost" size="sm" onClick={() => handleClearFilter('branches')} className="h-4 w-4 p-0">
-                  <X className="h-3 w-3" />
-                </Button>
-              </Badge>
-            )}
-            
-            {hasActiveDateFilter && (
-              <Badge variant="outline" className="flex items-center gap-1 px-1.5 py-1 h-6 bg-background">
-                <span className="text-xs">Datumfilter</span>
-                <Button variant="ghost" size="sm" onClick={() => handleClearFilter('date')} className="h-4 w-4 p-0">
-                  <X className="h-3 w-3" />
-                </Button>
-              </Badge>
-            )}
-          </div>
-        )}
-
-        <div className="mb-4">
-          <h4 className="text-sm font-medium mb-2">Tävlingsperiod</h4>
-          <div className="bg-background rounded-md border p-3">
-            <DateRangeFilter 
-              dateRange={filters.dateRange} 
-              onDateRangeChange={handleDateRangeChange}
-              hasActiveFilter={hasActiveDateFilter}
-              removeHeader={true}
-            />
-          </div>
+        <div className="md:hidden mb-4">
+          <Collapsible
+            open={mobileFiltersOpen}
+            onOpenChange={setMobileFiltersOpen}
+            className="w-full"
+          >
+            <CollapsibleTrigger asChild>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full justify-between"
+              >
+                {mobileFiltersOpen ? "Dölj filter" : "Visa filter"}
+                {hasActiveFilters && !mobileFiltersOpen && (
+                  <Badge variant="secondary" className="ml-2">
+                    {(filters.disciplines.length + filters.districts.length + typesArray.length + branchesArray.length) + 
+                    (hasActiveDateFilter ? 1 : 0) + (hasSearchQuery ? 1 : 0)}
+                  </Badge>
+                )}
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="mt-4">
+              {filterContent}
+            </CollapsibleContent>
+          </Collapsible>
         </div>
 
-        <Accordion 
-          type="multiple" 
-          value={expandedItems}
-          onValueChange={setExpandedItems}
-          className="space-y-2"
-        >
-          <CheckboxFilter
-            title="Tävlingstyp"
-            items={competitionTypes.map(t => ({ id: t, name: t }))}
-            selectedItems={typesArray}
-            onItemChange={handleTypeChange}
-            accordionValue="type"
-          />
-
-          <CheckboxFilter
-            title="Disciplin"
-            items={disciplines.map(d => ({ id: d, name: d }))}
-            selectedItems={filters.disciplines}
-            onItemChange={handleDisciplineChange}
-            accordionValue="discipline"
-          />
-
-          <CheckboxFilter
-            title="Distrikt"
-            items={districts.map(d => ({ id: d.id, name: d.name }))}
-            selectedItems={filters.districts}
-            onItemChange={handleDistrictChange}
-            accordionValue="district"
-          />
-
-          <CheckboxFilter
-            title="Orienteringsgren"
-            items={competitionBranches.map(b => ({ id: b, name: b }))}
-            selectedItems={branchesArray}
-            onItemChange={handleBranchChange}
-            accordionValue="branch"
-          />
-        </Accordion>
+        <div className="hidden md:block">
+          {filterContent}
+        </div>
       </div>
     </div>
   );
