@@ -9,6 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 
 type DateRangeValue = {
   from?: Date;
@@ -67,7 +68,7 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange, hasActiveFilter = false
   const activeFilterCount = (dateRange?.from ? 1 : 0) + (dateRange?.to ? 1 : 0);
 
   return (
-    <AccordionItem value="date-range" defaultValue="date-range">
+    <AccordionItem value="date-range" defaultValue="date-range" className="border-0">
       <AccordionTrigger className="py-2 hover:no-underline">
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium">
@@ -148,6 +149,7 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange, hasActiveFilter = false
           )}
         </div>
       </AccordionContent>
+      <Separator className="mt-2" />
     </AccordionItem>
   );
 };
