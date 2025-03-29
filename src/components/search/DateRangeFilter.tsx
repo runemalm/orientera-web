@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { sv } from "date-fns/locale";
 import { format, isValid, isToday, isYesterday, isTomorrow, addDays, startOfMonth, endOfMonth, isSameDay } from "date-fns";
@@ -24,8 +25,8 @@ const PRESET_OPTIONS = [
   { id: 'today', label: 'Idag' },
   { id: 'tomorrow', label: 'Imorgon' },
   { id: 'thisWeekend', label: 'Helgen' },
-  { id: 'next7days', label: 'Kommande 7 dagar' },
-  { id: 'next30days', label: 'Kommande 30 dagar' },
+  { id: 'next7days', label: 'Kommande 7d' },
+  { id: 'next30days', label: 'Kommande 30d' },
   { id: 'thisMonth', label: 'Denna månad' },
   { id: 'nextMonth', label: 'Nästa månad' },
 ];
@@ -219,7 +220,7 @@ const DateRangeFilter = ({
               type="button"
               variant={selectedPreset === option.id ? "default" : "outline"}
               size="sm"
-              className="text-xs h-7 w-full"
+              className="text-xs h-7 w-full px-1"
               onClick={() => handlePresetChange(option.id)}
             >
               {option.label}
