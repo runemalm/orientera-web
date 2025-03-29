@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -17,10 +16,12 @@ import { getDistance } from "@/lib/utils";
 import CompetitionCompactView from "@/components/CompetitionCompactView";
 import { isBefore, isAfter, isEqual, parseISO } from "date-fns";
 import AiSearchCard from "@/components/search/AiSearchCard";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Search = () => {
   const location = useLocation();
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   
   const {
     coords: userLocation,
@@ -288,59 +289,57 @@ const Search = () => {
       <main className="flex-1 container py-8">
         <h1 className="text-3xl font-bold mb-6">Sök tävlingar</h1>
         
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="md:col-span-1">
-            <Tabs value={currentTab} onValueChange={setCurrentTab} className="mb-4">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="traditional">
-                  <SearchIcon className="h-4 w-4 mr-2" />
-                  <span>Filtrera</span>
-                </TabsTrigger>
-                <TabsTrigger value="ai">
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  <span>AI-sökning</span>
-                </TabsTrigger>
-              </TabsList>
-              <TabsContent value="traditional" className="mt-2">
-                {renderTraditionalSearch()}
-              </TabsContent>
-              <TabsContent value="ai" className="mt-2">
-                <AiSearchCard onSearchComplete={handleAiSearchComplete} />
-              </TabsContent>
-            </Tabs>
+        <div className="max-w-3xl mx-auto">
+          <Tabs value={currentTab} onValueChange={setCurrentTab} className="mb-6">
+            <TabsList className="grid w-full grid-cols-2 mb-4">
+              <TabsTrigger value="traditional">
+                <SearchIcon className="h-4 w-4 mr-2" />
+                <span>Filtrera</span>
+              </TabsTrigger>
+              <TabsTrigger value="ai">
+                <Sparkles className="h-4 w-4 mr-2" />
+                <span>AI-sökning</span>
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="traditional" className="mt-2">
+              {renderTraditionalSearch()}
+            </TabsContent>
+            
+            <TabsContent value="ai" className="mt-2">
+              <AiSearchCard onSearchComplete={handleAiSearchComplete} initialQuery="" />
+            </TabsContent>
+          </Tabs>
+          
+          <div className="bg-card rounded-lg border p-4 mb-6">
+            <div className="flex justify-between items-center">
+              <h2 className="font-semibold">
+                {filteredCompetitions.length} {filteredCompetitions.length === 1 ? 'tävling' : 'tävlingar'} hittades
+              </h2>
+              {currentTab === "ai" && filters.searchQuery && (
+                <Button
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => setCurrentTab("traditional")}
+                  className="text-xs"
+                >
+                  Visa filter
+                  <ArrowRight className="ml-1 h-3 w-3" />
+                </Button>
+              )}
+            </div>
           </div>
           
-          <div className="md:col-span-3">
-            <div className="bg-card rounded-lg border p-4 mb-6">
-              <div className="flex justify-between items-center">
-                <h2 className="font-semibold">
-                  {filteredCompetitions.length} {filteredCompetitions.length === 1 ? 'tävling' : 'tävlingar'} hittades
-                </h2>
-                {currentTab === "ai" && filters.searchQuery && (
-                  <Button
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => setCurrentTab("traditional")}
-                    className="text-xs"
-                  >
-                    Visa filter
-                    <ArrowRight className="ml-1 h-3 w-3" />
-                  </Button>
-                )}
-              </div>
+          {filteredCompetitions.length > 0 ? (
+            <CompetitionCompactView competitions={filteredCompetitions} />
+          ) : (
+            <div className="bg-card rounded-lg border p-8 text-center">
+              <h3 className="text-lg font-medium mb-2">Inga tävlingar hittades</h3>
+              <p className="text-muted-foreground mb-4">
+                Det finns inga tävlingar som matchar dina filter. Prova att ändra dina sökkriterier.
+              </p>
             </div>
-            
-            {filteredCompetitions.length > 0 ? (
-              <CompetitionCompactView competitions={filteredCompetitions} />
-            ) : (
-              <div className="bg-card rounded-lg border p-8 text-center">
-                <h3 className="text-lg font-medium mb-2">Inga tävlingar hittades</h3>
-                <p className="text-muted-foreground mb-4">
-                  Det finns inga tävlingar som matchar dina filter. Prova att ändra dina sökkriterier.
-                </p>
-              </div>
-            )}
-          </div>
+          )}
         </div>
       </main>
       
