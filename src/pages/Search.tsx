@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -229,6 +228,162 @@ const Search = () => {
     e.preventDefault();
   };
 
+  const renderSearchResults = () => (
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      {searchMode === "manual" && (
+        <div className="md:col-span-1">
+          <div className="rounded-lg border bg-card mb-4">
+            <div className="p-4" ref={searchContainerRef}>
+              <form onSubmit={handleManualSearch} className="flex gap-2">
+                <div className="relative flex-1">
+                  <Input
+                    placeholder="Sök efter tävlingsnamn eller plats..."
+                    value={searchInputValue}
+                    onChange={(e) => handleSearchChange(e.target.value)}
+                    className="w-full pr-8"
+                  />
+                  {searchInputValue && (
+                    <button
+                      type="button"
+                      onClick={handleClearSearch}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      aria-label="Rensa sökning"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+                <Button type="submit" size="icon">
+                  <SearchIcon className="h-4 w-4" />
+                </Button>
+              </form>
+            </div>
+          </div>
+          
+          <SearchFilters 
+            filters={filters} 
+            onFilterChange={handleFilterChange} 
+            hasLocation={!!filters.userLocation}
+            hideSearchInput={true}
+          />
+        </div>
+      )}
+      
+      <div className={`md:col-span-${searchMode === "manual" ? "3" : "4"}`}>
+        <div className="bg-card rounded-lg border p-4 mb-6">
+          <div className="flex justify-between items-center">
+            <h2 className="font-semibold">
+              {filteredCompetitions.length} {filteredCompetitions.length === 1 ? 'tävling' : 'tävlingar'} hittades
+            </h2>
+            <Tabs
+              value={viewMode}
+              onValueChange={(value) => setViewMode(value as typeof viewMode)}
+              className="w-auto"
+            >
+              <TabsList className="grid w-[400px] grid-cols-5">
+                <TabsTrigger value="grid" className="flex items-center">
+                  <Grid className="h-4 w-4 mr-2" />
+                  Rutnät
+                </TabsTrigger>
+                <TabsTrigger value="list" className="flex items-center">
+                  <List className="h-4 w-4 mr-2" />
+                  Lista
+                </TabsTrigger>
+                <TabsTrigger value="compact" className="flex items-center">
+                  <MenuSquare className="h-4 w-4 mr-2" />
+                  Kompakt
+                </TabsTrigger>
+                <TabsTrigger value="calendar" className="flex items-center">
+                  <CalendarIcon className="h-4 w-4 mr-2" />
+                  Kalender
+                </TabsTrigger>
+                <TabsTrigger value="map" className="flex items-center">
+                  <MapIcon className="h-4 w-4 mr-2" />
+                  Karta
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+        </div>
+        
+        <Tabs value={viewMode} className="w-full">
+          <TabsContent value="grid" className="mt-0">
+            {filteredCompetitions.length > 0 ? (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {filteredCompetitions.map((competition) => (
+                  <CompetitionCard 
+                    key={`${competition.id}-${locationChangeCounter}`}
+                    competition={competition} 
+                    featured={competition.featured}
+                  />
+                ))}
+              </div>
+            ) : (
+              <div className="bg-card rounded-lg border p-8 text-center">
+                <h3 className="text-lg font-medium mb-2">Inga tävlingar hittades</h3>
+                <p className="text-muted-foreground mb-4">
+                  Det finns inga tävlingar som matchar dina filter. Prova att ändra dina sökkriterier.
+                </p>
+              </div>
+            )}
+          </TabsContent>
+          
+          <TabsContent value="list" className="mt-0">
+            {filteredCompetitions.length > 0 ? (
+              <CompetitionListView competitions={filteredCompetitions} />
+            ) : (
+              <div className="bg-card rounded-lg border p-8 text-center">
+                <h3 className="text-lg font-medium mb-2">Inga tävlingar hittades</h3>
+                <p className="text-muted-foreground mb-4">
+                  Det finns inga tävlingar som matchar dina filter. Prova att ändra dina sökkriterier.
+                </p>
+              </div>
+            )}
+          </TabsContent>
+          
+          <TabsContent value="compact" className="mt-0">
+            {filteredCompetitions.length > 0 ? (
+              <CompetitionCompactView competitions={filteredCompetitions} />
+            ) : (
+              <div className="bg-card rounded-lg border p-8 text-center">
+                <h3 className="text-lg font-medium mb-2">Inga tävlingar hittades</h3>
+                <p className="text-muted-foreground mb-4">
+                  Det finns inga tävlingar som matchar dina filter. Prova att ändra dina sökkriterier.
+                </p>
+              </div>
+            )}
+          </TabsContent>
+          
+          <TabsContent value="calendar" className="mt-0">
+            {filteredCompetitions.length > 0 ? (
+              <CompetitionCalendarView competitions={filteredCompetitions} />
+            ) : (
+              <div className="bg-card rounded-lg border p-8 text-center">
+                <h3 className="text-lg font-medium mb-2">Inga tävlingar hittades</h3>
+                <p className="text-muted-foreground mb-4">
+                  Det finns inga tävlingar som matchar dina filter. Prova att ändra dina sökkriterier.
+                </p>
+              </div>
+            )}
+          </TabsContent>
+          
+          <TabsContent value="map" className="mt-0">
+            {filteredCompetitions.length > 0 ? (
+              <CompetitionMapView competitions={filteredCompetitions} />
+            ) : (
+              <div className="bg-card rounded-lg border p-8 text-center">
+                <h3 className="text-lg font-medium mb-2">Inga tävlingar hittades</h3>
+                <p className="text-muted-foreground mb-4">
+                  Det finns inga tävlingar som matchar dina filter. Prova att ändra dina sökkriterier.
+                </p>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
+      </div>
+    </div>
+  );
+
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
@@ -249,167 +404,16 @@ const Search = () => {
           </TabsList>
           
           <TabsContent value="manual" className="mt-0">
-            {/* Vanlig sökning - inget här behövs direkt */}
+            {renderSearchResults()}
           </TabsContent>
           
           <TabsContent value="ai" className="mt-0">
             <div className="mb-6">
               <AiSearch className="w-full" />
             </div>
+            {renderSearchResults()}
           </TabsContent>
         </Tabs>
-        
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="md:col-span-1">
-            <div className="rounded-lg border bg-card mb-4">
-              <div className="p-4" ref={searchContainerRef}>
-                <form onSubmit={handleManualSearch} className="flex gap-2">
-                  <div className="relative flex-1">
-                    <Input
-                      placeholder="Sök efter tävlingsnamn eller plats..."
-                      value={searchInputValue}
-                      onChange={(e) => handleSearchChange(e.target.value)}
-                      className="w-full pr-8"
-                    />
-                    {searchInputValue && (
-                      <button
-                        type="button"
-                        onClick={handleClearSearch}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                        aria-label="Rensa sökning"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    )}
-                  </div>
-                  <Button type="submit" size="icon">
-                    <SearchIcon className="h-4 w-4" />
-                  </Button>
-                </form>
-              </div>
-            </div>
-            
-            <SearchFilters 
-              filters={filters} 
-              onFilterChange={handleFilterChange} 
-              hasLocation={!!filters.userLocation}
-              hideSearchInput={true}
-            />
-          </div>
-          
-          <div className="md:col-span-3">
-            <div className="bg-card rounded-lg border p-4 mb-6">
-              <div className="flex justify-between items-center">
-                <h2 className="font-semibold">
-                  {filteredCompetitions.length} {filteredCompetitions.length === 1 ? 'tävling' : 'tävlingar'} hittades
-                </h2>
-                <Tabs
-                  value={viewMode}
-                  onValueChange={(value) => setViewMode(value as typeof viewMode)}
-                  className="w-auto"
-                >
-                  <TabsList className="grid w-[400px] grid-cols-5">
-                    <TabsTrigger value="grid" className="flex items-center">
-                      <Grid className="h-4 w-4 mr-2" />
-                      Rutnät
-                    </TabsTrigger>
-                    <TabsTrigger value="list" className="flex items-center">
-                      <List className="h-4 w-4 mr-2" />
-                      Lista
-                    </TabsTrigger>
-                    <TabsTrigger value="compact" className="flex items-center">
-                      <MenuSquare className="h-4 w-4 mr-2" />
-                      Kompakt
-                    </TabsTrigger>
-                    <TabsTrigger value="calendar" className="flex items-center">
-                      <CalendarIcon className="h-4 w-4 mr-2" />
-                      Kalender
-                    </TabsTrigger>
-                    <TabsTrigger value="map" className="flex items-center">
-                      <MapIcon className="h-4 w-4 mr-2" />
-                      Karta
-                    </TabsTrigger>
-                  </TabsList>
-                </Tabs>
-              </div>
-            </div>
-            
-            <Tabs value={viewMode} className="w-full">
-              <TabsContent value="grid" className="mt-0">
-                {filteredCompetitions.length > 0 ? (
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {filteredCompetitions.map((competition) => (
-                      <CompetitionCard 
-                        key={`${competition.id}-${locationChangeCounter}`}
-                        competition={competition} 
-                        featured={competition.featured}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="bg-card rounded-lg border p-8 text-center">
-                    <h3 className="text-lg font-medium mb-2">Inga tävlingar hittades</h3>
-                    <p className="text-muted-foreground mb-4">
-                      Det finns inga tävlingar som matchar dina filter. Prova att ändra dina sökkriterier.
-                    </p>
-                  </div>
-                )}
-              </TabsContent>
-              
-              <TabsContent value="list" className="mt-0">
-                {filteredCompetitions.length > 0 ? (
-                  <CompetitionListView competitions={filteredCompetitions} />
-                ) : (
-                  <div className="bg-card rounded-lg border p-8 text-center">
-                    <h3 className="text-lg font-medium mb-2">Inga tävlingar hittades</h3>
-                    <p className="text-muted-foreground mb-4">
-                      Det finns inga tävlingar som matchar dina filter. Prova att ändra dina sökkriterier.
-                    </p>
-                  </div>
-                )}
-              </TabsContent>
-              
-              <TabsContent value="compact" className="mt-0">
-                {filteredCompetitions.length > 0 ? (
-                  <CompetitionCompactView competitions={filteredCompetitions} />
-                ) : (
-                  <div className="bg-card rounded-lg border p-8 text-center">
-                    <h3 className="text-lg font-medium mb-2">Inga tävlingar hittades</h3>
-                    <p className="text-muted-foreground mb-4">
-                      Det finns inga tävlingar som matchar dina filter. Prova att ändra dina sökkriterier.
-                    </p>
-                  </div>
-                )}
-              </TabsContent>
-              
-              <TabsContent value="calendar" className="mt-0">
-                {filteredCompetitions.length > 0 ? (
-                  <CompetitionCalendarView competitions={filteredCompetitions} />
-                ) : (
-                  <div className="bg-card rounded-lg border p-8 text-center">
-                    <h3 className="text-lg font-medium mb-2">Inga tävlingar hittades</h3>
-                    <p className="text-muted-foreground mb-4">
-                      Det finns inga tävlingar som matchar dina filter. Prova att ändra dina sökkriterier.
-                    </p>
-                  </div>
-                )}
-              </TabsContent>
-              
-              <TabsContent value="map" className="mt-0">
-                {filteredCompetitions.length > 0 ? (
-                  <CompetitionMapView competitions={filteredCompetitions} />
-                ) : (
-                  <div className="bg-card rounded-lg border p-8 text-center">
-                    <h3 className="text-lg font-medium mb-2">Inga tävlingar hittades</h3>
-                    <p className="text-muted-foreground mb-4">
-                      Det finns inga tävlingar som matchar dina filter. Prova att ändra dina sökkriterier.
-                    </p>
-                  </div>
-                )}
-              </TabsContent>
-            </Tabs>
-          </div>
-        </div>
       </main>
       
       <Footer />
