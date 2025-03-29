@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -201,6 +202,27 @@ const Search = () => {
     });
   };
 
+  const handleClearAllFilters = () => {
+    const resetFilters: SearchFiltersType = {
+      regions: [],
+      districts: [],
+      disciplines: [],
+      levels: [],
+      types: [],
+      branches: [],
+      searchQuery: "", 
+      dateRange: undefined
+    };
+    
+    setFilters(resetFilters);
+    setSearchInputValue("");
+    
+    toast({
+      title: "Filtren har återställts",
+      description: "Alla valda filter har rensats - nu visas alla tävlingar"
+    });
+  };
+
   const processQuery = (query: string) => {
     if (!query.trim()) {
       toast({
@@ -284,7 +306,7 @@ const Search = () => {
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="relative">
                     <Input
-                      placeholder="Till exempel: "Sprinttävlingar i Skåne under våren"..."
+                      placeholder="Till exempel: &quot;Sprinttävlingar i Skåne under våren&quot;..."
                       value={searchInputValue}
                       onChange={(e) => handleSearchChange(e.target.value)}
                       className="pr-8 text-base"
@@ -422,7 +444,7 @@ const Search = () => {
               )}
               
               {activeTab === "manual" && resultsView === "list" && (
-                <CompetitionCompactView competitions={filteredCompetitions} />
+                <CompetitionListView competitions={filteredCompetitions} />
               )}
               
               {activeTab === "manual" && resultsView === "calendar" && (
@@ -461,3 +483,4 @@ const Search = () => {
 };
 
 export default Search;
+
