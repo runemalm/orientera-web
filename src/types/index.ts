@@ -1,4 +1,3 @@
-
 export type Region = {
   id: string;
   name: string;
@@ -66,4 +65,8 @@ export type SearchFilters = {
   isManualLocation?: boolean; // Added to track if location is manually set
   locationCity?: string; // Added for city-based location
   detectedLocationInfo?: DetectedLocationInfo; // Added for detailed auto-detected location info
+  dateRange?: {
+    from: Date;
+    to?: Date;
+  }; // Add date range for filtering
 };
