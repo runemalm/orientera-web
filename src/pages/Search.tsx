@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -7,18 +8,19 @@ import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
 import { useGeolocation } from "@/hooks/useGeolocation";
-import { Search as SearchIcon, X, Sparkles } from "lucide-react";
+import { Search as SearchIcon, X, Sparkles, ArrowRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { getDistance } from "@/lib/utils";
 import CompetitionCompactView from "@/components/CompetitionCompactView";
 import { isBefore, isAfter, isEqual, parseISO } from "date-fns";
-import { processNaturalLanguageQuery } from "@/components/AiSearch";
+import AiSearchCard from "@/components/search/AiSearchCard";
 
 const Search = () => {
   const location = useLocation();
+  const { toast } = useToast();
   
   const {
     coords: userLocation,
@@ -42,15 +44,12 @@ const Search = () => {
     detectedLocationInfo: undefined
   });
 
-  const [aiQuery, setAiQuery] = useState("");
-  const [isAiProcessing, setIsAiProcessing] = useState(false);
   const [searchInputValue, setSearchInputValue] = useState("");
   const searchContainerRef = useRef<HTMLDivElement>(null);
-  const { toast } = useToast();
-  
   const [locationChangeCounter, setLocationChangeCounter] = useState(0);
-  const [showAiAssistant, setShowAiAssistant] = useState(false);
+  const [currentTab, setCurrentTab] = useState<string>("traditional");
 
+  // Effekt för URL-parametrar
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     
@@ -86,6 +85,7 @@ const Search = () => {
       setSearchInputValue(searchQuery);
       
       if (aiMode) {
+        setCurrentTab("ai");
         toast({
           title: "Sökning från AI",
           description: "Filtren har applicerats baserat på din AI-sökning",
@@ -95,6 +95,7 @@ const Search = () => {
     }
   }, [location.search, toast]);
 
+  // Effekt för att uppdatera filters när userLocation ändras
   useEffect(() => {
     console.log("Location changed, updating filters:", { userLocation, detectedLocationInfo, isManualLocation });
     setFilters(prevFilters => ({
@@ -107,6 +108,7 @@ const Search = () => {
     setLocationChangeCounter(prev => prev + 1);
   }, [userLocation, detectedLocationInfo, isManualLocation]);
 
+  // Loggning av ändringar (för debug)
   useEffect(() => {
     console.log("🚀 userLocation changed in Search:", userLocation);
   }, [userLocation]);
@@ -119,6 +121,7 @@ const Search = () => {
     console.log("🚀 isManualLocation changed in Search:", isManualLocation);
   }, [isManualLocation]);
 
+  // Beräkna avstånd för tävlingar
   const competitionsWithDistance = useMemo(() => {
     console.log("Recalculating distances with userLocation:", userLocation);
     
@@ -142,6 +145,7 @@ const Search = () => {
     });
   }, [userLocation, locationChangeCounter]);
 
+  // Filtrera tävlingar baserat på alla filter
   const filteredCompetitions = useMemo(() => {
     let filtered = filterCompetitions(competitionsWithDistance, {
       ...filters,
@@ -169,6 +173,7 @@ const Search = () => {
     return filtered;
   }, [competitionsWithDistance, filters, userLocation]);
 
+  // Handler för när filtren ändras
   const handleFilterChange = (newFilters: SearchFiltersType) => {
     if (newFilters.isManualLocation !== filters.isManualLocation) {
       if (newFilters.isManualLocation === false && filters.isManualLocation === true) {
@@ -196,6 +201,7 @@ const Search = () => {
     }
   };
 
+  // Handler för söktextfältet
   const handleSearchChange = (value: string) => {
     setSearchInputValue(value);
     
@@ -205,6 +211,7 @@ const Search = () => {
     });
   };
 
+  // Handler för att rensa sökning
   const handleClearSearch = () => {
     setSearchInputValue("");
     setFilters({
@@ -218,166 +225,59 @@ const Search = () => {
     });
   };
 
+  // Handler för att skicka sökformulär
   const handleManualSearch = (e: React.FormEvent) => {
     e.preventDefault();
   };
 
-  const toggleAiAssistant = () => {
-    setShowAiAssistant(prev => !prev);
-    if (!showAiAssistant) {
-      setAiQuery("");
-    }
-  };
-
-  const handleAiQuerySubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  // Handler för AI-sökningens callback
+  const handleAiSearchComplete = (newFilters: SearchFiltersType) => {
+    setFilters(prevFilters => ({
+      ...prevFilters,
+      disciplines: newFilters.disciplines,
+      levels: newFilters.levels,
+      dateRange: newFilters.dateRange,
+      searchQuery: newFilters.searchQuery
+    }));
     
-    if (!aiQuery.trim()) {
-      toast({
-        title: "Tomt sökfält",
-        description: "Vänligen beskriv vad du letar efter",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsAiProcessing(true);
-
-    try {
-      const newFilters = processNaturalLanguageQuery(aiQuery);
-      
-      setFilters(prevFilters => ({
-        ...prevFilters,
-        disciplines: newFilters.disciplines,
-        levels: newFilters.levels,
-        dateRange: newFilters.dateRange,
-        searchQuery: newFilters.searchQuery
-      }));
-      
-      setSearchInputValue(newFilters.searchQuery || "");
-      
-      toast({
-        title: "AI-sökning bearbetad",
-        description: "Filtren har uppdaterats baserat på din sökning",
-        duration: 3000,
-      });
-      
-      setShowAiAssistant(false);
-    } catch (error) {
-      console.error("Error processing AI query:", error);
-      toast({
-        title: "Något gick fel",
-        description: "Det gick inte att bearbeta din sökning",
-        variant: "destructive",
-      });
-    } finally {
-      setIsAiProcessing(false);
-    }
+    setSearchInputValue(newFilters.searchQuery || "");
+    setCurrentTab("traditional");
   };
 
-  const renderAiAssistant = () => {
-    if (!showAiAssistant) return null;
-    
-    return (
-      <div className="bg-card rounded-lg border p-4 mb-4">
-        <form onSubmit={handleAiQuerySubmit} className="space-y-4">
-          <div className="relative">
-            <Textarea
-              placeholder="Beskriv den tävling du letar efter, t.ex. 'Nationella tävlingar i Skåne nästa månad'"
-              value={aiQuery}
-              onChange={(e) => setAiQuery(e.target.value)}
-              className="min-h-[100px] text-base resize-none p-4 pr-12"
-            />
-            <Sparkles className="absolute right-4 top-4 h-5 w-5 text-muted-foreground" />
-          </div>
-          
-          <div className="flex justify-end gap-2">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={toggleAiAssistant}
-            >
-              Avbryt
-            </Button>
-            <Button 
-              type="submit" 
-              disabled={isAiProcessing}
-            >
-              {isAiProcessing ? "Bearbetar sökning..." : "Sök med AI"}
-            </Button>
-          </div>
-        </form>
-      </div>
-    );
-  };
-
-  const renderSearchResults = () => (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-      <div className="md:col-span-1">
-        <div className="rounded-lg border bg-card mb-4">
-          <div className="p-4" ref={searchContainerRef}>
-            <div className="flex gap-2">
-              <div className="relative flex-1">
-                <Input
-                  placeholder="Sök efter namn eller plats..."
-                  value={searchInputValue}
-                  onChange={(e) => handleSearchChange(e.target.value)}
-                  className="w-full pr-8"
-                />
-                {searchInputValue && (
-                  <button
-                    type="button"
-                    onClick={handleClearSearch}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                    aria-label="Rensa sökning"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                )}
-              </div>
-              <Button 
-                type="button" 
-                onClick={toggleAiAssistant}
-                variant={showAiAssistant ? "default" : "outline"}
-                className="flex-shrink-0"
-              >
-                <Sparkles className="h-4 w-4" />
-                <span className="sr-only md:not-sr-only md:ml-2">AI-hjälp</span>
-              </Button>
+  // UI-renderingsfunktioner
+  const renderTraditionalSearch = () => (
+    <div className="space-y-4">
+      <div className="rounded-lg border bg-card p-4 mb-4">
+        <div ref={searchContainerRef}>
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Input
+                placeholder="Sök efter namn eller plats..."
+                value={searchInputValue}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                className="w-full pr-8"
+              />
+              {searchInputValue && (
+                <button
+                  type="button"
+                  onClick={handleClearSearch}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  aria-label="Rensa sökning"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
             </div>
           </div>
         </div>
-        
-        {renderAiAssistant()}
-        
-        <SearchFilters 
-          filters={filters} 
-          onFilterChange={handleFilterChange} 
-          hasLocation={!!filters.userLocation}
-          hideSearchInput={true}
-        />
       </div>
       
-      <div className="md:col-span-3">
-        <div className="bg-card rounded-lg border p-4 mb-6">
-          <div className="flex justify-between items-center">
-            <h2 className="font-semibold">
-              {filteredCompetitions.length} {filteredCompetitions.length === 1 ? 'tävling' : 'tävlingar'} hittades
-            </h2>
-          </div>
-        </div>
-        
-        {filteredCompetitions.length > 0 ? (
-          <CompetitionCompactView competitions={filteredCompetitions} />
-        ) : (
-          <div className="bg-card rounded-lg border p-8 text-center">
-            <h3 className="text-lg font-medium mb-2">Inga tävlingar hittades</h3>
-            <p className="text-muted-foreground mb-4">
-              Det finns inga tävlingar som matchar dina filter. Prova att ändra dina sökkriterier.
-            </p>
-          </div>
-        )}
-      </div>
+      <SearchFilters 
+        filters={filters} 
+        onFilterChange={handleFilterChange} 
+        hasLocation={!!filters.userLocation}
+        hideSearchInput={true}
+      />
     </div>
   );
 
@@ -388,7 +288,60 @@ const Search = () => {
       <main className="flex-1 container py-8">
         <h1 className="text-3xl font-bold mb-6">Sök tävlingar</h1>
         
-        {renderSearchResults()}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div className="md:col-span-1">
+            <Tabs value={currentTab} onValueChange={setCurrentTab} className="mb-4">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="traditional">
+                  <SearchIcon className="h-4 w-4 mr-2" />
+                  <span>Filtrera</span>
+                </TabsTrigger>
+                <TabsTrigger value="ai">
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  <span>AI-sökning</span>
+                </TabsTrigger>
+              </TabsList>
+              <TabsContent value="traditional" className="mt-2">
+                {renderTraditionalSearch()}
+              </TabsContent>
+              <TabsContent value="ai" className="mt-2">
+                <AiSearchCard onSearchComplete={handleAiSearchComplete} />
+              </TabsContent>
+            </Tabs>
+          </div>
+          
+          <div className="md:col-span-3">
+            <div className="bg-card rounded-lg border p-4 mb-6">
+              <div className="flex justify-between items-center">
+                <h2 className="font-semibold">
+                  {filteredCompetitions.length} {filteredCompetitions.length === 1 ? 'tävling' : 'tävlingar'} hittades
+                </h2>
+                {currentTab === "ai" && filters.searchQuery && (
+                  <Button
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => setCurrentTab("traditional")}
+                    className="text-xs"
+                  >
+                    Visa filter
+                    <ArrowRight className="ml-1 h-3 w-3" />
+                  </Button>
+                )}
+              </div>
+            </div>
+            
+            {filteredCompetitions.length > 0 ? (
+              <CompetitionCompactView competitions={filteredCompetitions} />
+            ) : (
+              <div className="bg-card rounded-lg border p-8 text-center">
+                <h3 className="text-lg font-medium mb-2">Inga tävlingar hittades</h3>
+                <p className="text-muted-foreground mb-4">
+                  Det finns inga tävlingar som matchar dina filter. Prova att ändra dina sökkriterier.
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
       </main>
       
       <Footer />
