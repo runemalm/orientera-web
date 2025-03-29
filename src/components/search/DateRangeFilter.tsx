@@ -75,9 +75,13 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange, hasActiveFilter = false
         <div className="flex items-center gap-2">
           <CalendarRange className="h-4 w-4" />
           <span>Datum</span>
-          {activeFilterCount > 0 && (
+          {activeFilterCount > 0 ? (
             <Badge variant="secondary" className="ml-1 font-normal">
               {activeFilterCount}
+            </Badge>
+          ) : (
+            <Badge variant="outline" className="ml-1 font-normal text-xs">
+              Alla datum
             </Badge>
           )}
         </div>
