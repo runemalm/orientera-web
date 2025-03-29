@@ -1,26 +1,17 @@
 
 import React, { useMemo } from "react";
-import { Calendar } from "@/components/ui/calendar";
-import { Badge } from "@/components/ui/badge";
+import { Competition } from "@/types";
 import { 
   Card, 
-  CardHeader, 
-  CardTitle, 
-  CardDescription,
   CardContent
 } from "@/components/ui/card";
-import { 
-  Table, 
-  TableHeader, 
-  TableBody, 
-  TableRow, 
-  TableHead, 
-  TableCell 
-} from "@/components/ui/table";
-import { Competition } from "@/types";
+import { Badge } from "@/components/ui/badge";
+import { format, isWeekend, parseISO, isSameMonth } from "date-fns";
+import { sv } from "date-fns/locale";
 import { formatDate } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
-import { Calendar as CalendarIcon, MapPin, Flag } from "lucide-react";
+import { Calendar, MapPin, Flag, Star, Navigation } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface CompetitionCalendarViewProps {
   competitions: Competition[];
@@ -31,127 +22,115 @@ const CompetitionCalendarView: React.FC<CompetitionCalendarViewProps> = ({
 }) => {
   const navigate = useNavigate();
   
-  // Group competitions by date
-  const competitionsByDate = useMemo(() => {
+  // Sort competitions by date in ascending order
+  const sortedCompetitions = useMemo(() => 
+    [...competitions].sort((a, b) => 
+      new Date(a.date).getTime() - new Date(b.date).getTime()
+    )
+  , [competitions]);
+
+  // Group competitions by month
+  const competitionsByMonth = useMemo(() => {
     const grouped = new Map<string, Competition[]>();
     
-    competitions.forEach(competition => {
-      const dateKey = competition.date.split('T')[0];
-      if (!grouped.has(dateKey)) {
-        grouped.set(dateKey, []);
+    sortedCompetitions.forEach(competition => {
+      const date = parseISO(competition.date);
+      const monthKey = format(date, 'yyyy-MM');
+      const monthName = format(date, 'MMMM yyyy', { locale: sv });
+      
+      if (!grouped.has(monthKey)) {
+        grouped.set(monthKey, []);
       }
-      grouped.get(dateKey)?.push(competition);
+      grouped.get(monthKey)?.push(competition);
     });
     
-    return grouped;
-  }, [competitions]);
+    return Array.from(grouped.entries()).map(([key, comps]) => ({
+      monthKey: key,
+      monthName: format(parseISO(`${key}-01`), 'MMMM yyyy', { locale: sv }),
+      competitions: comps
+    }));
+  }, [sortedCompetitions]);
 
-  // Create date objects for use in calendar
-  const competitionDates = useMemo(() => {
-    return Array.from(competitionsByDate.keys()).map(dateStr => new Date(dateStr));
-  }, [competitionsByDate]);
-
-  // Selected date state
-  const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(
-    competitionDates.length > 0 ? competitionDates[0] : undefined
-  );
-
-  // Get competitions for selected date
-  const selectedDateCompetitions = useMemo(() => {
-    if (!selectedDate) return [];
-    const dateKey = selectedDate.toISOString().split('T')[0];
-    return competitionsByDate.get(dateKey) || [];
-  }, [selectedDate, competitionsByDate]);
+  if (competitions.length === 0) {
+    return (
+      <Card>
+        <CardContent className="p-8 text-center">
+          <p className="text-muted-foreground">Inga tävlingar hittades med dessa filter</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div className="md:col-span-1">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Välj datum</CardTitle>
-            <CardDescription>
-              {competitionDates.length} datum med tävlingar
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Calendar
-              mode="single"
-              selected={selectedDate}
-              onSelect={setSelectedDate}
-              className="p-3 pointer-events-auto"
-              components={{
-                DayContent: (props) => {
-                  const date = props.date;
-                  const dateKey = date.toISOString().split('T')[0];
-                  const hasEvents = competitionsByDate.has(dateKey);
-                  
-                  return (
-                    <div className="relative">
-                      <div>{props.date.getDate()}</div>
-                      {hasEvents && (
-                        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-1 rounded-full bg-primary" />
-                      )}
-                    </div>
-                  );
-                },
-              }}
-            />
-          </CardContent>
-        </Card>
-      </div>
-      
-      <div className="md:col-span-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              {selectedDate 
-                ? `Tävlingar ${formatDate(selectedDate.toISOString())}` 
-                : "Välj ett datum för att se tävlingar"}
-            </CardTitle>
-            <CardDescription>
-              {selectedDateCompetitions.length} 
-              {selectedDateCompetitions.length === 1 ? ' tävling' : ' tävlingar'}
-              {selectedDate ? ` ${formatDate(selectedDate.toISOString())}` : ''}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {selectedDateCompetitions.length > 0 ? (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Tävling</TableHead>
-                    <TableHead>Arrangör</TableHead>
-                    <TableHead>Disciplin</TableHead>
-                    <TableHead>Nivå</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {selectedDateCompetitions.map((competition) => (
-                    <TableRow 
-                      key={competition.id}
-                      className="cursor-pointer hover:bg-muted"
-                      onClick={() => navigate(`/competition/${competition.id}`)}
-                    >
-                      <TableCell className="font-medium">{competition.name}</TableCell>
-                      <TableCell>{competition.organizer}</TableCell>
-                      <TableCell>
+    <div className="space-y-8">
+      {competitionsByMonth.map(({ monthKey, monthName, competitions }) => (
+        <div key={monthKey} className="space-y-4">
+          <div className="sticky top-0 z-10 bg-background pt-2 pb-1">
+            <h3 className="text-xl font-semibold capitalize border-b pb-2">{monthName}</h3>
+          </div>
+          
+          <div className="space-y-3">
+            {competitions.map((competition) => {
+              const date = parseISO(competition.date);
+              const isWeekendDay = isWeekend(date);
+              
+              return (
+                <Card 
+                  key={competition.id}
+                  className={cn(
+                    "overflow-hidden transition-all hover:shadow-md cursor-pointer",
+                    isWeekendDay ? "border-l-4 border-l-amber-400" : "",
+                    competition.featured ? "border-accent border-l-4" : ""
+                  )}
+                  onClick={() => navigate(`/competition/${competition.id}`)}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div className="flex-1">
+                        <div className="flex items-center mb-1.5">
+                          <div className={cn(
+                            "flex items-center justify-center min-w-[40px] h-10 mr-3 rounded font-medium text-sm",
+                            isWeekendDay ? "bg-amber-100 text-amber-700" : "bg-muted text-muted-foreground"
+                          )}>
+                            <div className="flex flex-col items-center leading-tight">
+                              <span>{format(date, 'd')}</span>
+                              <span className="text-xs capitalize">{format(date, 'EEE', { locale: sv })}</span>
+                            </div>
+                          </div>
+                          
+                          <div>
+                            <h4 className="font-medium flex items-center">
+                              {competition.featured && (
+                                <Star className="h-4 w-4 text-accent mr-1.5" />
+                              )}
+                              {competition.name}
+                            </h4>
+                            <div className="text-sm text-muted-foreground flex items-center gap-1">
+                              <MapPin className="h-3 w-3" />
+                              <span>{competition.location}</span>
+                              {competition.distance !== undefined && (
+                                <Badge variant="outline" className="ml-1 text-xs">
+                                  <Navigation className="h-3 w-3 mr-1" />
+                                  {competition.distance} km
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-2 sm:ml-4">
                         <Badge variant="secondary">{competition.discipline}</Badge>
-                      </TableCell>
-                      <TableCell>{competition.level}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            ) : (
-              <div className="text-center py-10 text-muted-foreground">
-                {selectedDate 
-                  ? "Inga tävlingar detta datum" 
-                  : "Välj ett datum i kalendern för att se tävlingar"}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+                        <Badge variant="muted">{competition.level}</Badge>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      ))}
     </div>
   );
 };
