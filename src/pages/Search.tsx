@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -395,7 +396,7 @@ const Search = () => {
               )}
               
               {activeTab === "manual" && resultsView === "list" && (
-                <CompetitionListView competitions={filteredCompetitions} />
+                <CompetitionCompactView competitions={filteredCompetitions} />
               )}
               
               {activeTab === "manual" && resultsView === "map" && (
