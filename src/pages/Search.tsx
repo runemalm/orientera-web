@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -6,19 +7,15 @@ import SearchFilters from "@/components/SearchFilters";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
-import { Filter, Trash2, Map, Calendar, LayoutPanelLeft, MapPin } from "lucide-react";
+import { Filter, Trash2, Map, LayoutPanelLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import CompetitionMapView from "@/components/CompetitionMapView";
 import CompetitionCalendarView from "@/components/CompetitionCalendarView";
-import CompetitionListView from "@/components/CompetitionListView";
 import { useIsMobile, useBreakpoint } from "@/hooks/use-mobile";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { cn } from "@/lib/utils";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 
-const SEARCH_RESULTS_VIEW_KEY = "search-results-view";
 const SEARCH_SIDEBAR_OPEN_KEY = "search-sidebar-open";
 const SEARCH_FILTERS_KEY = "search-filters";
 const SEARCH_MAP_VISIBLE_KEY = "search-map-visible";
@@ -40,8 +37,6 @@ const Search = () => {
     searchQuery: "",
     showMap: false
   });
-
-  const [resultsView, setResultsView] = useState<"calendar" | "list">("calendar");
 
   useEffect(() => {
     const savedFilters = localStorage.getItem(SEARCH_FILTERS_KEY);
@@ -86,17 +81,6 @@ const Search = () => {
       setSidebarOpen(!isMobile);
     }
   }, [isMobile]);
-
-  useEffect(() => {
-    const savedView = localStorage.getItem(SEARCH_RESULTS_VIEW_KEY);
-    if (savedView === "list" || savedView === "calendar") {
-      setResultsView(savedView);
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem(SEARCH_RESULTS_VIEW_KEY, resultsView);
-  }, [resultsView]);
 
   useEffect(() => {
     localStorage.setItem(SEARCH_SIDEBAR_OPEN_KEY, sidebarOpen.toString());
@@ -183,12 +167,6 @@ const Search = () => {
     }));
   };
 
-  const toggleResultsView = (value: string) => {
-    if (value === "list" || value === "calendar") {
-      setResultsView(value);
-    }
-  };
-
   const typesArray = Array.isArray(filters.types) ? filters.types : [];
   const branchesArray = Array.isArray(filters.branches) ? filters.branches : [];
   
@@ -258,7 +236,7 @@ const Search = () => {
                   )}
                 </div>
                 
-                <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                <div className="flex items-center gap-2">
                   {!isMobile && (
                     <Button
                       variant="ghost"
@@ -290,22 +268,6 @@ const Search = () => {
                         Karta
                       </label>
                     </div>
-                    
-                    <ToggleGroup 
-                      type="single" 
-                      value={resultsView} 
-                      onValueChange={toggleResultsView}
-                      className="bg-muted p-1 rounded-md h-9"
-                    >
-                      <ToggleGroupItem value="calendar" aria-label="Visa kalendervy" className="h-7 px-2.5 data-[state=on]:bg-background">
-                        <Calendar className="h-3.5 w-3.5" />
-                        <span className="sr-only md:not-sr-only md:ml-2 text-xs">Kalender</span>
-                      </ToggleGroupItem>
-                      <ToggleGroupItem value="list" aria-label="Visa listvy" className="h-7 px-2.5 data-[state=on]:bg-background">
-                        <MapPin className="h-3.5 w-3.5" />
-                        <span className="sr-only md:not-sr-only md:ml-2 text-xs">Lista</span>
-                      </ToggleGroupItem>
-                    </ToggleGroup>
                   </div>
                 </div>
               </div>
@@ -319,11 +281,7 @@ const Search = () => {
                   </div>
                 )}
                 
-                {resultsView === "calendar" ? (
-                  <CompetitionCalendarView competitions={filteredCompetitions} />
-                ) : (
-                  <CompetitionListView competitions={filteredCompetitions} />
-                )}
+                <CompetitionCalendarView competitions={filteredCompetitions} />
               </div>
             ) : (
               <div className="bg-card rounded-lg border p-8 text-center">
@@ -332,18 +290,6 @@ const Search = () => {
                   Inga tävlingar matchar dina nuvarande filter. Prova att justera dem för att se fler resultat.
                 </p>
                 <ul className="text-left text-sm text-muted-foreground max-w-xs mx-auto mb-6 space-y-2">
-                  <li className="flex items-start">
-                    <span className="bg-muted rounded-full p-1 mr-2 mt-0.5">
-                      <Calendar className="h-3 w-3" />
-                    </span>
-                    <span>Välj ett bredare datumintervall</span>
-                  </li>
-                  <li className="flex items-start">
-                    <span className="bg-muted rounded-full p-1 mr-2 mt-0.5">
-                      <MapPin className="h-3 w-3" />
-                    </span>
-                    <span>Inkludera fler distrikt</span>
-                  </li>
                   <li className="flex items-start">
                     <span className="bg-muted rounded-full p-1 mr-2 mt-0.5">
                       <Filter className="h-3 w-3" />
