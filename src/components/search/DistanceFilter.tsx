@@ -39,9 +39,6 @@ const DistanceFilter = ({
           <MapPin className="h-4 w-4" />
           <span className="text-sm font-medium">
             Avstånd
-            {distance !== undefined && (
-              <span className="ml-1 text-muted-foreground">({distance} km valt)</span>
-            )}
           </span>
           {locationName && (
             <Badge variant="outline" className="ml-2 font-normal">

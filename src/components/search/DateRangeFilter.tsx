@@ -73,11 +73,6 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange, hasActiveFilter = false
           <CalendarRange className="h-4 w-4" />
           <span>
             Datum
-            {activeFilterCount > 0 && (
-              <span className="ml-1 text-muted-foreground">
-                ({activeFilterCount} {activeFilterCount === 1 ? 'valt' : 'valda'})
-              </span>
-            )}
           </span>
         </div>
       </AccordionTrigger>
