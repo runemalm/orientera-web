@@ -1,4 +1,3 @@
-
 import { FilterIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -69,12 +68,11 @@ const SearchFiltersComponent = ({
     onFilterChange({ ...filters, districts: updatedDistricts });
   };
 
-  const handleDateRangeChange = (dateRange: { from: Date; to?: Date } | undefined) => {
+  const handleDateRangeChange = (dateRange: { from?: Date; to?: Date } | undefined) => {
     onFilterChange({ ...filters, dateRange });
   };
 
   const handleClearAllFilters = () => {
-    // Create a completely new filters object with all properties explicitly reset
     const resetFilters: SearchFiltersType = {
       regions: [],
       districts: [],
@@ -83,10 +81,9 @@ const SearchFiltersComponent = ({
       types: [],
       branches: [],
       searchQuery: "", 
-      dateRange: undefined // Explicitly set to undefined
+      dateRange: undefined
     };
     
-    // Pass the completely reset filters object to the parent component
     onFilterChange(resetFilters);
     
     toast({

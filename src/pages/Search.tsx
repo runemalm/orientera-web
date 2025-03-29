@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -90,15 +91,17 @@ const Search = () => {
   const filteredCompetitions = useMemo(() => {
     let filtered = filterCompetitions(competitions, filters);
 
-    if (filters.dateRange?.from) {
+    if (filters.dateRange?.from || filters.dateRange?.to) {
       filtered = filtered.filter(competition => {
         const competitionDate = parseISO(competition.date);
         
+        // Check from date if it exists
         if (filters.dateRange?.from && isBefore(competitionDate, filters.dateRange.from) && 
             !isEqual(competitionDate, filters.dateRange.from)) {
           return false;
         }
         
+        // Check to date if it exists
         if (filters.dateRange?.to && isAfter(competitionDate, filters.dateRange.to) && 
             !isEqual(competitionDate, filters.dateRange.to)) {
           return false;

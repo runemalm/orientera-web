@@ -9,9 +9,10 @@ import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Label } from "@/components/ui/label";
 
 type DateRangeValue = {
-  from: Date;
+  from?: Date;
   to?: Date;
 };
 
@@ -21,46 +22,67 @@ interface DateRangeFilterProps {
 }
 
 const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilterProps) => {
-  const [date, setDate] = useState<DateRangeValue | undefined>(dateRange);
-  const [isOpen, setIsOpen] = useState(false);
+  const [fromDate, setFromDate] = useState<Date | undefined>(dateRange?.from);
+  const [toDate, setToDate] = useState<Date | undefined>(dateRange?.to);
+  const [fromDateOpen, setFromDateOpen] = useState(false);
+  const [toDateOpen, setToDateOpen] = useState(false);
   
-  // Add useEffect to synchronize the local state with props
+  // Sync local state with props
   useEffect(() => {
-    setDate(dateRange);
+    setFromDate(dateRange?.from);
+    setToDate(dateRange?.to);
   }, [dateRange]);
   
-  const handleSelect = (value: DateRangeValue | undefined) => {
-    setDate(value);
-    
-    if (value?.from) {
-      // If a complete range is selected (both from and to dates), update the parent component
-      if (!value.to || value.from.getTime() <= value.to.getTime()) {
-        onDateRangeChange(value);
-      }
-    } else {
-      // If selection is cleared
+  const handleFromDateSelect = (date: Date | undefined) => {
+    setFromDate(date);
+    updateDateRange(date, toDate);
+  };
+
+  const handleToDateSelect = (date: Date | undefined) => {
+    setToDate(date);
+    updateDateRange(fromDate, date);
+  };
+  
+  const updateDateRange = (from: Date | undefined, to: Date | undefined) => {
+    if (!from && !to) {
       onDateRangeChange(undefined);
+      return;
     }
+    
+    onDateRangeChange({ from, to });
+  };
+
+  const formatDate = (date?: Date): string => {
+    if (!date) return "";
+    return format(date, "d MMM yyyy", { locale: sv });
   };
 
   const formatDateRange = (range?: DateRangeValue): string => {
-    if (!range?.from) return "";
+    if (!range?.from && !range?.to) return "";
     
-    const fromFormatted = format(range.from, "d MMM yyyy", { locale: sv });
+    const fromText = range.from ? formatDate(range.from) : "";
+    const toText = range.to ? formatDate(range.to) : "";
     
-    if (!range.to) {
-      return `Från ${fromFormatted}`;
+    if (fromText && toText) {
+      return `${fromText} - ${toText}`;
+    } else if (fromText) {
+      return `Från ${fromText}`;
+    } else if (toText) {
+      return `Till ${toText}`;
     }
     
-    const toFormatted = format(range.to, "d MMM yyyy", { locale: sv });
-    return `${fromFormatted} - ${toFormatted}`;
+    return "";
   };
 
   const clearDateRange = () => {
-    setDate(undefined);
+    setFromDate(undefined);
+    setToDate(undefined);
     onDateRangeChange(undefined);
-    setIsOpen(false);
+    setFromDateOpen(false);
+    setToDateOpen(false);
   };
+
+  const hasDateFilter = fromDate || toDate;
 
   return (
     <AccordionItem value="date-range">
@@ -68,52 +90,86 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilterProps)
         <div className="flex items-center gap-2">
           <CalendarRange className="h-4 w-4" />
           <span>Datum</span>
-          {dateRange && (
+          {hasDateFilter && (
             <Badge variant="secondary" className="ml-2">
-              {formatDateRange(dateRange)}
+              {formatDateRange({ from: fromDate, to: toDate })}
             </Badge>
           )}
         </div>
       </AccordionTrigger>
       <AccordionContent>
-        <div className="pt-2 space-y-2">
-          <Popover open={isOpen} onOpenChange={setIsOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "w-full justify-start text-left font-normal",
-                  !date && "text-muted-foreground"
-                )}
-              >
-                <CalendarRange className="mr-2 h-4 w-4" />
-                {date ? formatDateRange(date) : <span>Välj datumperiod</span>}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="range"
-                selected={date}
-                onSelect={handleSelect}
-                locale={sv}
-                initialFocus
-                className="pointer-events-auto"
-              />
-              <div className="p-3 border-t border-border">
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={clearDateRange}
-                  className="w-full text-sm justify-center"
-                >
-                  <X className="h-3.5 w-3.5 mr-1.5" />
-                  Rensa datumval
-                </Button>
-              </div>
-            </PopoverContent>
-          </Popover>
+        <div className="pt-2 space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            {/* From date selector */}
+            <div className="space-y-2">
+              <Label htmlFor="from-date">Från</Label>
+              <Popover open={fromDateOpen} onOpenChange={setFromDateOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    id="from-date"
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !fromDate && "text-muted-foreground"
+                    )}
+                  >
+                    {fromDate ? formatDate(fromDate) : "Välj datum"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={fromDate}
+                    onSelect={handleFromDateSelect}
+                    locale={sv}
+                    initialFocus
+                    className="pointer-events-auto"
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
 
-          {/* Remove the duplicate badges section here */}
+            {/* To date selector */}
+            <div className="space-y-2">
+              <Label htmlFor="to-date">Till</Label>
+              <Popover open={toDateOpen} onOpenChange={setToDateOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    id="to-date"
+                    variant="outline"
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !toDate && "text-muted-foreground"
+                    )}
+                  >
+                    {toDate ? formatDate(toDate) : "Välj datum"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={toDate}
+                    onSelect={handleToDateSelect}
+                    locale={sv}
+                    initialFocus
+                    className="pointer-events-auto"
+                  />
+                </PopoverContent>
+              </Popover>
+            </div>
+          </div>
+
+          {hasDateFilter && (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={clearDateRange}
+              className="w-full text-sm justify-center"
+            >
+              <X className="h-3.5 w-3.5 mr-1.5" />
+              Rensa datumval
+            </Button>
+          )}
         </div>
       </AccordionContent>
     </AccordionItem>

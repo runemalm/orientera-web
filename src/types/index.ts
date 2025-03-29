@@ -64,8 +64,8 @@ export type SearchFilters = {
   userLocation?: Coordinates;
   locationCity?: string; // Location name for display
   dateRange?: {
-    from: Date;
+    from?: Date;
     to?: Date;
-  }; // Date range for filtering
+  }; // Date range for filtering, both from and to are now optional
   distance?: number; // Optional distance filter
 };
