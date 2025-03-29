@@ -17,6 +17,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import CompetitionCalendarView from "@/components/CompetitionCalendarView";
 import CompetitionCompactView from "@/components/CompetitionCompactView";
 import CompetitionListView from "@/components/CompetitionListView";
+import { isBefore, isAfter, isEqual, parseISO } from "date-fns";
 
 const Search = () => {
   const {
@@ -96,10 +97,30 @@ const Search = () => {
   }, [userLocation, locationChangeCounter]);
 
   const filteredCompetitions = useMemo(() => {
-    return filterCompetitions(competitionsWithDistance, {
+    let filtered = filterCompetitions(competitionsWithDistance, {
       ...filters,
       userLocation,
     });
+
+    if (filters.dateRange?.from) {
+      filtered = filtered.filter(competition => {
+        const competitionDate = parseISO(competition.date);
+        
+        if (filters.dateRange?.from && isBefore(competitionDate, filters.dateRange.from) && 
+            !isEqual(competitionDate, filters.dateRange.from)) {
+          return false;
+        }
+        
+        if (filters.dateRange?.to && isAfter(competitionDate, filters.dateRange.to) && 
+            !isEqual(competitionDate, filters.dateRange.to)) {
+          return false;
+        }
+        
+        return true;
+      });
+    }
+    
+    return filtered;
   }, [competitionsWithDistance, filters, userLocation]);
 
   const handleFilterChange = (newFilters: SearchFiltersType) => {

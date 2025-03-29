@@ -10,6 +10,7 @@ import { districts } from "@/data/districts";
 import { SearchFilters as SearchFiltersType } from "@/types";
 import DistanceFilter from "./search/DistanceFilter";
 import CheckboxFilter from "./search/CheckboxFilter";
+import DateRangeFilter from "./search/DateRangeFilter";
 
 const disciplines = ['Sprint', 'Medel', 'Lång', 'Natt', 'Stafett', 'Ultralång'];
 const levels = ['Klubb', 'Krets', 'Distrikt', 'Nationell', 'Internationell'];
@@ -72,6 +73,10 @@ const SearchFiltersComponent = ({
     onFilterChange({ ...filters, distance: distance || undefined });
   };
 
+  const handleDateRangeChange = (dateRange: { from: Date; to?: Date } | undefined) => {
+    onFilterChange({ ...filters, dateRange });
+  };
+
   const handleDetectLocation = () => {
     // This is the handler for the auto detection button
     // We need to properly trigger the useGeolocation hook's detectLocation method
@@ -117,7 +122,8 @@ const SearchFiltersComponent = ({
       userLocation: filters.userLocation,
       isManualLocation: filters.isManualLocation,
       locationCity: filters.locationCity,
-      detectedLocationInfo: filters.detectedLocationInfo
+      detectedLocationInfo: filters.detectedLocationInfo,
+      dateRange: undefined
     });
   };
 
@@ -129,7 +135,12 @@ const SearchFiltersComponent = ({
           <h3 className="font-medium">Filtrera</h3>
         </div>
 
-        <Accordion type="multiple" defaultValue={["distance", "discipline", "level"]} className="space-y-4">
+        <Accordion type="multiple" defaultValue={["date-range", "distance", "discipline", "level"]} className="space-y-4">
+          <DateRangeFilter 
+            dateRange={filters.dateRange} 
+            onDateRangeChange={handleDateRangeChange}
+          />
+
           <DistanceFilter
             userLocation={filters.userLocation}
             detectedLocationInfo={filters.detectedLocationInfo}
