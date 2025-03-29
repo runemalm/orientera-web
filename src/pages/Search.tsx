@@ -59,6 +59,14 @@ const Search = () => {
     console.log("🚀 userLocation changed in Search:", userLocation);
   }, [userLocation]);
 
+  useEffect(() => {
+    console.log("🚀 detectedLocationInfo changed in Search:", detectedLocationInfo);
+  }, [detectedLocationInfo]);
+
+  useEffect(() => {
+    console.log("🚀 isManualLocation changed in Search:", isManualLocation);
+  }, [isManualLocation]);
+
   const competitionsWithDistance = useMemo(() => {
     console.log("Recalculating distances with userLocation:", userLocation);
     
