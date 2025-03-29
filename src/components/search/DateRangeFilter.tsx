@@ -108,23 +108,7 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilterProps)
             </PopoverContent>
           </Popover>
 
-          {dateRange && (
-            <div className="flex flex-wrap gap-1">
-              <Badge 
-                variant="secondary" 
-                className="flex items-center gap-1 bg-muted hover:bg-muted/80"
-              >
-                {formatDateRange(dateRange)}
-                <button 
-                  onClick={clearDateRange} 
-                  className="ml-1 rounded-full"
-                  aria-label="Rensa datumfilter"
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </Badge>
-            </div>
-          )}
+          {/* Remove the duplicate badges section here */}
         </div>
       </AccordionContent>
     </AccordionItem>
