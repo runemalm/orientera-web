@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { sv } from "date-fns/locale";
 import { format, isValid, isToday, isYesterday, isTomorrow, addDays, startOfMonth, endOfMonth, isSameDay } from "date-fns";
@@ -47,7 +46,6 @@ const DateRangeFilter = ({
     setFromDate(dateRange?.from);
     setToDate(dateRange?.to);
     
-    // Check if the current date range matches any preset
     if (dateRange?.from) {
       checkAndSetPreset(dateRange.from, dateRange.to);
     } else {
@@ -56,9 +54,8 @@ const DateRangeFilter = ({
   }, [dateRange]);
   
   const checkAndSetPreset = (from: Date, to?: Date) => {
-    // Check if the current range matches any preset
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Normalize today to start of day
+    today.setHours(0, 0, 0, 0);
     
     const isMatchingPreset = (presetId: string): boolean => {
       let presetFrom: Date | undefined;
@@ -76,8 +73,8 @@ const DateRangeFilter = ({
           break;
           
         case 'thisWeekend':
-          presetFrom = addDays(today, (5 - today.getDay() + 7) % 7); // Next Friday
-          presetTo = addDays(presetFrom, 2); // Sunday
+          presetFrom = addDays(today, (5 - today.getDay() + 7) % 7);
+          presetTo = addDays(presetFrom, 2);
           break;
           
         case 'next7days':
@@ -104,7 +101,6 @@ const DateRangeFilter = ({
           return false;
       }
       
-      // Compare dates accurately
       const fromMatches = presetFrom && from && isSameDay(from, presetFrom);
       const toMatches = 
         (presetTo && to && isSameDay(to, presetTo)) || 
@@ -113,7 +109,6 @@ const DateRangeFilter = ({
       return fromMatches && toMatches;
     };
     
-    // Check each preset
     for (const preset of PRESET_OPTIONS) {
       if (isMatchingPreset(preset.id)) {
         setSelectedPreset(preset.id);
@@ -167,7 +162,7 @@ const DateRangeFilter = ({
   const handlePresetChange = (value: string) => {
     setSelectedPreset(value);
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Normalize today to start of day
+    today.setHours(0, 0, 0, 0);
     
     let from: Date | undefined;
     let to: Date | undefined;
@@ -184,9 +179,8 @@ const DateRangeFilter = ({
         break;
         
       case 'thisWeekend':
-        // Calculate the coming weekend (Fri-Sun)
-        from = addDays(today, (5 - today.getDay() + 7) % 7); // Next Friday
-        to = addDays(from, 2); // Sunday
+        from = addDays(today, (5 - today.getDay() + 7) % 7);
+        to = addDays(from, 2);
         break;
         
       case 'next7days':
@@ -218,14 +212,14 @@ const DateRangeFilter = ({
   return (
     <div className="space-y-4">
       <div className="space-y-3">
-        <div className="flex flex-wrap gap-1">
+        <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
           {PRESET_OPTIONS.map(option => (
             <Button
               key={option.id}
               type="button"
               variant={selectedPreset === option.id ? "default" : "outline"}
               size="sm"
-              className="text-xs h-7 px-2"
+              className="text-xs h-7 w-full"
               onClick={() => handlePresetChange(option.id)}
             >
               {option.label}
@@ -233,7 +227,7 @@ const DateRangeFilter = ({
           ))}
         </div>
         
-        <div className="text-center text-sm">
+        <div className="text-center text-sm text-muted-foreground">
           eller
         </div>
         
