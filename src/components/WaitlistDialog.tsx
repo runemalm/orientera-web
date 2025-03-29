@@ -42,8 +42,8 @@ const WaitlistDialog = ({ open, setOpen }: WaitlistDialogProps) => {
         <DialogHeader>
           <DialogTitle>Ställ dig i vår väntlista</DialogTitle>
           <DialogDescription>
-            Orientera.com är för närvarande i beta-testning. Lämna din e-postadress
-            så kontaktar vi dig så snart appen är tillgänglig för användning.
+            Orientera.com har för tillfället ett högt tryck av nya användare. Lämna din e-postadress
+            så kontaktar vi dig så snart vi kan erbjuda dig ett konto.
           </DialogDescription>
         </DialogHeader>
         
