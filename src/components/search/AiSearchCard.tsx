@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Sparkles, Loader2, Search, Clock, Zap } from "lucide-react";
+import { Sparkles, Loader2, Search, Clock, Zap, TrendingUp } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { SearchFilters } from "@/types";
 import { processNaturalLanguageQuery } from "@/utils/aiQueryProcessor";
@@ -26,6 +26,15 @@ const quickSearches = [
   { id: 'national', label: 'Nationella tävlingar', query: 'Nationella tävlingar' },
   { id: 'youth', label: 'Ungdomstävlingar', query: 'Tävlingar för ungdomar' },
   { id: 'sprint', label: 'Sprinttävlingar', query: 'Sprint tävlingar' },
+];
+
+// Lista på populära sökningar som visas när användaren inte har några tidigare sökningar
+const popularSearches = [
+  "Nationella tävlingar i sommar",
+  "Sprinttävlingar i Stockholm",
+  "Ungdomstävlingar nästa månad",
+  "Stafetter i södra Sverige",
+  "Tävlingar inom 50 km från Stockholm",
 ];
 
 const AiSearchCard = ({ onSearchComplete, initialQuery = "" }: AiSearchCardProps) => {
@@ -149,7 +158,7 @@ const AiSearchCard = ({ onSearchComplete, initialQuery = "" }: AiSearchCardProps
           </div>
         </div>
         
-        {recentSearches.length > 0 && (
+        {recentSearches.length > 0 ? (
           <div className="mt-4">
             <div className="flex items-center gap-2 mb-2">
               <Clock className="h-4 w-4 text-muted-foreground" />
@@ -166,6 +175,27 @@ const AiSearchCard = ({ onSearchComplete, initialQuery = "" }: AiSearchCardProps
                 >
                   <Search className="h-3 w-3 mr-2" />
                   {search.length > 60 ? `${search.substring(0, 60)}...` : search}
+                </Button>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="mt-4">
+            <div className="flex items-center gap-2 mb-2">
+              <TrendingUp className="h-4 w-4 text-primary" />
+              <h3 className="text-sm font-medium">Populära sökningar</h3>
+            </div>
+            <div className="flex flex-col gap-1">
+              {popularSearches.map((search, index) => (
+                <Button
+                  key={index}
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleQuickSearch(search)}
+                  className="text-xs justify-start h-auto py-1.5 text-muted-foreground hover:text-foreground"
+                >
+                  <Search className="h-3 w-3 mr-2" />
+                  {search}
                 </Button>
               ))}
             </div>

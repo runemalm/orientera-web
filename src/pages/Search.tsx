@@ -7,7 +7,7 @@ import SearchFilters from "@/components/SearchFilters";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
-import { X, Sparkles, Clock, Search as SearchIcon, Filter, Trash2 } from "lucide-react";
+import { X, Sparkles, Clock, Search as SearchIcon, Filter, Trash2, TrendingUp } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -16,6 +16,15 @@ import { isBefore, isAfter, isEqual, parseISO } from "date-fns";
 import { processNaturalLanguageQuery } from "@/utils/aiQueryProcessor";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+// Array of popular searches to display when no recent searches exist
+const popularSearches = [
+  "Nationella tävlingar i sommar",
+  "Sprinttävlingar i Stockholm",
+  "Ungdomstävlingar nästa månad",
+  "Stafetter i södra Sverige",
+  "Långdistans i fjällen",
+];
 
 const Search = () => {
   const location = useLocation();
@@ -288,7 +297,7 @@ const Search = () => {
                   </Button>
                 </form>
                 
-                {recentSearches.length > 0 && (
+                {recentSearches.length > 0 ? (
                   <div className="mt-4">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
@@ -316,6 +325,27 @@ const Search = () => {
                         >
                           <SearchIcon className="h-3 w-3 mr-2" />
                           {search.length > 60 ? `${search.substring(0, 60)}...` : search}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mt-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <TrendingUp className="h-4 w-4 text-primary" />
+                      <h3 className="text-sm font-medium">Populära sökningar</h3>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      {popularSearches.map((search, index) => (
+                        <Button
+                          key={index}
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => processQuery(search)}
+                          className="text-xs justify-start h-auto py-1.5 text-muted-foreground hover:text-foreground"
+                        >
+                          <SearchIcon className="h-3 w-3 mr-2" />
+                          {search}
                         </Button>
                       ))}
                     </div>
