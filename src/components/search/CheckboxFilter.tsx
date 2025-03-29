@@ -32,6 +32,11 @@ const CheckboxFilter = ({
           <span className="text-sm font-medium">
             {title}
           </span>
+          {selectedCount > 0 && (
+            <Badge variant="secondary" className="ml-1 text-xs">
+              {selectedCount}
+            </Badge>
+          )}
         </div>
       </AccordionTrigger>
       <AccordionContent>
