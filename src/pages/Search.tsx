@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -6,8 +7,7 @@ import SearchFilters from "@/components/SearchFilters";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
-import { X, Filter, Trash2, Map, Calendar, LayoutPanelLeft } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Filter, Trash2, Map, Calendar, LayoutPanelLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import CompetitionMapView from "@/components/CompetitionMapView";
@@ -37,7 +37,6 @@ const Search = () => {
     searchQuery: ""
   });
 
-  const [searchInputValue, setSearchInputValue] = useState("");
   const [resultsView, setResultsView] = useState<"calendar" | "map">("calendar");
 
   useEffect(() => {
@@ -84,18 +83,13 @@ const Search = () => {
       };
     }
     
-    const searchQuery = searchParams.get('q') || "";
-    
-    if (disciplines.length > 0 || levels.length > 0 || dateRange || searchQuery) {
+    if (disciplines.length > 0 || levels.length > 0 || dateRange) {
       setFilters(prevFilters => ({
         ...prevFilters,
         disciplines: disciplines as any[],
         levels: levels as any[],
-        dateRange,
-        searchQuery
+        dateRange
       }));
-      
-      setSearchInputValue(searchQuery);
     }
   }, [location.search, toast]);
 
@@ -138,33 +132,6 @@ const Search = () => {
   const handleFilterChange = (newFilters: SearchFiltersType) => {
     console.log("Filter changed:", newFilters);
     setFilters(newFilters);
-    
-    if (newFilters.searchQuery === "" && filters.searchQuery !== "") {
-      setSearchInputValue("");
-    }
-  };
-
-  const handleSearchChange = (value: string) => {
-    setSearchInputValue(value);
-    
-    if (value === "") {
-      setFilters({
-        ...filters,
-        searchQuery: ""
-      });
-    }
-  };
-
-  const handleClearSearch = () => {
-    setSearchInputValue("");
-    setFilters({
-      ...filters,
-      searchQuery: ""
-    });
-    toast({
-      title: "Sökningen rensad",
-      description: "Alla tävlingar visas nu utan sökfilter"
-    });
   };
 
   const handleClearAllFilters = () => {
@@ -180,29 +147,10 @@ const Search = () => {
     };
     
     setFilters(resetFilters);
-    setSearchInputValue("");
     
     toast({
       title: "Filtren har återställts",
       description: "Alla valda filter har rensats - nu visas alla tävlingar"
-    });
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!searchInputValue.trim()) {
-      return;
-    }
-    
-    setFilters({
-      ...filters,
-      searchQuery: searchInputValue
-    });
-    
-    toast({
-      title: "Sökning slutförd",
-      description: `Visar resultat för "${searchInputValue}"`
     });
   };
 
@@ -238,36 +186,6 @@ const Search = () => {
                   Filtrera tävlingar
                 </h2>
                 
-                <form onSubmit={handleSubmit} className="mb-4">
-                  <div className="relative mb-4">
-                    <Input
-                      placeholder="Sök efter tävlingsnamn, plats..."
-                      value={searchInputValue}
-                      onChange={(e) => handleSearchChange(e.target.value)}
-                      className="pr-8"
-                    />
-                    {searchInputValue && (
-                      <button
-                        type="button"
-                        onClick={handleClearSearch}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                        aria-label="Rensa sökning"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    )}
-                  </div>
-                  
-                  <Button 
-                    type="submit" 
-                    variant="default" 
-                    className="w-full"
-                    disabled={!searchInputValue.trim()}
-                  >
-                    Sök
-                  </Button>
-                </form>
-                
                 <SearchFilters 
                   filters={filters} 
                   onFilterChange={handleFilterChange} 
@@ -280,8 +198,7 @@ const Search = () => {
                   filters.disciplines.length > 0 || 
                   filters.levels.length > 0 || 
                   filters.types.length > 0 || 
-                  filters.branches.length > 0 || 
-                  filters.searchQuery) && (
+                  filters.branches.length > 0) && (
                   <Button
                     variant="outline"
                     onClick={handleClearAllFilters}
@@ -349,7 +266,6 @@ const Search = () => {
                 <ul className="text-left text-sm text-muted-foreground ml-6 mb-4 list-disc space-y-1">
                   <li>Ändra ditt datumintervall</li>
                   <li>Ta bort några filter</li>
-                  <li>Bredda din sökning med färre söktermer</li>
                 </ul>
                 <Button
                   variant="outline"

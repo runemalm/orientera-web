@@ -1,18 +1,15 @@
 
-import { SearchFilters, CompetitionType, CompetitionBranch, Discipline, CompetitionLevel } from "@/types";
+import { SearchFilters } from "@/types";
 
-// Basic search query processor
+// No longer used as freetext search has been removed
 export const processNaturalLanguageQuery = (query: string): SearchFilters => {
-  query = query.toLowerCase();
-  const filters: SearchFilters = {
+  return {
     regions: [],
     districts: [],
     disciplines: [],
     levels: [],
     types: [],
     branches: [],
-    searchQuery: query,
+    searchQuery: "",
   };
-
-  return filters;
 };
