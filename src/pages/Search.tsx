@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -7,13 +6,14 @@ import SearchFilters from "@/components/SearchFilters";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
-import { X, Sparkles, Clock, Search as SearchIcon, Filter, Trash2, TrendingUp, List, Map } from "lucide-react";
+import { X, Sparkles, Clock, Search as SearchIcon, Filter, Trash2, TrendingUp, List, Map, Calendar } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import CompetitionCompactView from "@/components/CompetitionCompactView";
 import CompetitionListView from "@/components/CompetitionListView";
 import CompetitionMapView from "@/components/CompetitionMapView";
+import CompetitionCalendarView from "@/components/CompetitionCalendarView";
 import { isBefore, isAfter, isEqual, parseISO } from "date-fns";
 import { processNaturalLanguageQuery } from "@/utils/aiQueryProcessor";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -46,7 +46,7 @@ const Search = () => {
   const [searchInputValue, setSearchInputValue] = useState("");
   const [activeTab, setActiveTab] = useState("ai");
   const [isProcessing, setIsProcessing] = useState(false);
-  const [resultsView, setResultsView] = useState<"list" | "map">("list");
+  const [resultsView, setResultsView] = useState<"list" | "calendar" | "map">("list");
   const [recentSearches, setRecentSearches] = useState<string[]>(() => {
     const saved = localStorage.getItem('recentAiSearches');
     return saved ? JSON.parse(saved) : [];
@@ -375,10 +375,14 @@ const Search = () => {
               </h2>
               
               {activeTab === "manual" && (
-                <ToggleGroup type="single" value={resultsView} onValueChange={(value) => value && setResultsView(value as "list" | "map")}>
+                <ToggleGroup type="single" value={resultsView} onValueChange={(value) => value && setResultsView(value as "list" | "calendar" | "map")}>
                   <ToggleGroupItem value="list" aria-label="Visa som lista">
                     <List className="h-4 w-4 mr-1" />
                     Lista
+                  </ToggleGroupItem>
+                  <ToggleGroupItem value="calendar" aria-label="Visa som kalender">
+                    <Calendar className="h-4 w-4 mr-1" />
+                    Kalender
                   </ToggleGroupItem>
                   <ToggleGroupItem value="map" aria-label="Visa på karta">
                     <Map className="h-4 w-4 mr-1" />
@@ -397,6 +401,10 @@ const Search = () => {
               
               {activeTab === "manual" && resultsView === "list" && (
                 <CompetitionCompactView competitions={filteredCompetitions} />
+              )}
+              
+              {activeTab === "manual" && resultsView === "calendar" && (
+                <CompetitionCalendarView competitions={filteredCompetitions} />
               )}
               
               {activeTab === "manual" && resultsView === "map" && (
