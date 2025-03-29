@@ -1,6 +1,6 @@
 
 import { useState, useMemo } from "react";
-import { format, addDays, addMonths, isEqual, isAfter, isBefore, isValid } from "date-fns";
+import { format, addDays, addMonths, isEqual, isAfter, isBefore, isValid, nextSaturday, nextSunday } from "date-fns";
 import { sv } from "date-fns/locale";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { SelectSeparator } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 type DateRangeValue = {
   from: Date;
@@ -49,11 +50,35 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilterProps)
       })
     },
     {
-      label: "Nästa 30 dagar",
-      value: () => ({
-        from: today,
-        to: addDays(today, 29)
-      })
+      label: "Kommande helg",
+      value: () => {
+        const saturday = nextSaturday(today);
+        const sunday = nextSunday(today);
+        // If today is Sunday, we need the next weekend
+        if (format(today, 'EEEE', { locale: sv }) === 'söndag') {
+          const nextWeekSaturday = addDays(saturday, 7);
+          const nextWeekSunday = addDays(sunday, 7);
+          return {
+            from: nextWeekSaturday,
+            to: nextWeekSunday
+          };
+        }
+        return {
+          from: saturday,
+          to: sunday
+        };
+      }
+    },
+    {
+      label: "Kommande två helger",
+      value: () => {
+        const saturday = nextSaturday(today);
+        const nextNextSunday = addDays(nextSunday(today), 7);
+        return {
+          from: saturday,
+          to: nextNextSunday
+        };
+      }
     },
     {
       label: "Denna månad",
@@ -75,13 +100,6 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilterProps)
           to: lastDayNextMonth
         };
       }
-    },
-    {
-      label: "Nästa 3 månader",
-      value: () => ({
-        from: today,
-        to: addMonths(today, 3)
-      })
     }
   ], [today]);
 
@@ -151,13 +169,13 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilterProps)
       </AccordionTrigger>
       <AccordionContent>
         <div className="flex flex-col gap-3 pt-2">
-          <div className="flex flex-wrap gap-2">
+          <div className="grid grid-cols-2 gap-2">
             {quickOptions.map((option, index) => (
               <Button
                 key={index}
                 size="sm"
                 variant={isQuickOptionActive(option) ? "default" : "outline"}
-                className="text-xs"
+                className="text-xs w-full"
                 onClick={() => handleQuickOptionSelect(option)}
               >
                 {option.label}
