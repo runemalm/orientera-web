@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -28,6 +27,8 @@ const Search = () => {
     districts: [],
     disciplines: [],
     levels: [],
+    types: [],
+    branches: [],
     searchQuery: "",
     userLocation: undefined,
     locationCity: undefined
@@ -133,6 +134,18 @@ const Search = () => {
         
         return true;
       });
+    }
+
+    if (filters.types && filters.types.length > 0) {
+      filtered = filtered.filter(competition => 
+        competition.type && filters.types.includes(competition.type)
+      );
+    }
+
+    if (filters.branches && filters.branches.length > 0) {
+      filtered = filtered.filter(competition => 
+        competition.branch && filters.branches.includes(competition.branch)
+      );
     }
     
     return filtered;

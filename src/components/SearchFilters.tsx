@@ -1,16 +1,20 @@
+
 import { FilterIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Accordion
 } from "@/components/ui/accordion";
-import { SearchFilters as SearchFiltersType } from "@/types";
+import { SearchFilters as SearchFiltersType, CompetitionType, CompetitionBranch } from "@/types";
 import DistanceFilter from "./search/DistanceFilter";
 import CheckboxFilter from "./search/CheckboxFilter";
 import DateRangeFilter from "./search/DateRangeFilter";
 import { useToast } from "@/hooks/use-toast";
+import { districts } from "@/data/districts";
 
 const disciplines = ['Sprint', 'Medel', 'Lång', 'Natt', 'Stafett', 'Ultralång'];
 const levels = ['Klubb', 'Krets', 'Distrikt', 'Nationell', 'Internationell'];
+const competitionTypes: CompetitionType[] = ['Värdetävlingar', 'Nationella tävlingar', 'Distriktstävlingar', 'Närtävlingar', 'Veckans bana'];
+const competitionBranches: CompetitionBranch[] = ['Orienteringslöpning', 'Skidorientering', 'Mountainbikeorientering', 'Precisionsorientering', 'Orienteringsskytte'];
 
 interface SearchFiltersProps {
   filters: SearchFiltersType;
@@ -45,6 +49,36 @@ const SearchFiltersComponent = ({
       updatedLevels = updatedLevels.filter(l => l !== level);
     }
     onFilterChange({ ...filters, levels: updatedLevels });
+  };
+
+  const handleTypeChange = (type: string, checked: boolean) => {
+    let updatedTypes = [...(filters.types || [])];
+    if (checked) {
+      updatedTypes.push(type as CompetitionType);
+    } else {
+      updatedTypes = updatedTypes.filter(t => t !== type);
+    }
+    onFilterChange({ ...filters, types: updatedTypes });
+  };
+
+  const handleBranchChange = (branch: string, checked: boolean) => {
+    let updatedBranches = [...(filters.branches || [])];
+    if (checked) {
+      updatedBranches.push(branch as CompetitionBranch);
+    } else {
+      updatedBranches = updatedBranches.filter(b => b !== branch);
+    }
+    onFilterChange({ ...filters, branches: updatedBranches });
+  };
+
+  const handleDistrictChange = (district: string, checked: boolean) => {
+    let updatedDistricts = [...filters.districts];
+    if (checked) {
+      updatedDistricts.push(district);
+    } else {
+      updatedDistricts = updatedDistricts.filter(d => d !== district);
+    }
+    onFilterChange({ ...filters, districts: updatedDistricts });
   };
 
   const handleDateRangeChange = (dateRange: { from: Date; to?: Date } | undefined) => {
@@ -85,6 +119,8 @@ const SearchFiltersComponent = ({
       districts: [],
       disciplines: [],
       levels: [],
+      types: [],
+      branches: [],
       searchQuery: "", 
       distance: undefined,
       userLocation: undefined,
@@ -118,7 +154,7 @@ const SearchFiltersComponent = ({
           </Button>
         </div>
 
-        <Accordion type="multiple" defaultValue={["date-range", "distance", "discipline", "level"]} className="space-y-2">
+        <Accordion type="multiple" defaultValue={["date-range", "distance", "district", "type", "discipline", "branch"]} className="space-y-2">
           <DateRangeFilter 
             dateRange={filters.dateRange} 
             onDateRangeChange={handleDateRangeChange}
@@ -133,6 +169,22 @@ const SearchFiltersComponent = ({
           />
 
           <CheckboxFilter
+            title="Distrikt"
+            items={districts.map(d => ({ id: d.id, name: d.name }))}
+            selectedItems={filters.districts}
+            onItemChange={handleDistrictChange}
+            accordionValue="district"
+          />
+
+          <CheckboxFilter
+            title="Typ"
+            items={competitionTypes.map(t => ({ id: t, name: t }))}
+            selectedItems={filters.types || []}
+            onItemChange={handleTypeChange}
+            accordionValue="type"
+          />
+
+          <CheckboxFilter
             title="Disciplin"
             items={disciplines.map(d => ({ id: d, name: d }))}
             selectedItems={filters.disciplines}
@@ -141,11 +193,11 @@ const SearchFiltersComponent = ({
           />
 
           <CheckboxFilter
-            title="Tävlingsnivå"
-            items={levels.map(l => ({ id: l, name: l }))}
-            selectedItems={filters.levels}
-            onItemChange={handleLevelChange}
-            accordionValue="level"
+            title="Gren"
+            items={competitionBranches.map(b => ({ id: b, name: b }))}
+            selectedItems={filters.branches || []}
+            onItemChange={handleBranchChange}
+            accordionValue="branch"
           />
         </Accordion>
       </div>

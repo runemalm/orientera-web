@@ -1,4 +1,3 @@
-
 export type Region = {
   id: string;
   name: string;
@@ -12,6 +11,9 @@ export type District = {
 export type Discipline = 'Sprint' | 'Medel' | 'Lång' | 'Natt' | 'Stafett' | 'Ultralång';
 
 export type CompetitionLevel = 'Klubb' | 'Krets' | 'Distrikt' | 'Nationell' | 'Internationell';
+
+export type CompetitionType = 'Värdetävlingar' | 'Nationella tävlingar' | 'Distriktstävlingar' | 'Närtävlingar' | 'Veckans bana';
+export type CompetitionBranch = 'Orienteringslöpning' | 'Skidorientering' | 'Mountainbikeorientering' | 'Precisionsorientering' | 'Orienteringsskytte';
 
 export type Coordinates = {
   lat: number;
@@ -40,6 +42,8 @@ export type Competition = {
   coordinates: Coordinates;
   discipline: Discipline;
   level: CompetitionLevel;
+  type?: CompetitionType;
+  branch?: CompetitionBranch;
   registrationDeadline: string;
   description: string;
   website?: string;
@@ -54,6 +58,8 @@ export type SearchFilters = {
   districts: string[];
   disciplines: Discipline[];
   levels: CompetitionLevel[];
+  types: CompetitionType[];
+  branches: CompetitionBranch[];
   searchQuery: string;
   userLocation?: Coordinates;
   locationCity?: string; // Location name for display
