@@ -194,13 +194,7 @@ export const useGeolocation = (autoDetect = true) => {
 
   const setManualLocation = async (cityName: string) => {
 
-    setState({
-      coords: undefined,
-      detectedLocationInfo: undefined,
-      loading: true,
-      error: null
-    });
-    setIsManualLocation(false);
+    clearLocation();
 
     try {
       const response = await fetch(
