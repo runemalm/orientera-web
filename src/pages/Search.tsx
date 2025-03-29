@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -7,12 +6,10 @@ import SearchFilters from "@/components/SearchFilters";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
-import { X, Filter, Trash2, List, Map, Calendar, LayoutPanelLeft } from "lucide-react";
+import { X, Filter, Trash2, Map, Calendar, LayoutPanelLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import CompetitionCompactView from "@/components/CompetitionCompactView";
-import CompetitionListView from "@/components/CompetitionListView";
 import CompetitionMapView from "@/components/CompetitionMapView";
 import CompetitionCalendarView from "@/components/CompetitionCalendarView";
 import { isBefore, isAfter, isEqual, parseISO } from "date-fns";
@@ -41,11 +38,11 @@ const Search = () => {
   });
 
   const [searchInputValue, setSearchInputValue] = useState("");
-  const [resultsView, setResultsView] = useState<"list" | "calendar" | "map">("list");
+  const [resultsView, setResultsView] = useState<"calendar" | "map">("calendar");
 
   useEffect(() => {
-    const savedView = localStorage.getItem(SEARCH_RESULTS_VIEW_KEY) as "list" | "calendar" | "map" | null;
-    if (savedView && ["list", "calendar", "map"].includes(savedView)) {
+    const savedView = localStorage.getItem(SEARCH_RESULTS_VIEW_KEY) as "calendar" | "map" | null;
+    if (savedView && ["calendar", "map"].includes(savedView)) {
       setResultsView(savedView);
     }
   }, []);
@@ -319,11 +316,7 @@ const Search = () => {
                     </Button>
                   )}
                   
-                  <ToggleGroup type="single" value={resultsView} onValueChange={(value) => value && setResultsView(value as "list" | "calendar" | "map")}>
-                    <ToggleGroupItem value="list" aria-label="Visa som lista">
-                      <List className="h-4 w-4 mr-1" />
-                      Lista
-                    </ToggleGroupItem>
+                  <ToggleGroup type="single" value={resultsView} onValueChange={(value) => value && setResultsView(value as "calendar" | "map")}>
                     <ToggleGroupItem value="calendar" aria-label="Visa som kalender">
                       <Calendar className="h-4 w-4 mr-1" />
                       Kalender
@@ -339,10 +332,6 @@ const Search = () => {
             
             {filteredCompetitions.length > 0 ? (
               <>
-                {resultsView === "list" && (
-                  <CompetitionListView competitions={filteredCompetitions} />
-                )}
-                
                 {resultsView === "calendar" && (
                   <CompetitionCalendarView competitions={filteredCompetitions} />
                 )}
