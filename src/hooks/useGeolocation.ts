@@ -98,7 +98,7 @@ export const useGeolocation = (autoDetect = true) => {
             // Immediately update state with coordinates
             setState(prev => ({
               ...prev,
-              coords,
+              coords: { lat: position.coords.latitude, lng: position.coords.longitude },
               loading: false
             }));
             
