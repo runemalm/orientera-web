@@ -1,12 +1,9 @@
 
-import { useState } from "react";
 import { FilterIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Accordion
 } from "@/components/ui/accordion";
-import { regions } from "@/data/regions";
-import { districts } from "@/data/districts";
 import { SearchFilters as SearchFiltersType } from "@/types";
 import DistanceFilter from "./search/DistanceFilter";
 import CheckboxFilter from "./search/CheckboxFilter";
@@ -29,26 +26,6 @@ const SearchFiltersComponent = ({
   hideSearchInput = false
 }: SearchFiltersProps) => {
   
-  const handleRegionChange = (regionId: string, checked: boolean) => {
-    let updatedRegions = [...filters.regions];
-    if (checked) {
-      updatedRegions.push(regionId);
-    } else {
-      updatedRegions = updatedRegions.filter(id => id !== regionId);
-    }
-    onFilterChange({ ...filters, regions: updatedRegions });
-  };
-
-  const handleDistrictChange = (districtId: string, checked: boolean) => {
-    let updatedDistricts = [...filters.districts];
-    if (checked) {
-      updatedDistricts.push(districtId);
-    } else {
-      updatedDistricts = updatedDistricts.filter(id => id !== districtId);
-    }
-    onFilterChange({ ...filters, districts: updatedDistricts });
-  };
-
   const handleDisciplineChange = (discipline: string, checked: boolean) => {
     let updatedDisciplines = [...filters.disciplines];
     if (checked) {
@@ -78,8 +55,6 @@ const SearchFiltersComponent = ({
   };
 
   const handleDetectLocation = () => {
-    // This is the handler for the auto detection button
-    // We need to properly trigger the useGeolocation hook's detectLocation method
     onFilterChange({
       ...filters,
       isManualLocation: false
@@ -117,7 +92,7 @@ const SearchFiltersComponent = ({
       districts: [],
       disciplines: [],
       levels: [],
-      searchQuery: "", // Make sure searchQuery is cleared
+      searchQuery: "", 
       distance: undefined,
       userLocation: filters.userLocation,
       isManualLocation: filters.isManualLocation,
@@ -130,12 +105,21 @@ const SearchFiltersComponent = ({
   return (
     <div className="rounded-lg border bg-card">
       <div className="p-4">
-        <div className="flex items-center gap-2 mb-4">
-          <FilterIcon className="h-4 w-4" />
-          <h3 className="font-medium">Filtrera</h3>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <FilterIcon className="h-4 w-4" />
+            <h3 className="font-medium">Filtrera</h3>
+          </div>
+          <Button 
+            variant="ghost" 
+            size="sm"
+            onClick={handleClearAllFilters}
+          >
+            Rensa alla
+          </Button>
         </div>
 
-        <Accordion type="multiple" defaultValue={["date-range", "distance", "discipline", "level"]} className="space-y-4">
+        <Accordion type="multiple" defaultValue={["date-range", "distance", "discipline", "level"]} className="space-y-2">
           <DateRangeFilter 
             dateRange={filters.dateRange} 
             onDateRangeChange={handleDateRangeChange}
@@ -150,14 +134,6 @@ const SearchFiltersComponent = ({
             onDistanceChange={handleDistanceChange}
             onDetectLocation={handleDetectLocation}
             onSetManualLocation={handleSetManualLocation}
-          />
-
-          <CheckboxFilter
-            title="Distrikt"
-            items={districts.map(d => ({ id: d.id, name: d.name }))}
-            selectedItems={filters.districts}
-            onItemChange={handleDistrictChange}
-            accordionValue="districts"
           />
 
           <CheckboxFilter
@@ -176,14 +152,6 @@ const SearchFiltersComponent = ({
             accordionValue="level"
           />
         </Accordion>
-        
-        <Button 
-          className="w-full mt-4" 
-          variant="outline"
-          onClick={handleClearAllFilters}
-        >
-          Rensa alla filter
-        </Button>
       </div>
     </div>
   );
