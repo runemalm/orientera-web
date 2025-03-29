@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -6,15 +7,14 @@ import SearchFilters from "@/components/SearchFilters";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
-import { Search as SearchIcon, X, Sparkles, ArrowRight } from "lucide-react";
+import { X, Sparkles, Clock, Search as SearchIcon, ArrowRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { getDistance } from "@/lib/utils";
 import CompetitionCompactView from "@/components/CompetitionCompactView";
 import { isBefore, isAfter, isEqual, parseISO } from "date-fns";
-import AiSearchCard from "@/components/search/AiSearchCard";
+import { processNaturalLanguageQuery } from "@/utils/aiQueryProcessor";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const Search = () => {
@@ -33,8 +33,20 @@ const Search = () => {
   });
 
   const [searchInputValue, setSearchInputValue] = useState("");
-  const searchContainerRef = useRef<HTMLDivElement>(null);
-  const [currentTab, setCurrentTab] = useState<string>("ai");
+  const [showFilters, setShowFilters] = useState(true);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [recentSearches, setRecentSearches] = useState<string[]>(() => {
+    const saved = localStorage.getItem('recentAiSearches');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  // Vanliga sökningar som fördefinierade snabbval
+  const quickSearches = [
+    { id: 'upcoming', label: 'Kommande tävlingar', query: 'Tävlingar de närmaste 30 dagarna' },
+    { id: 'national', label: 'Nationella tävlingar', query: 'Nationella tävlingar' },
+    { id: 'youth', label: 'Ungdomstävlingar', query: 'Tävlingar för ungdomar' },
+    { id: 'sprint', label: 'Sprinttävlingar', query: 'Sprint tävlingar' },
+  ];
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -70,13 +82,16 @@ const Search = () => {
       
       setSearchInputValue(searchQuery);
       
-      if (aiMode) {
-        setCurrentTab("ai");
-        toast({
-          title: "Sökning från AI",
-          description: "Filtren har applicerats baserat på din AI-sökning",
-          duration: 3000,
-        });
+      if (aiMode || searchQuery) {
+        setShowFilters(false);
+        
+        if (aiMode) {
+          toast({
+            title: "Sökning från AI",
+            description: "Filtren har applicerats baserat på din AI-sökning",
+            duration: 3000,
+          });
+        }
       }
     }
   }, [location.search, toast]);
@@ -136,16 +151,20 @@ const Search = () => {
     
     if (newFilters.searchQuery === "" && filters.searchQuery !== "") {
       setSearchInputValue("");
+      setShowFilters(true);
     }
   };
 
   const handleSearchChange = (value: string) => {
     setSearchInputValue(value);
     
-    setFilters({
-      ...filters,
-      searchQuery: value
-    });
+    if (value === "") {
+      setShowFilters(true);
+      setFilters({
+        ...filters,
+        searchQuery: ""
+      });
+    }
   };
 
   const handleClearSearch = () => {
@@ -154,6 +173,7 @@ const Search = () => {
       ...filters,
       searchQuery: ""
     });
+    setShowFilters(true);
     toast({
       title: "Sökningen rensad",
       description: "Alla sökresultat visas nu",
@@ -161,58 +181,66 @@ const Search = () => {
     });
   };
 
-  const handleManualSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-  };
+  const processQuery = (query: string) => {
+    if (!query.trim()) {
+      toast({
+        title: "Tomt sökfält",
+        description: "Vänligen beskriv vad du letar efter",
+        variant: "destructive",
+      });
+      return;
+    }
 
-  const handleAiSearchComplete = (newFilters: SearchFiltersType) => {
-    setFilters(prevFilters => ({
-      ...prevFilters,
-      disciplines: newFilters.disciplines,
-      levels: newFilters.levels,
-      dateRange: newFilters.dateRange,
-      searchQuery: newFilters.searchQuery
-    }));
-    
-    setSearchInputValue(newFilters.searchQuery || "");
-    setCurrentTab("traditional");
-  };
+    setIsProcessing(true);
 
-  const renderTraditionalSearch = () => (
-    <div className="space-y-4">
-      <div className="rounded-lg border bg-card p-4 mb-4">
-        <div ref={searchContainerRef}>
-          <div className="flex gap-2">
-            <div className="relative flex-1">
-              <Input
-                placeholder="Sök efter namn eller plats..."
-                value={searchInputValue}
-                onChange={(e) => handleSearchChange(e.target.value)}
-                className="w-full pr-8"
-              />
-              {searchInputValue && (
-                <button
-                  type="button"
-                  onClick={handleClearSearch}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  aria-label="Rensa sökning"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
+    try {
+      const newFilters = processNaturalLanguageQuery(query);
       
-      <SearchFilters 
-        filters={filters} 
-        onFilterChange={handleFilterChange} 
-        hasLocation={!!filters.userLocation}
-        hideSearchInput={true}
-      />
-    </div>
-  );
+      // Spara sökningen i historiken
+      const updatedSearches = [query, ...recentSearches.filter(s => s !== query)].slice(0, 5);
+      setRecentSearches(updatedSearches);
+      localStorage.setItem('recentAiSearches', JSON.stringify(updatedSearches));
+      
+      setFilters({
+        ...filters,
+        disciplines: newFilters.disciplines,
+        levels: newFilters.levels,
+        dateRange: newFilters.dateRange,
+        searchQuery: query
+      });
+      
+      setShowFilters(false);
+      
+      toast({
+        title: "Sökning bearbetad",
+        description: "Filtren har uppdaterats baserat på din sökning",
+        duration: 3000,
+      });
+    } catch (error) {
+      console.error("Error processing query:", error);
+      toast({
+        title: "Något gick fel",
+        description: "Det gick inte att bearbeta din sökning",
+        variant: "destructive",
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    processQuery(searchInputValue);
+  };
+
+  const handleQuickSearch = (query: string) => {
+    setSearchInputValue(query);
+    processQuery(query);
+  };
+
+  const handleShowFilters = () => {
+    setShowFilters(true);
+  };
 
   return (
     <div className="flex min-h-screen flex-col">
@@ -222,43 +250,120 @@ const Search = () => {
         <h1 className="text-3xl font-bold mb-6">Sök tävlingar</h1>
         
         <div className="max-w-3xl mx-auto">
-          <Tabs value={currentTab} onValueChange={setCurrentTab} className="mb-6">
-            <TabsList className="grid w-full grid-cols-2 mb-4">
-              <TabsTrigger value="ai">
-                <Sparkles className="h-4 w-4 mr-2" />
-                <span>AI-sökning</span>
-              </TabsTrigger>
-              <TabsTrigger value="traditional">
-                <SearchIcon className="h-4 w-4 mr-2" />
-                <span>Filtrera</span>
-              </TabsTrigger>
-            </TabsList>
+          <div className="rounded-lg border bg-card p-4 mb-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="relative">
+                <Input
+                  placeholder="Beskriv med egna ord vad du letar efter..."
+                  value={searchInputValue}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  className="pr-8 text-base"
+                />
+                {searchInputValue && (
+                  <button
+                    type="button"
+                    onClick={handleClearSearch}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    aria-label="Rensa sökning"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+              
+              <Button 
+                type="submit" 
+                disabled={isProcessing || !searchInputValue.trim()}
+                className="w-full"
+              >
+                {isProcessing ? (
+                  <>
+                    <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full mr-2"></div>
+                    Bearbetar sökning...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Sök
+                  </>
+                )}
+              </Button>
+            </form>
             
-            <TabsContent value="ai" className="mt-2">
-              <AiSearchCard onSearchComplete={handleAiSearchComplete} initialQuery="" />
-            </TabsContent>
+            <div className="mt-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Sparkles className="h-4 w-4 text-primary" />
+                <h3 className="text-sm font-medium">Snabbval</h3>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {quickSearches.map((search) => (
+                  <Button
+                    key={search.id}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleQuickSearch(search.query)}
+                    className="text-xs"
+                  >
+                    {search.label}
+                  </Button>
+                ))}
+              </div>
+            </div>
             
-            <TabsContent value="traditional" className="mt-2">
-              {renderTraditionalSearch()}
-            </TabsContent>
-          </Tabs>
+            {recentSearches.length > 0 && (
+              <div className="mt-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  <h3 className="text-sm font-medium">Senaste sökningar</h3>
+                </div>
+                <div className="flex flex-col gap-1">
+                  {recentSearches.map((search, index) => (
+                    <Button
+                      key={index}
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleQuickSearch(search)}
+                      className="text-xs justify-start h-auto py-1.5 text-muted-foreground hover:text-foreground"
+                    >
+                      <SearchIcon className="h-3 w-3 mr-2" />
+                      {search.length > 60 ? `${search.substring(0, 60)}...` : search}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+          
+          {filters.searchQuery && !showFilters && (
+            <div className="mb-4">
+              <Button
+                variant="outline" 
+                size="sm" 
+                onClick={handleShowFilters}
+                className="text-xs"
+              >
+                Visa filter
+                <ArrowRight className="ml-1 h-3 w-3" />
+              </Button>
+            </div>
+          )}
+          
+          {showFilters && (
+            <div className="mb-4">
+              <SearchFilters 
+                filters={filters} 
+                onFilterChange={handleFilterChange} 
+                hasLocation={!!filters.userLocation}
+                hideSearchInput={true}
+              />
+            </div>
+          )}
           
           <div className="bg-card rounded-lg border p-4 mb-6">
             <div className="flex justify-between items-center">
               <h2 className="font-semibold">
                 {filteredCompetitions.length} {filteredCompetitions.length === 1 ? 'tävling' : 'tävlingar'} hittades
               </h2>
-              {currentTab === "ai" && filters.searchQuery && (
-                <Button
-                  variant="ghost" 
-                  size="sm" 
-                  onClick={() => setCurrentTab("traditional")}
-                  className="text-xs"
-                >
-                  Visa filter
-                  <ArrowRight className="ml-1 h-3 w-3" />
-                </Button>
-              )}
             </div>
           </div>
           
