@@ -1,3 +1,4 @@
+
 export type Region = {
   id: string;
   name: string;
@@ -68,4 +69,6 @@ export type SearchFilters = {
   }; // Date range for filtering, both from and to are now optional
   distance?: number; // Optional distance filter
   datePreset?: string; // New field to track the date preset selection
+  showMap?: boolean; // New field to track map visibility
 };
+

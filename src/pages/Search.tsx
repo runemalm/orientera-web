@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -15,10 +16,12 @@ import { isBefore, isAfter, isEqual, parseISO } from "date-fns";
 import { useIsMobile, useBreakpoint } from "@/hooks/use-mobile";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from "@/lib/utils";
+import { Switch } from "@/components/ui/switch";
 
 const SEARCH_RESULTS_VIEW_KEY = "search-results-view";
 const SEARCH_SIDEBAR_OPEN_KEY = "search-sidebar-open";
 const SEARCH_FILTERS_KEY = "search-filters";
+const SEARCH_MAP_VISIBLE_KEY = "search-map-visible";
 
 const Search = () => {
   const location = useLocation();
@@ -34,10 +37,11 @@ const Search = () => {
     levels: [],
     types: [],
     branches: [],
-    searchQuery: ""
+    searchQuery: "",
+    showMap: false
   });
 
-  const [resultsView, setResultsView] = useState<"calendar" | "map">("calendar");
+  const [resultsView, setResultsView] = useState<"calendar">("calendar");
 
   useEffect(() => {
     const savedFilters = localStorage.getItem(SEARCH_FILTERS_KEY);
@@ -61,10 +65,14 @@ const Search = () => {
     }
   }, []);
 
+  // Load map visibility from localStorage
   useEffect(() => {
-    const savedView = localStorage.getItem(SEARCH_RESULTS_VIEW_KEY) as "calendar" | "map" | null;
-    if (savedView && ["calendar", "map"].includes(savedView)) {
-      setResultsView(savedView);
+    const savedMapVisible = localStorage.getItem(SEARCH_MAP_VISIBLE_KEY);
+    if (savedMapVisible !== null) {
+      setFilters(prev => ({
+        ...prev,
+        showMap: savedMapVisible === "true"
+      }));
     }
   }, []);
 
@@ -84,6 +92,13 @@ const Search = () => {
   useEffect(() => {
     localStorage.setItem(SEARCH_SIDEBAR_OPEN_KEY, sidebarOpen.toString());
   }, [sidebarOpen]);
+
+  // Save map visibility to localStorage when it changes
+  useEffect(() => {
+    if (filters.showMap !== undefined) {
+      localStorage.setItem(SEARCH_MAP_VISIBLE_KEY, filters.showMap.toString());
+    }
+  }, [filters.showMap]);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -171,7 +186,8 @@ const Search = () => {
       types: [],
       branches: [],
       searchQuery: "", 
-      dateRange: undefined
+      dateRange: undefined,
+      showMap: filters.showMap // Preserve map visibility setting
     };
     
     setFilters(resetFilters);
@@ -184,6 +200,13 @@ const Search = () => {
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
+  };
+
+  const toggleMapVisibility = () => {
+    setFilters(prev => ({
+      ...prev,
+      showMap: !prev.showMap
+    }));
   };
 
   const hasActiveFilters = filters.regions.length > 0 || 
@@ -253,48 +276,33 @@ const Search = () => {
                   </Button>
                 )}
                 
-                <ToggleGroup 
-                  type="single" 
-                  value={resultsView} 
-                  onValueChange={(value) => value && setResultsView(value as "calendar" | "map")}
-                  className="bg-muted rounded-md p-0.5"
-                >
-                  <ToggleGroupItem 
-                    value="calendar" 
-                    aria-label="Visa som kalender"
-                    className={cn(
-                      "rounded-sm h-8 px-3 text-xs data-[state=on]:bg-background",
-                      resultsView === "calendar" && "shadow-sm"
-                    )}
-                  >
-                    <Calendar className="h-3.5 w-3.5 mr-1.5" />
-                    Kalender
-                  </ToggleGroupItem>
-                  <ToggleGroupItem 
-                    value="map" 
-                    aria-label="Visa på karta"
-                    className={cn(
-                      "rounded-sm h-8 px-3 text-xs data-[state=on]:bg-background",
-                      resultsView === "map" && "shadow-sm"
-                    )}
-                  >
-                    <Map className="h-3.5 w-3.5 mr-1.5" />
-                    Karta
-                  </ToggleGroupItem>
-                </ToggleGroup>
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 bg-muted p-1.5 rounded-md">
+                    <Switch 
+                      id="map-toggle"
+                      checked={filters.showMap}
+                      onCheckedChange={toggleMapVisibility}
+                      className="data-[state=checked]:bg-primary"
+                    />
+                    <label htmlFor="map-toggle" className="text-xs font-medium cursor-pointer">
+                      <Map className="h-3.5 w-3.5 mr-1 inline-block" />
+                      Visa karta
+                    </label>
+                  </div>
+                </div>
               </div>
             </div>
             
             {filteredCompetitions.length > 0 ? (
-              <>
-                {resultsView === "calendar" && (
-                  <CompetitionCalendarView competitions={filteredCompetitions} />
+              <div className="space-y-6">
+                {filters.showMap && (
+                  <div className="mb-6">
+                    <CompetitionMapView competitions={filteredCompetitions} />
+                  </div>
                 )}
                 
-                {resultsView === "map" && (
-                  <CompetitionMapView competitions={filteredCompetitions} />
-                )}
-              </>
+                <CompetitionCalendarView competitions={filteredCompetitions} />
+              </div>
             ) : (
               <div className="bg-card rounded-lg border p-8 text-center">
                 <h3 className="text-lg font-medium mb-2">Inga matchande tävlingar</h3>
