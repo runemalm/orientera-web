@@ -53,10 +53,10 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilterProps)
       })
     },
     {
-      label: "Resten av året",
+      label: "30 dagar",
       value: () => ({
         from: today,
-        to: endOfYear(today)
+        to: addDays(today, 30)
       })
     }
   ], [today]);
