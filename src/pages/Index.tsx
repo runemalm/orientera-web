@@ -1,13 +1,12 @@
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Compass, Sparkles, Search } from "lucide-react";
+import { Compass, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import FeaturedCompetitions from "@/components/FeaturedCompetitions";
 import WaitlistDialog from "@/components/WaitlistDialog";
-import AiSearch from "@/components/AiSearch";
 
 const Index = () => {
   const [waitlistOpen, setWaitlistOpen] = useState(false);
@@ -42,14 +41,6 @@ const Index = () => {
                   variant="outline" 
                   size="lg" 
                   className="text-md"
-                  asChild
-                >
-                  <Link to="/ai-search"><Sparkles className="mr-2 h-4 w-4" /> Sök med AI</Link>
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="lg" 
-                  className="text-md"
                   onClick={showWaitlist}
                 >
                   För arrangörer
@@ -58,27 +49,6 @@ const Index = () => {
             </div>
           </div>
         </section>
-        
-        {/* AI Search Section */}
-        <section className="py-16 bg-orienteering-green/5">
-          <div className="container">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold mb-4">Sök med naturligt språk</h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
-                Beskriv vad du letar efter med dina egna ord, så hjälper vår AI dig att hitta rätt tävlingar.
-              </p>
-            </div>
-            
-            <div className="text-center">
-              <Button asChild size="lg" className="mx-auto">
-                <Link to="/ai-search"><Sparkles className="mr-2 h-4 w-4" /> Prova AI-sökning</Link>
-              </Button>
-            </div>
-          </div>
-        </section>
-        
-        {/* Featured Competitions */}
-        <FeaturedCompetitions />
         
         {/* Features Section */}
         <section className="py-16 md:py-24">
@@ -130,6 +100,9 @@ const Index = () => {
           </div>
         </section>
         
+        {/* Featured Competitions */}
+        <FeaturedCompetitions />
+        
         {/* CTA Section */}
         <section className="py-16 bg-orienteering-green/10">
           <div className="container">
@@ -141,9 +114,6 @@ const Index = () => {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button asChild size="lg">
                   <Link to="/search"><Search className="mr-2 h-4 w-4" /> Sök tävlingar</Link>
-                </Button>
-                <Button asChild variant="outline" size="lg">
-                  <Link to="/ai-search"><Sparkles className="mr-2 h-4 w-4" /> Sök med AI</Link>
                 </Button>
               </div>
             </div>

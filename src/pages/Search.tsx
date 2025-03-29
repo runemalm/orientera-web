@@ -7,17 +7,24 @@ import SearchFilters from "@/components/SearchFilters";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
-import { X, Sparkles, Clock, Search as SearchIcon, Filter, Trash2, TrendingUp } from "lucide-react";
+import { X, Filter, Trash2, ListFilter, CalendarDays, Map as MapIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import CompetitionCompactView from "@/components/CompetitionCompactView";
+import CompetitionCalendarView from "@/components/CompetitionCalendarView";
+import CompetitionMapView from "@/components/CompetitionMapView";
+import CompetitionListView from "@/components/CompetitionListView";
 import { isBefore, isAfter, isEqual, parseISO } from "date-fns";
 import { processNaturalLanguageQuery } from "@/utils/aiQueryProcessor";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { 
+  ToggleGroup, 
+  ToggleGroupItem 
+} from "@/components/ui/toggle-group";
 
-// Array of popular searches to display when no recent searches exist
+// Array of popular searches to display
 const popularSearches = [
   "Nationella tävlingar i sommar",
   "Sprinttävlingar i Stockholm",
@@ -25,6 +32,9 @@ const popularSearches = [
   "Stafetter i södra Sverige",
   "Långdistans i fjällen",
 ];
+
+// View type for competition display
+type ViewType = "list" | "compact" | "calendar" | "map";
 
 const Search = () => {
   const location = useLocation();
@@ -42,12 +52,12 @@ const Search = () => {
   });
 
   const [searchInputValue, setSearchInputValue] = useState("");
-  const [activeTab, setActiveTab] = useState("ai");
   const [isProcessing, setIsProcessing] = useState(false);
   const [recentSearches, setRecentSearches] = useState<string[]>(() => {
     const saved = localStorage.getItem('recentAiSearches');
     return saved ? JSON.parse(saved) : [];
   });
+  const [viewType, setViewType] = useState<ViewType>("compact");
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -70,7 +80,6 @@ const Search = () => {
     }
     
     const searchQuery = searchParams.get('q') || "";
-    const aiMode = searchParams.get('mode') === 'ai';
     
     if (disciplines.length > 0 || levels.length > 0 || dateRange || searchQuery) {
       setFilters(prevFilters => ({
@@ -82,18 +91,6 @@ const Search = () => {
       }));
       
       setSearchInputValue(searchQuery);
-      
-      if (aiMode || searchQuery) {
-        setActiveTab("ai");
-        
-        if (aiMode) {
-          toast({
-            title: "Sökning från AI",
-            description: "Filtren har applicerats baserat på din AI-sökning",
-            duration: 3000,
-          });
-        }
-      }
     }
   }, [location.search, toast]);
 
@@ -228,8 +225,30 @@ const Search = () => {
     processQuery(searchInputValue);
   };
 
-  const handleTabChange = (value: string) => {
-    setActiveTab(value);
+  const renderCompetitionView = () => {
+    if (filteredCompetitions.length === 0) {
+      return (
+        <div className="bg-card rounded-lg border p-8 text-center">
+          <h3 className="text-lg font-medium mb-2">Inga tävlingar hittades</h3>
+          <p className="text-muted-foreground mb-4">
+            Det finns inga tävlingar som matchar dina filter. Prova att ändra dina sökkriterier.
+          </p>
+        </div>
+      );
+    }
+
+    switch (viewType) {
+      case "list":
+        return <CompetitionListView competitions={filteredCompetitions} />;
+      case "compact":
+        return <CompetitionCompactView competitions={filteredCompetitions} />;
+      case "calendar":
+        return <CompetitionCalendarView competitions={filteredCompetitions} />;
+      case "map":
+        return <CompetitionMapView competitions={filteredCompetitions} />;
+      default:
+        return <CompetitionCompactView competitions={filteredCompetitions} />;
+    }
   };
 
   return (
@@ -237,154 +256,133 @@ const Search = () => {
       <Header />
       
       <main className="flex-1 container py-8">
-        <h1 className="text-3xl font-bold mb-6">Sök tävlingar</h1>
-        
         <div className="max-w-3xl mx-auto">
-          <Tabs value={activeTab} onValueChange={handleTabChange} className="mb-6">
-            <TabsList className="grid w-full grid-cols-2 mb-4">
-              <TabsTrigger value="ai">
-                <Sparkles className="mr-2 h-4 w-4" />
-                Sök med AI
-              </TabsTrigger>
-              <TabsTrigger value="manual">
-                <Filter className="mr-2 h-4 w-4" />
-                Klassisk sök
-              </TabsTrigger>
-            </TabsList>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+            <h1 className="text-3xl font-bold">Sök tävlingar</h1>
             
-            <TabsContent value="ai" className="space-y-4">
-              <div className="rounded-lg border bg-card p-4">
-                <div className="mb-4 text-sm text-muted-foreground">
-                  <p className="mb-2">Beskriv den tävling du letar efter med dina egna ord, så hjälper vår AI dig att hitta rätt.</p>
-                  <p>Exempel: "Nationella tävlingar nära Stockholm i juni" eller "Sprint för ungdomar på klubbnivå"</p>
+            <ToggleGroup 
+              type="single" 
+              value={viewType} 
+              onValueChange={(value) => value && setViewType(value as ViewType)}
+              className="bg-muted p-1 rounded-md"
+            >
+              <ToggleGroupItem value="list" aria-label="Lista" title="Lista">
+                <ListFilter className="h-5 w-5" />
+              </ToggleGroupItem>
+              <ToggleGroupItem value="compact" aria-label="Kompakt" title="Kompakt">
+                <Filter className="h-5 w-5" />
+              </ToggleGroupItem>
+              <ToggleGroupItem value="calendar" aria-label="Kalender" title="Kalender">
+                <CalendarDays className="h-5 w-5" />
+              </ToggleGroupItem>
+              <ToggleGroupItem value="map" aria-label="Karta" title="Karta">
+                <MapIcon className="h-5 w-5" />
+              </ToggleGroupItem>
+            </ToggleGroup>
+          </div>
+          
+          <div className="space-y-6">
+            <div className="rounded-lg border bg-card p-4">
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="relative">
+                  <Input
+                    placeholder="Sök efter tävlingar..."
+                    value={searchInputValue}
+                    onChange={(e) => handleSearchChange(e.target.value)}
+                    className="pr-8 text-base"
+                  />
+                  {searchInputValue && (
+                    <button
+                      type="button"
+                      onClick={handleClearSearch}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      aria-label="Rensa sökning"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  )}
                 </div>
                 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="relative">
-                    <Input
-                      placeholder="Sök efter tävlingar med vanligt språk..."
-                      value={searchInputValue}
-                      onChange={(e) => handleSearchChange(e.target.value)}
-                      className="pr-8 text-base"
-                    />
-                    {searchInputValue && (
-                      <button
-                        type="button"
-                        onClick={handleClearSearch}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                        aria-label="Rensa sökning"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    )}
-                  </div>
-                  
-                  <Button 
-                    type="submit" 
-                    disabled={isProcessing || !searchInputValue.trim()}
-                    className="w-full"
-                  >
-                    {isProcessing ? (
-                      <>
-                        <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full mr-2"></div>
-                        Bearbetar sökning...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="mr-2 h-4 w-4" />
-                        Sök
-                      </>
-                    )}
-                  </Button>
-                </form>
-                
-                {recentSearches.length > 0 && (
-                  <div className="mt-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <Clock className="h-4 w-4 text-muted-foreground" />
-                        <h3 className="text-sm font-medium">Senaste sökningar</h3>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleClearHistory}
-                        className="h-7 px-2 text-xs text-muted-foreground hover:text-destructive"
-                      >
-                        <Trash2 className="h-3 w-3 mr-1" />
-                        Rensa historik
-                      </Button>
-                    </div>
-                    <div className="flex flex-col gap-1">
-                      {recentSearches.map((search, index) => (
-                        <Button
-                          key={index}
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => processQuery(search)}
-                          className="text-xs justify-start h-auto py-1.5 text-muted-foreground hover:text-foreground"
-                        >
-                          <SearchIcon className="h-3 w-3 mr-2" />
-                          {search.length > 60 ? `${search.substring(0, 60)}...` : search}
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                
+                <Button 
+                  type="submit" 
+                  disabled={isProcessing || !searchInputValue.trim()}
+                  className="w-full"
+                >
+                  {isProcessing ? "Bearbetar sökning..." : "Sök"}
+                </Button>
+              </form>
+              
+              {/* Popular searches - always shown */}
+              <div className="mt-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <h3 className="text-sm font-medium">Populära sökningar</h3>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {popularSearches.map((search, index) => (
+                    <Button
+                      key={index}
+                      variant="outline"
+                      size="sm"
+                      onClick={() => processQuery(search)}
+                      className="text-xs"
+                    >
+                      {search}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Recent searches - only shown if there are any */}
+              {recentSearches.length > 0 && (
                 <div className="mt-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <TrendingUp className="h-4 w-4 text-primary" />
-                    <h3 className="text-sm font-medium">Populära sökningar</h3>
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="text-sm font-medium">Senaste sökningar</h3>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleClearHistory}
+                      className="h-7 px-2 text-xs text-muted-foreground hover:text-destructive"
+                    >
+                      <Trash2 className="h-3 w-3 mr-1" />
+                      Rensa historik
+                    </Button>
                   </div>
-                  <div className="flex flex-col gap-1">
-                    {popularSearches.map((search, index) => (
+                  <div className="flex flex-wrap gap-2">
+                    {recentSearches.map((search, index) => (
                       <Button
                         key={index}
-                        variant="ghost"
+                        variant="outline"
                         size="sm"
                         onClick={() => processQuery(search)}
-                        className="text-xs justify-start h-auto py-1.5 text-muted-foreground hover:text-foreground"
+                        className="text-xs"
                       >
-                        <SearchIcon className="h-3 w-3 mr-2" />
-                        {search}
+                        {search.length > 30 ? `${search.substring(0, 30)}...` : search}
                       </Button>
                     ))}
                   </div>
                 </div>
-              </div>
-            </TabsContent>
+              )}
+            </div>
             
-            <TabsContent value="manual">
-              <div className="mb-4">
-                <SearchFilters 
-                  filters={filters} 
-                  onFilterChange={handleFilterChange} 
-                  hasLocation={false}
-                  hideSearchInput={true}
-                />
+            <div className="mb-4">
+              <SearchFilters 
+                filters={filters} 
+                onFilterChange={handleFilterChange} 
+                hasLocation={false}
+                hideSearchInput={true}
+              />
+            </div>
+            
+            <div className="bg-card rounded-lg border p-4 mb-6">
+              <div className="flex justify-between items-center">
+                <h2 className="font-semibold">
+                  {filteredCompetitions.length} {filteredCompetitions.length === 1 ? 'tävling' : 'tävlingar'} hittades
+                </h2>
               </div>
-            </TabsContent>
-          </Tabs>
-          
-          <div className="bg-card rounded-lg border p-4 mb-6">
-            <div className="flex justify-between items-center">
-              <h2 className="font-semibold">
-                {filteredCompetitions.length} {filteredCompetitions.length === 1 ? 'tävling' : 'tävlingar'} hittades
-              </h2>
             </div>
+            
+            {renderCompetitionView()}
           </div>
-          
-          {filteredCompetitions.length > 0 ? (
-            <CompetitionCompactView competitions={filteredCompetitions} />
-          ) : (
-            <div className="bg-card rounded-lg border p-8 text-center">
-              <h3 className="text-lg font-medium mb-2">Inga tävlingar hittades</h3>
-              <p className="text-muted-foreground mb-4">
-                Det finns inga tävlingar som matchar dina filter. Prova att ändra dina sökkriterier.
-              </p>
-            </div>
-          )}
         </div>
       </main>
       
