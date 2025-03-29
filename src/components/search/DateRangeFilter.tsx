@@ -155,13 +155,10 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilterProps)
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !localDateRange && "text-muted-foreground"
-                  )}
+                  className="w-full justify-start text-left font-normal"
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {formatDateRange(localDateRange)}
+                  {isDateRangeSelected ? "Anpassat datumintervall" : "Välj datum"}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
