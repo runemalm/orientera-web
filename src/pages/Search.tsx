@@ -1,16 +1,14 @@
-
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import CompetitionCard from "@/components/CompetitionCard";
 import SearchFilters from "@/components/SearchFilters";
-import AiSearch from "@/components/AiSearch";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
 import { useGeolocation } from "@/hooks/useGeolocation";
-import { Search as SearchIcon, X, Grid, Calendar as CalendarIcon, List, MenuSquare, Map as MapIcon, Sparkles, SlidersHorizontal } from "lucide-react";
+import { Search as SearchIcon, X, Grid, Calendar as CalendarIcon, List, MenuSquare, Map as MapIcon, SlidersHorizontal } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Command } from "@/components/ui/command";
@@ -55,7 +53,6 @@ const Search = () => {
   
   const [locationChangeCounter, setLocationChangeCounter] = useState(0);
   const [viewMode, setViewMode] = useState<"grid" | "list" | "compact" | "calendar" | "map">("grid");
-  const [searchMode, setSearchMode] = useState<"manual" | "ai">("manual");
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -92,7 +89,6 @@ const Search = () => {
       setSearchInputValue(searchQuery);
       
       if (aiMode) {
-        setSearchMode("ai");
         toast({
           title: "Sökning från AI",
           description: "Filtren har applicerats baserat på din AI-sökning",
@@ -231,46 +227,44 @@ const Search = () => {
 
   const renderSearchResults = () => (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-      {searchMode === "manual" && (
-        <div className="md:col-span-1">
-          <div className="rounded-lg border bg-card mb-4">
-            <div className="p-4" ref={searchContainerRef}>
-              <form onSubmit={handleManualSearch} className="flex gap-2">
-                <div className="relative flex-1">
-                  <Input
-                    placeholder="Sök efter tävlingsnamn eller plats..."
-                    value={searchInputValue}
-                    onChange={(e) => handleSearchChange(e.target.value)}
-                    className="w-full pr-8"
-                  />
-                  {searchInputValue && (
-                    <button
-                      type="button"
-                      onClick={handleClearSearch}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                      aria-label="Rensa sökning"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  )}
-                </div>
-                <Button type="submit" size="icon">
-                  <SearchIcon className="h-4 w-4" />
-                </Button>
-              </form>
-            </div>
+      <div className="md:col-span-1">
+        <div className="rounded-lg border bg-card mb-4">
+          <div className="p-4" ref={searchContainerRef}>
+            <form onSubmit={handleManualSearch} className="flex gap-2">
+              <div className="relative flex-1">
+                <Input
+                  placeholder="Sök efter tävlingsnamn eller plats..."
+                  value={searchInputValue}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  className="w-full pr-8"
+                />
+                {searchInputValue && (
+                  <button
+                    type="button"
+                    onClick={handleClearSearch}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    aria-label="Rensa sökning"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+              <Button type="submit" size="icon">
+                <SearchIcon className="h-4 w-4" />
+              </Button>
+            </form>
           </div>
-          
-          <SearchFilters 
-            filters={filters} 
-            onFilterChange={handleFilterChange} 
-            hasLocation={!!filters.userLocation}
-            hideSearchInput={true}
-          />
         </div>
-      )}
+        
+        <SearchFilters 
+          filters={filters} 
+          onFilterChange={handleFilterChange} 
+          hasLocation={!!filters.userLocation}
+          hideSearchInput={true}
+        />
+      </div>
       
-      <div className={`md:col-span-${searchMode === "manual" ? "3" : "4"}`}>
+      <div className="md:col-span-3">
         <div className="bg-card rounded-lg border p-4 mb-6">
           <div className="flex justify-between items-center">
             <h2 className="font-semibold">
@@ -392,29 +386,7 @@ const Search = () => {
       <main className="flex-1 container py-8">
         <h1 className="text-3xl font-bold mb-6">Sök tävlingar</h1>
         
-        <Tabs value={searchMode} onValueChange={(value) => setSearchMode(value as "manual" | "ai")} className="w-full mb-8">
-          <TabsList className="grid w-full max-w-md grid-cols-2 mb-4">
-            <TabsTrigger value="manual" className="flex items-center gap-2">
-              <SlidersHorizontal className="h-4 w-4" />
-              Vanlig sökning
-            </TabsTrigger>
-            <TabsTrigger value="ai" className="flex items-center gap-2">
-              <Sparkles className="h-4 w-4" />
-              Sök med AI
-            </TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="manual" className="mt-0">
-            {renderSearchResults()}
-          </TabsContent>
-          
-          <TabsContent value="ai" className="mt-0">
-            <div className="mb-6">
-              <AiSearch className="w-full" />
-            </div>
-            {renderSearchResults()}
-          </TabsContent>
-        </Tabs>
+        {renderSearchResults()}
       </main>
       
       <Footer />
