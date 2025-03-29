@@ -19,10 +19,15 @@ const CompetitionListView: React.FC<CompetitionListViewProps> = ({
   competitions 
 }) => {
   const navigate = useNavigate();
+  
+  // Sort competitions by date in descending order
+  const sortedCompetitions = [...competitions].sort((a, b) => 
+    new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
 
   return (
     <div className="space-y-4">
-      {competitions.map((competition) => (
+      {sortedCompetitions.map((competition) => (
         <Card 
           key={competition.id}
           className={`overflow-hidden transition-all hover:shadow-md cursor-pointer ${

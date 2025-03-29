@@ -23,6 +23,11 @@ const CompetitionCompactView: React.FC<CompetitionCompactViewProps> = ({
   competitions 
 }) => {
   const navigate = useNavigate();
+  
+  // Sort competitions by date in descending order
+  const sortedCompetitions = [...competitions].sort((a, b) => 
+    new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
 
   return (
     <Card className="overflow-hidden">
@@ -37,8 +42,8 @@ const CompetitionCompactView: React.FC<CompetitionCompactViewProps> = ({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {competitions.length > 0 ? (
-            competitions.map((competition) => (
+          {sortedCompetitions.length > 0 ? (
+            sortedCompetitions.map((competition) => (
               <TableRow 
                 key={competition.id}
                 className="cursor-pointer hover:bg-muted"
