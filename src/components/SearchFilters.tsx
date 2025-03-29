@@ -142,14 +142,6 @@ const SearchFiltersComponent = ({
           />
 
           <CheckboxFilter
-            title="Län"
-            items={regions.map(r => ({ id: r.id, name: r.name }))}
-            selectedItems={filters.regions}
-            onItemChange={handleRegionChange}
-            accordionValue="regions"
-          />
-
-          <CheckboxFilter
             title="Distrikt"
             items={districts.map(d => ({ id: d.id, name: d.name }))}
             selectedItems={filters.districts}
