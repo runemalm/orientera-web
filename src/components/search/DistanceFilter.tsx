@@ -1,47 +1,67 @@
 
 import { useState } from "react";
-import { MapPin, Locate } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { 
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import LocationDialog from "./LocationDialog";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 
 interface DistanceFilterProps {
   userLocation?: { lat: number; lng: number };
-  detectedLocationInfo?: {
-    city?: string;
-    municipality?: string;
-    county?: string;
-    display_name?: string;
-  };
   distance?: number;
-  isManualLocation: boolean;
-  locationCity?: string;
+  locationName?: string;
   onDistanceChange: (distance: number | null) => void;
-  onDetectLocation: () => void;
-  onSetManualLocation: (city: string) => Promise<boolean>;
+  onLocationSearch: (city: string) => Promise<boolean>;
 }
 
 const distances = [25, 50, 100];
 
 const DistanceFilter = ({ 
   userLocation, 
-  detectedLocationInfo, 
-  distance, 
-  isManualLocation,
-  locationCity,
+  distance,
+  locationName,
   onDistanceChange,
-  onDetectLocation,
-  onSetManualLocation
+  onLocationSearch
 }: DistanceFilterProps) => {
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [cityInput, setCityInput] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+  const { toast } = useToast();
 
-  const locationName = isManualLocation 
-    ? locationCity 
-    : (detectedLocationInfo?.city || "Din position");
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (cityInput.trim().length < 2) {
+      toast({
+        title: "För kort sökord",
+        description: "Ange minst två tecken för att söka",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setIsSearching(true);
+    const success = await onLocationSearch(cityInput);
+    setIsSearching(false);
+    
+    if (success) {
+      setCityInput("");
+      toast({
+        title: "Plats hittad",
+        description: `Söker nu runt ${cityInput}`
+      });
+    } else {
+      toast({
+        title: "Kunde inte hitta platsen",
+        description: "Försök med en annan ort i Sverige",
+        variant: "destructive"
+      });
+    }
+  };
 
   return (
     <AccordionItem value="distance" className="border-b-0">
@@ -49,41 +69,30 @@ const DistanceFilter = ({
         <div className="flex items-center gap-2">
           <MapPin className="h-4 w-4" />
           <span className="text-sm font-medium">Avstånd</span>
+          {locationName && (
+            <Badge variant="outline" className="ml-2 font-normal">
+              {locationName}
+            </Badge>
+          )}
         </div>
       </AccordionTrigger>
       <AccordionContent>
         <div className="space-y-4">
-          {userLocation ? (
-            <div className="text-sm text-muted-foreground mb-2">
-              Sökområde: {locationName}
-            </div>
-          ) : (
-            <div className="text-sm text-destructive font-medium mb-2">
-              Ingen position vald
-            </div>
-          )}
-          
-          <div className="grid grid-cols-2 gap-2 mb-3">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="w-full"
-              onClick={onDetectLocation}
-            >
-              <Locate className="h-3.5 w-3.5 mr-1" />
-              <span className="truncate">Min position</span>
-            </Button>
-            
-            <LocationDialog 
-              open={isDialogOpen} 
-              onOpenChange={setIsDialogOpen}
-              onCitySelect={async (city) => {
-                const success = await onSetManualLocation(city);
-                if (success) setIsDialogOpen(false);
-                return success;
-              }}
+          <form onSubmit={handleSearch} className="flex gap-2 items-center">
+            <Input 
+              placeholder="Sök ort i Sverige..."
+              value={cityInput}
+              onChange={(e) => setCityInput(e.target.value)}
+              className="flex-1"
             />
-          </div>
+            <Button 
+              type="submit" 
+              size="sm"
+              disabled={isSearching || cityInput.trim().length < 2}
+            >
+              Sök
+            </Button>
+          </form>
           
           <div className="grid grid-cols-4 gap-2">
             <Button 

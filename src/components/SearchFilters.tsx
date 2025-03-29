@@ -1,4 +1,3 @@
-
 import { FilterIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,6 +7,7 @@ import { SearchFilters as SearchFiltersType } from "@/types";
 import DistanceFilter from "./search/DistanceFilter";
 import CheckboxFilter from "./search/CheckboxFilter";
 import DateRangeFilter from "./search/DateRangeFilter";
+import { useToast } from "@/hooks/use-toast";
 
 const disciplines = ['Sprint', 'Medel', 'Lång', 'Natt', 'Stafett', 'Ultralång'];
 const levels = ['Klubb', 'Krets', 'Distrikt', 'Nationell', 'Internationell'];
@@ -25,6 +25,7 @@ const SearchFiltersComponent = ({
   hasLocation,
   hideSearchInput = false
 }: SearchFiltersProps) => {
+  const { toast } = useToast();
   
   const handleDisciplineChange = (discipline: string, checked: boolean) => {
     let updatedDisciplines = [...filters.disciplines];
@@ -46,22 +47,15 @@ const SearchFiltersComponent = ({
     onFilterChange({ ...filters, levels: updatedLevels });
   };
 
-  const handleDistanceChange = (distance: number | null) => {
-    onFilterChange({ ...filters, distance: distance || undefined });
-  };
-
   const handleDateRangeChange = (dateRange: { from: Date; to?: Date } | undefined) => {
     onFilterChange({ ...filters, dateRange });
   };
 
-  const handleDetectLocation = () => {
-    onFilterChange({
-      ...filters,
-      isManualLocation: false
-    });
+  const handleDistanceChange = (distance: number | null) => {
+    onFilterChange({ ...filters, distance: distance || undefined });
   };
 
-  const handleSetManualLocation = async (cityName: string) => {
+  const handleLocationSearch = async (cityName: string) => {
     try {
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cityName)}, Sweden&countrycodes=se&limit=1`
@@ -74,7 +68,6 @@ const SearchFiltersComponent = ({
         onFilterChange({
           ...filters,
           userLocation: { lat: parseFloat(lat), lng: parseFloat(lon) },
-          isManualLocation: true,
           locationCity: cityName
         });
         return true;
@@ -94,13 +87,19 @@ const SearchFiltersComponent = ({
       levels: [],
       searchQuery: "", 
       distance: undefined,
-      userLocation: filters.userLocation,
-      isManualLocation: filters.isManualLocation,
-      locationCity: filters.locationCity,
-      detectedLocationInfo: filters.detectedLocationInfo,
+      userLocation: undefined,
+      locationCity: undefined,
       dateRange: undefined
     });
+    
+    toast({
+      title: "Filter rensade",
+      description: "Alla filter har återställts"
+    });
   };
+
+  // Get a friendly location name to display
+  const locationName = filters.locationCity;
 
   return (
     <div className="rounded-lg border bg-card">
@@ -127,13 +126,10 @@ const SearchFiltersComponent = ({
 
           <DistanceFilter
             userLocation={filters.userLocation}
-            detectedLocationInfo={filters.detectedLocationInfo}
             distance={filters.distance}
-            isManualLocation={filters.isManualLocation || false}
-            locationCity={filters.locationCity}
+            locationName={locationName}
             onDistanceChange={handleDistanceChange}
-            onDetectLocation={handleDetectLocation}
-            onSetManualLocation={handleSetManualLocation}
+            onLocationSearch={handleLocationSearch}
           />
 
           <CheckboxFilter

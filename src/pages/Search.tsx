@@ -6,7 +6,6 @@ import SearchFilters from "@/components/SearchFilters";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
-import { useGeolocation } from "@/hooks/useGeolocation";
 import { Search as SearchIcon, X, Sparkles, ArrowRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -23,16 +22,6 @@ const Search = () => {
   const { toast } = useToast();
   const isMobile = useIsMobile();
   
-  const {
-    coords: userLocation,
-    detectedLocationInfo,
-    isManualLocation,
-    loading: isRequestingLocation,
-    setManualLocation,
-    clearLocation,
-    detectLocation
-  } = useGeolocation(true);
-
   const [filters, setFilters] = useState<SearchFiltersType>({
     regions: [],
     districts: [],
@@ -40,14 +29,11 @@ const Search = () => {
     levels: [],
     searchQuery: "",
     userLocation: undefined,
-    isManualLocation: false,
-    locationCity: undefined,
-    detectedLocationInfo: undefined
+    locationCity: undefined
   });
 
   const [searchInputValue, setSearchInputValue] = useState("");
   const searchContainerRef = useRef<HTMLDivElement>(null);
-  const [locationChangeCounter, setLocationChangeCounter] = useState(0);
   const [currentTab, setCurrentTab] = useState<string>("ai");
 
   useEffect(() => {
@@ -95,34 +81,10 @@ const Search = () => {
     }
   }, [location.search, toast]);
 
-  useEffect(() => {
-    console.log("Location changed, updating filters:", { userLocation, detectedLocationInfo, isManualLocation });
-    setFilters(prevFilters => ({
-      ...prevFilters,
-      userLocation,
-      detectedLocationInfo,
-      isManualLocation
-    }));
-    
-    setLocationChangeCounter(prev => prev + 1);
-  }, [userLocation, detectedLocationInfo, isManualLocation]);
-
-  useEffect(() => {
-    console.log("🚀 userLocation changed in Search:", userLocation);
-  }, [userLocation]);
-
-  useEffect(() => {
-    console.log("🚀 detectedLocationInfo changed in Search:", detectedLocationInfo);
-  }, [detectedLocationInfo]);
-
-  useEffect(() => {
-    console.log("🚀 isManualLocation changed in Search:", isManualLocation);
-  }, [isManualLocation]);
-
   const competitionsWithDistance = useMemo(() => {
-    console.log("Recalculating distances with userLocation:", userLocation);
+    console.log("Recalculating distances with userLocation:", filters.userLocation);
     
-    if (!userLocation) return competitions;
+    if (!filters.userLocation) return competitions;
     
     return competitions.map(competition => {
       if (!competition.coordinates) {
@@ -131,21 +93,20 @@ const Search = () => {
       }
       
       const distance = getDistance(
-        userLocation.lat,
-        userLocation.lng,
+        filters.userLocation!.lat,
+        filters.userLocation!.lng,
         competition.coordinates.lat,
         competition.coordinates.lng
       );
       
-      console.log(`Competition ${competition.name} - Distance: ${distance}m`);
       return { ...competition, distance };
     });
-  }, [userLocation, locationChangeCounter]);
+  }, [filters.userLocation]);
 
   const filteredCompetitions = useMemo(() => {
     let filtered = filterCompetitions(competitionsWithDistance, {
       ...filters,
-      userLocation,
+      userLocation: filters.userLocation,
     });
 
     if (filters.dateRange?.from) {
@@ -167,32 +128,14 @@ const Search = () => {
     }
     
     return filtered;
-  }, [competitionsWithDistance, filters, userLocation]);
+  }, [competitionsWithDistance, filters]);
 
   const handleFilterChange = (newFilters: SearchFiltersType) => {
-    if (newFilters.isManualLocation !== filters.isManualLocation) {
-      if (newFilters.isManualLocation === false && filters.isManualLocation === true) {
-        clearLocation();
-        detectLocation();
-      }
-    }
-
-    if (newFilters.searchQuery === "" && filters.searchQuery !== "") {
-      setSearchInputValue("");
-      toast({
-        title: "Sökfältet rensat",
-        description: "Sökfrågan har rensats",
-        duration: 2000,
-      });
-    }
-
-    const locationChanged = newFilters.userLocation !== filters.userLocation;
-
     console.log("Filter changed:", newFilters);
     setFilters(newFilters);
     
-    if (locationChanged) {
-      setLocationChangeCounter(prev => prev + 1);
+    if (newFilters.searchQuery === "" && filters.searchQuery !== "") {
+      setSearchInputValue("");
     }
   };
 

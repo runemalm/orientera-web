@@ -18,13 +18,6 @@ export type Coordinates = {
   lng: number;
 };
 
-export type DetectedLocationInfo = {
-  city?: string;
-  municipality?: string;
-  county?: string;
-  display_name?: string;
-};
-
 export type CompetitionResourceType = 'Inbjudan' | 'PM' | 'Startlista' | 'Resultat' | 'Sträcktider';
 
 export type CompetitionResource = {
@@ -63,11 +56,9 @@ export type SearchFilters = {
   levels: CompetitionLevel[];
   searchQuery: string;
   userLocation?: Coordinates;
-  isManualLocation?: boolean; // Added to track if location is manually set
-  locationCity?: string; // Added for city-based location
-  detectedLocationInfo?: DetectedLocationInfo; // Added for detailed auto-detected location info
+  locationCity?: string; // Location name for display
   dateRange?: {
     from: Date;
     to?: Date;
-  }; // Add date range for filtering
+  }; // Date range for filtering
 };
