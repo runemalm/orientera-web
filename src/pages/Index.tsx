@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Compass } from "lucide-react";
+import { Compass, Sparkles, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -36,7 +36,15 @@ const Index = () => {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button asChild size="lg" className="text-md">
-                  <Link to="/search">Sök tävlingar</Link>
+                  <Link to="/search"><Search className="mr-2 h-4 w-4" /> Sök tävlingar</Link>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="text-md"
+                  asChild
+                >
+                  <Link to="/ai-search"><Sparkles className="mr-2 h-4 w-4" /> Sök med AI</Link>
                 </Button>
                 <Button 
                   variant="outline" 
@@ -61,7 +69,11 @@ const Index = () => {
               </p>
             </div>
             
-            <AiSearch />
+            <div className="text-center">
+              <Button asChild size="lg" className="mx-auto">
+                <Link to="/ai-search"><Sparkles className="mr-2 h-4 w-4" /> Prova AI-sökning</Link>
+              </Button>
+            </div>
           </div>
         </section>
         
@@ -126,9 +138,14 @@ const Index = () => {
               <p className="text-muted-foreground mb-8">
                 Hitta din nästa orienteringstävling nu och ta del av Sveriges bästa plattform för orienterare.
               </p>
-              <Button asChild size="lg">
-                <Link to="/search">Sök tävlingar</Link>
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button asChild size="lg">
+                  <Link to="/search"><Search className="mr-2 h-4 w-4" /> Sök tävlingar</Link>
+                </Button>
+                <Button asChild variant="outline" size="lg">
+                  <Link to="/ai-search"><Sparkles className="mr-2 h-4 w-4" /> Sök med AI</Link>
+                </Button>
+              </div>
             </div>
           </div>
         </section>

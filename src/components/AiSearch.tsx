@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SearchFilters } from "@/types";
@@ -128,9 +127,6 @@ const AiSearch: React.FC<AiSearchProps> = ({ className }) => {
       if (filters.searchQuery) {
         searchParams.append('q', filters.searchQuery);
       }
-      
-      // Add AI mode flag
-      searchParams.append('mode', 'ai');
 
       // Navigate to search page with the extracted filters
       navigate(`/search?${searchParams.toString()}`);
