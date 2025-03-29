@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -12,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import CompetitionMapView from "@/components/CompetitionMapView";
 import CompetitionCalendarView from "@/components/CompetitionCalendarView";
-import { isBefore, isAfter, isEqual, parseISO } from "date-fns";
 import { useIsMobile, useBreakpoint } from "@/hooks/use-mobile";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { cn } from "@/lib/utils";
@@ -65,7 +63,6 @@ const Search = () => {
     }
   }, []);
 
-  // Load map visibility from localStorage
   useEffect(() => {
     const savedMapVisible = localStorage.getItem(SEARCH_MAP_VISIBLE_KEY);
     if (savedMapVisible !== null) {
@@ -93,7 +90,6 @@ const Search = () => {
     localStorage.setItem(SEARCH_SIDEBAR_OPEN_KEY, sidebarOpen.toString());
   }, [sidebarOpen]);
 
-  // Save map visibility to localStorage when it changes
   useEffect(() => {
     if (filters.showMap !== undefined) {
       localStorage.setItem(SEARCH_MAP_VISIBLE_KEY, filters.showMap.toString());
@@ -137,39 +133,7 @@ const Search = () => {
   }, [filters]);
 
   const filteredCompetitions = useMemo(() => {
-    let filtered = filterCompetitions(competitions, filters);
-
-    if (filters.dateRange?.from || filters.dateRange?.to) {
-      filtered = filtered.filter(competition => {
-        const competitionDate = parseISO(competition.date);
-        
-        if (filters.dateRange?.from && isBefore(competitionDate, filters.dateRange.from) && 
-            !isEqual(competitionDate, filters.dateRange.from)) {
-          return false;
-        }
-        
-        if (filters.dateRange?.to && isAfter(competitionDate, filters.dateRange.to) && 
-            !isEqual(competitionDate, filters.dateRange.to)) {
-          return false;
-        }
-        
-        return true;
-      });
-    }
-
-    if (filters.types && filters.types.length > 0) {
-      filtered = filtered.filter(competition => 
-        competition.type && filters.types.includes(competition.type)
-      );
-    }
-
-    if (filters.branches && filters.branches.length > 0) {
-      filtered = filtered.filter(competition => 
-        competition.branch && filters.branches.includes(competition.branch)
-      );
-    }
-    
-    return filtered;
+    return filterCompetitions(competitions, filters);
   }, [competitions, filters]);
 
   const handleFilterChange = (newFilters: SearchFiltersType) => {

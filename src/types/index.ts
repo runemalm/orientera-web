@@ -71,4 +71,3 @@ export type SearchFilters = {
   datePreset?: string; // New field to track the date preset selection
   showMap?: boolean; // New field to track map visibility
 };
-

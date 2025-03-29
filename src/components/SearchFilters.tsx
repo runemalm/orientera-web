@@ -1,4 +1,3 @@
-
 import { FilterIcon, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -107,7 +106,8 @@ const SearchFiltersComponent = ({
       types: [],
       branches: [],
       searchQuery: "", 
-      dateRange: undefined
+      dateRange: undefined,
+      showMap: filters.showMap
     };
     
     onFilterChange(resetFilters);

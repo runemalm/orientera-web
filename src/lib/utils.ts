@@ -1,6 +1,8 @@
+
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { Competition, SearchFilters } from "@/types";
+import { isAfter, isBefore, isEqual, parseISO } from "date-fns";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -11,33 +13,91 @@ export const filterCompetitions = (
   filters: SearchFilters
 ): Competition[] => {
   return competitions.filter((competition) => {
+    // Region filter
     const regionMatch =
       filters.regions.length === 0 ||
       filters.regions.includes(competition.region);
 
+    // District filter
     const districtMatch =
       filters.districts.length === 0 ||
       filters.districts.includes(competition.district);
 
+    // Discipline filter
     const disciplineMatch =
       filters.disciplines.length === 0 ||
       filters.disciplines.includes(competition.discipline);
 
+    // Level filter
     const levelMatch =
       filters.levels.length === 0 || filters.levels.includes(competition.level);
 
+    // Type filter
+    const typeMatch =
+      !filters.types || 
+      filters.types.length === 0 || 
+      (competition.type && filters.types.includes(competition.type));
+
+    // Branch filter
+    const branchMatch =
+      !filters.branches || 
+      filters.branches.length === 0 || 
+      (competition.branch && filters.branches.includes(competition.branch));
+
+    // Date range filter
+    const dateMatch = (() => {
+      if (!filters.dateRange?.from && !filters.dateRange?.to) return true;
+      
+      const competitionDate = parseISO(competition.date);
+      
+      if (filters.dateRange?.from && 
+          (isBefore(competitionDate, filters.dateRange.from) && 
+           !isEqual(competitionDate, filters.dateRange.from))) {
+        return false;
+      }
+      
+      if (filters.dateRange?.to && 
+          (isAfter(competitionDate, filters.dateRange.to) && 
+           !isEqual(competitionDate, filters.dateRange.to))) {
+        return false;
+      }
+      
+      return true;
+    })();
+
+    // Search query filter
     const searchQueryMatch =
       !filters.searchQuery ||
       competition.name.toLowerCase().includes(filters.searchQuery.toLowerCase()) ||
       competition.location.toLowerCase().includes(filters.searchQuery.toLowerCase()) ||
       competition.organizer.toLowerCase().includes(filters.searchQuery.toLowerCase());
 
+    // Distance filter
+    const distanceMatch = (() => {
+      if (!filters.userLocation || !filters.distance) return true;
+      
+      if (!competition.coordinates) return false;
+      
+      const distanceInKm = getDistance(
+        filters.userLocation.lat,
+        filters.userLocation.lng,
+        competition.coordinates.lat,
+        competition.coordinates.lng
+      ) / 1000; // Convert meters to kilometers
+      
+      return distanceInKm <= filters.distance;
+    })();
+
     return (
       regionMatch &&
       districtMatch &&
       disciplineMatch &&
       levelMatch &&
-      searchQueryMatch
+      typeMatch &&
+      branchMatch &&
+      dateMatch &&
+      searchQueryMatch &&
+      distanceMatch
     );
   });
 };
