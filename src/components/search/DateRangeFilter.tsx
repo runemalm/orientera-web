@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import { format, addDays, addMonths, isEqual, isAfter, isBefore, isValid, nextSaturday, nextSunday } from "date-fns";
 import { sv } from "date-fns/locale";
@@ -50,6 +49,20 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilterProps)
       })
     },
     {
+      label: "Två veckor",
+      value: () => ({
+        from: today,
+        to: addDays(today, 13)
+      })
+    },
+    {
+      label: "1 månad",
+      value: () => ({
+        from: today,
+        to: addDays(today, 29)
+      })
+    },
+    {
       label: "Kommande helg",
       value: () => {
         const saturday = nextSaturday(today);
@@ -77,27 +90,6 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilterProps)
         return {
           from: saturday,
           to: nextNextSunday
-        };
-      }
-    },
-    {
-      label: "Denna månad",
-      value: () => {
-        const lastDayOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-        return {
-          from: today,
-          to: lastDayOfMonth
-        };
-      }
-    },
-    {
-      label: "Nästa månad",
-      value: () => {
-        const firstDayNextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
-        const lastDayNextMonth = new Date(today.getFullYear(), today.getMonth() + 2, 0);
-        return {
-          from: firstDayNextMonth,
-          to: lastDayNextMonth
         };
       }
     }
