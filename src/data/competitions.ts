@@ -1,4 +1,3 @@
-
 import { Competition, CompetitionResource } from '@/types';
 
 // Sample resources for competitions
@@ -1628,6 +1627,370 @@ const decemberCompetitions: Competition[] = [
   }
 ];
 
+// New club competitions - Veteran-OL and similar club events
+const clubCompetitions: Competition[] = [
+  {
+    id: '83',
+    name: 'Veteran-OL Täby',
+    date: '2025-01-14',
+    organizer: 'Täby OK',
+    region: 'stockholm',
+    district: 'stockholm',
+    location: 'Täby Centrum, Stockholm',
+    coordinates: {
+      lat: 59.4448,
+      lng: 18.0722
+    },
+    discipline: 'Medel',
+    level: 'Klubb',
+    registrationDeadline: '2025-01-13',
+    description: 'Veteran-OL för klubbmedlemmar 50+ år. Gemensamt fika efter tävlingen i klubbstugan.',
+    website: 'https://tabyok.se/veteran-ol'
+  },
+  {
+    id: '84',
+    name: 'Veteran-OL Täby',
+    date: '2025-01-28',
+    organizer: 'Täby OK',
+    region: 'stockholm',
+    district: 'stockholm',
+    location: 'Rösjöskogen, Täby',
+    coordinates: {
+      lat: 59.4578,
+      lng: 17.9906
+    },
+    discipline: 'Lång',
+    level: 'Klubb',
+    registrationDeadline: '2025-01-27',
+    description: 'Andra Veteran-OL för säsongen. Varannan tisdag genom vintern för klubbens seniorlöpare.',
+    website: 'https://tabyok.se/veteran-ol'
+  },
+  {
+    id: '85',
+    name: 'Veteran-OL Uppsala',
+    date: '2025-01-16',
+    organizer: 'OK Linné',
+    region: 'uppsala',
+    district: 'uppland',
+    location: 'Hågadalen, Uppsala',
+    coordinates: {
+      lat: 59.8340,
+      lng: 17.5891
+    },
+    discipline: 'Medel',
+    level: 'Klubb',
+    registrationDeadline: '2025-01-15',
+    description: 'Första Veteran-OL i Uppsala för säsongen. Lätta banor med social samvaro efteråt.',
+    website: 'https://oklinne.se/veteranol'
+  },
+  {
+    id: '86',
+    name: 'Veteran-OL Uppsala',
+    date: '2025-01-30',
+    organizer: 'OK Linné',
+    region: 'uppsala',
+    district: 'uppland',
+    location: 'Stabby, Uppsala',
+    coordinates: {
+      lat: 59.8576,
+      lng: 17.6145
+    },
+    discipline: 'Medel',
+    level: 'Klubb',
+    registrationDeadline: '2025-01-29',
+    description: 'Andra Veteran-OL i Uppsala för säsongen. Välj mellan tre olika banor efter förmåga.',
+    website: 'https://oklinne.se/veteranol'
+  },
+  {
+    id: '87',
+    name: 'Torsdags-OL Göteborg',
+    date: '2025-01-09',
+    organizer: 'IFK Göteborg Orientering',
+    region: 'vastra-gotaland',
+    district: 'goteborg',
+    location: 'Skatås, Göteborg',
+    coordinates: {
+      lat: 57.7065,
+      lng: 12.0492
+    },
+    discipline: 'Medel',
+    level: 'Klubb',
+    registrationDeadline: '2025-01-08',
+    description: 'Veckans klubbträning öppen för alla åldrar. Gemensam start kl 18.00.',
+    website: 'https://ifkgoteborg.se/torsdagsol'
+  },
+  {
+    id: '88',
+    name: 'Torsdags-OL Göteborg',
+    date: '2025-01-23',
+    organizer: 'IFK Göteborg Orientering',
+    region: 'vastra-gotaland',
+    district: 'goteborg',
+    location: 'Delsjön, Göteborg',
+    coordinates: {
+      lat: 57.6885,
+      lng: 12.0459
+    },
+    discipline: 'Lång',
+    level: 'Klubb',
+    registrationDeadline: '2025-01-22',
+    description: 'Klubbträning med teknikfokus. Tre olika längder att välja mellan.',
+    website: 'https://ifkgoteborg.se/torsdagsol'
+  },
+  {
+    id: '89',
+    name: 'Veteran-OL Täby',
+    date: '2025-02-11',
+    organizer: 'Täby OK',
+    region: 'stockholm',
+    district: 'stockholm',
+    location: 'Skogberga, Täby',
+    coordinates: {
+      lat: 59.4780,
+      lng: 18.0851
+    },
+    discipline: 'Medel',
+    level: 'Klubb',
+    registrationDeadline: '2025-02-10',
+    description: 'Fortsättning på våra varannanveckors-träffar för veteraner. Fika efteråt i klubbstugan.',
+    website: 'https://tabyok.se/veteran-ol'
+  },
+  {
+    id: '90',
+    name: 'Veteran-OL Täby',
+    date: '2025-02-25',
+    organizer: 'Täby OK',
+    region: 'stockholm',
+    district: 'stockholm',
+    location: 'Näsbypark, Täby',
+    coordinates: {
+      lat: 59.4287,
+      lng: 18.0936
+    },
+    discipline: 'Lång',
+    level: 'Klubb',
+    registrationDeadline: '2025-02-24',
+    description: 'Veteran-OL med längre banor för att bygga uthållighet inför vårsäsongen.',
+    website: 'https://tabyok.se/veteran-ol'
+  },
+  {
+    id: '91',
+    name: 'Veteran-OL Uppsala',
+    date: '2025-02-13',
+    organizer: 'OK Linné',
+    region: 'uppsala',
+    district: 'uppland',
+    location: 'Sunnersta, Uppsala',
+    coordinates: {
+      lat: 59.8091,
+      lng: 17.6362
+    },
+    discipline: 'Medel',
+    level: 'Klubb',
+    registrationDeadline: '2025-02-12',
+    description: 'Veteran-OL med kartövningar och trevlig samvaro för klubbens seniorer.',
+    website: 'https://oklinne.se/veteranol'
+  },
+  {
+    id: '92',
+    name: 'Veteran-OL Uppsala',
+    date: '2025-02-27',
+    organizer: 'OK Linné',
+    region: 'uppsala',
+    district: 'uppland',
+    location: 'Gränby, Uppsala',
+    coordinates: {
+      lat: 59.8789,
+      lng: 17.6738
+    },
+    discipline: 'Medel',
+    level: 'Klubb',
+    registrationDeadline: '2025-02-26',
+    description: 'Februari månads sista Veteran-OL i Uppsala. Fika som vanligt efter loppet.',
+    website: 'https://oklinne.se/veteranol'
+  },
+  {
+    id: '93',
+    name: 'Torsdags-OL Göteborg',
+    date: '2025-02-06',
+    organizer: 'IFK Göteborg Orientering',
+    region: 'vastra-gotaland',
+    district: 'goteborg',
+    location: 'Änggårdsbergen, Göteborg',
+    coordinates: {
+      lat: 57.6792,
+      lng: 11.9336
+    },
+    discipline: 'Medel',
+    level: 'Klubb',
+    registrationDeadline: '2025-02-05',
+    description: 'Veckans klubbträning i teknisk terräng. Passar alla nivåer med olika banval.',
+    website: 'https://ifkgoteborg.se/torsdagsol'
+  },
+  {
+    id: '94',
+    name: 'Torsdags-OL Göteborg',
+    date: '2025-02-20',
+    organizer: 'IFK Göteborg Orientering',
+    region: 'vastra-gotaland',
+    district: 'goteborg',
+    location: 'Slottsskogen, Göteborg',
+    coordinates: {
+      lat: 57.6851,
+      lng: 11.9418
+    },
+    discipline: 'Sprint',
+    level: 'Klubb',
+    registrationDeadline: '2025-02-19',
+    description: 'Sprintfokuserad träning i parkmiljö. Bra för att träna snabba beslut.',
+    website: 'https://ifkgoteborg.se/torsdagsol'
+  },
+  {
+    id: '95',
+    name: 'Tisdagsorientering Örebro',
+    date: '2025-01-07',
+    organizer: 'Almby IK',
+    region: 'orebro',
+    district: 'orebro',
+    location: 'Markaskogen, Örebro',
+    coordinates: {
+      lat: 59.2534,
+      lng: 15.2628
+    },
+    discipline: 'Medel',
+    level: 'Klubb',
+    registrationDeadline: '2025-01-06',
+    description: 'Årets första tisdagsträning. Gemensam start kl 10.00 för pensionärer och veteraner.',
+    website: 'https://almbyik.se/tisdagsol'
+  },
+  {
+    id: '96',
+    name: 'Tisdagsorientering Örebro',
+    date: '2025-01-21',
+    organizer: 'Almby IK',
+    region: 'orebro',
+    district: 'orebro',
+    location: 'Karlslund, Örebro',
+    coordinates: {
+      lat: 59.2921,
+      lng: 15.1871
+    },
+    discipline: 'Lång',
+    level: 'Klubb',
+    registrationDeadline: '2025-01-20',
+    description: 'Tisdagsträning med längre banor. Välj mellan 3, 5 eller 7 km. Fika i klubbstugan efteråt.',
+    website: 'https://almbyik.se/tisdagsol'
+  },
+  {
+    id: '97',
+    name: 'Veteran-OL Skåne',
+    date: '2025-01-08',
+    organizer: 'Lunds OK',
+    region: 'skane',
+    district: 'skane',
+    location: 'Dalby, Lund',
+    coordinates: {
+      lat: 55.6705,
+      lng: 13.3509
+    },
+    discipline: 'Medel',
+    level: 'Klubb',
+    registrationDeadline: '2025-01-07',
+    description: 'Skånes veteranorientering för löpare 60+. Lätta banor i behaglig terräng.',
+    website: 'https://lundsok.se/veteran'
+  },
+  {
+    id: '98',
+    name: 'Veteran-OL Skåne',
+    date: '2025-01-22',
+    organizer: 'Lunds OK',
+    region: 'skane',
+    district: 'skane',
+    location: 'Sankt Hans backar, Lund',
+    coordinates: {
+      lat: 55.7145,
+      lng: 13.1850
+    },
+    discipline: 'Medel',
+    level: 'Klubb',
+    registrationDeadline: '2025-01-21',
+    description: 'Varannan-onsdags träff för veteranlöpare i Skåneregionen. Socialt fokus med orientering.',
+    website: 'https://lundsok.se/veteran'
+  },
+  {
+    id: '99',
+    name: 'Tisdagsorientering Örebro',
+    date: '2025-02-04',
+    organizer: 'Almby IK',
+    region: 'orebro',
+    district: 'orebro',
+    location: 'Adolfsberg, Örebro',
+    coordinates: {
+      lat: 59.2417,
+      lng: 15.1566
+    },
+    discipline: 'Medel',
+    level: 'Klubb',
+    registrationDeadline: '2025-02-03',
+    description: 'Träning för alla nivåer med tekniskt fokus. Start mellan 10.00-11.00.',
+    website: 'https://almbyik.se/tisdagsol'
+  },
+  {
+    id: '100',
+    name: 'Tisdagsorientering Örebro',
+    date: '2025-02-18',
+    organizer: 'Almby IK',
+    region: 'orebro',
+    district: 'orebro',
+    location: 'Öknaskogen, Örebro',
+    coordinates: {
+      lat: 59.2733,
+      lng: 15.2894
+    },
+    discipline: 'Lång',
+    level: 'Klubb',
+    registrationDeadline: '2025-02-17',
+    description: 'Långdistansträning med gemensam reflexgenomgång efteråt inför nattorienteringssäsongen.',
+    website: 'https://almbyik.se/tisdagsol'
+  },
+  {
+    id: '101',
+    name: 'Veteran-OL Skåne',
+    date: '2025-02-05',
+    organizer: 'Lunds OK',
+    region: 'skane',
+    district: 'skane',
+    location: 'Bokskogen, Malmö',
+    coordinates: {
+      lat: 55.5597,
+      lng: 13.2125
+    },
+    discipline: 'Medel',
+    level: 'Klubb',
+    registrationDeadline: '2025-02-04',
+    description: 'Första februariträffen för veteraner. Orientering i klassisk Skånsk bokskog.',
+    website: 'https://lundsok.se/veteran'
+  },
+  {
+    id: '102',
+    name: 'Veteran-OL Skåne',
+    date: '2025-02-19',
+    organizer: 'Lunds OK',
+    region: 'skane',
+    district: 'skane',
+    location: 'Skrylle, Lund',
+    coordinates: {
+      lat: 55.6900,
+      lng: 13.3834
+    },
+    discipline: 'Medel',
+    level: 'Klubb',
+    registrationDeadline: '2025-02-18',
+    description: 'Veteran-OL för löpare i alla åldrar. Samlingsplats vid Skryllegården kl 10.00.',
+    website: 'https://lundsok.se/veteran'
+  }
+];
+
 // Combine all competitions
 export const competitions: Competition[] = [
   ...originalCompetitions,
@@ -1642,6 +2005,6 @@ export const competitions: Competition[] = [
   ...septemberCompetitions,
   ...octoberCompetitions,
   ...novemberCompetitions,
-  ...decemberCompetitions
+  ...decemberCompetitions,
+  ...clubCompetitions
 ];
-
