@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { sv } from "date-fns/locale";
 import { format } from "date-fns";
 import { CalendarRange, X } from "lucide-react";
@@ -23,6 +23,11 @@ interface DateRangeFilterProps {
 const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilterProps) => {
   const [date, setDate] = useState<DateRangeValue | undefined>(dateRange);
   const [isOpen, setIsOpen] = useState(false);
+  
+  // Add useEffect to synchronize the local state with props
+  useEffect(() => {
+    setDate(dateRange);
+  }, [dateRange]);
   
   const handleSelect = (value: DateRangeValue | undefined) => {
     setDate(value);

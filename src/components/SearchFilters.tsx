@@ -74,7 +74,8 @@ const SearchFiltersComponent = ({
   };
 
   const handleClearAllFilters = () => {
-    onFilterChange({
+    // Create a completely new filters object with all properties explicitly reset
+    const resetFilters: SearchFiltersType = {
       regions: [],
       districts: [],
       disciplines: [],
@@ -82,8 +83,11 @@ const SearchFiltersComponent = ({
       types: [],
       branches: [],
       searchQuery: "", 
-      dateRange: undefined
-    });
+      dateRange: undefined // Explicitly set to undefined
+    };
+    
+    // Pass the completely reset filters object to the parent component
+    onFilterChange(resetFilters);
     
     toast({
       title: "Filter rensade",
