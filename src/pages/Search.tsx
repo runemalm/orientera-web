@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -7,13 +6,12 @@ import SearchFilters from "@/components/SearchFilters";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
-import { Filter, Trash2, Map, LayoutPanelLeft } from "lucide-react";
+import { Filter, Trash2, Map, LayoutPanelLeft, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import CompetitionMapView from "@/components/CompetitionMapView";
 import CompetitionCalendarView from "@/components/CompetitionCalendarView";
 import { useIsMobile, useBreakpoint } from "@/hooks/use-mobile";
-import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 
 const SEARCH_SIDEBAR_OPEN_KEY = "search-sidebar-open";
@@ -239,13 +237,13 @@ const Search = () => {
                 <div className="flex items-center gap-2">
                   {!isMobile && (
                     <Button
-                      variant="ghost"
+                      variant="outline"
                       size="sm"
                       onClick={toggleSidebar}
                       className="h-9"
                       title={sidebarOpen ? "Dölj filter" : "Visa filter"}
                     >
-                      <LayoutPanelLeft className="h-4 w-4 mr-2" />
+                      <Filter className="h-4 w-4 mr-2" />
                       <span>{sidebarOpen ? "Dölj filter" : "Visa filter"}</span>
                       {hasActiveFilters && !sidebarOpen && (
                         <Badge variant="secondary" className="ml-2">
@@ -255,20 +253,16 @@ const Search = () => {
                     </Button>
                   )}
                   
-                  <div className="flex items-center space-x-2">
-                    <div className="flex items-center gap-1.5 bg-muted p-1.5 rounded-md">
-                      <Switch 
-                        id="map-toggle"
-                        checked={filters.showMap}
-                        onCheckedChange={toggleMapVisibility}
-                        className="data-[state=checked]:bg-primary"
-                      />
-                      <label htmlFor="map-toggle" className="text-xs font-medium cursor-pointer flex items-center">
-                        <Map className="h-3.5 w-3.5 mr-1" />
-                        Karta
-                      </label>
-                    </div>
-                  </div>
+                  <Button
+                    variant={filters.showMap ? "default" : "outline"}
+                    size="sm"
+                    onClick={toggleMapVisibility}
+                    className="h-9"
+                    title={filters.showMap ? "Dölj karta" : "Visa karta"}
+                  >
+                    <MapPin className="h-4 w-4 mr-2" />
+                    <span>{filters.showMap ? "Dölj karta" : "Visa karta"}</span>
+                  </Button>
                 </div>
               </div>
             </div>

@@ -1,4 +1,3 @@
-
 import { FilterIcon, X, SearchIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion } from "@/components/ui/accordion";
@@ -186,7 +185,6 @@ const SearchFiltersComponent = ({
                            hasActiveDateFilter ||
                            hasSearchQuery;
 
-  // On mobile, show a collapsible filter section
   const filterContent = (
     <>
       {!hideSearchInput && (
