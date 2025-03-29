@@ -1,3 +1,4 @@
+
 import { FilterIcon, X, SearchIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion } from "@/components/ui/accordion";
@@ -120,6 +121,40 @@ const SearchFiltersComponent = ({
       title: "Filtren har återställts",
       description: "Alla valda filter har rensats"
     });
+  };
+  
+  // Add the missing handleClearFilter function
+  const handleClearFilter = (filterType: 'districts' | 'disciplines' | 'types' | 'branches' | 'search' | 'date') => {
+    const updatedFilters = {...filters};
+    
+    if (filterType === 'search') {
+      updatedFilters.searchQuery = "";
+      setSearchValue("");
+    } else if (filterType === 'date') {
+      updatedFilters.dateRange = undefined;
+    } else {
+      updatedFilters[filterType] = [];
+    }
+    
+    onFilterChange(updatedFilters);
+    
+    toast({
+      title: `${getFilterGroupName(filterType)} borttaget`,
+      description: `Filtret har tagits bort`
+    });
+  };
+  
+  // Add the missing getFilterGroupName function
+  const getFilterGroupName = (filterType: string): string => {
+    switch(filterType) {
+      case 'districts': return 'Distrikt';
+      case 'disciplines': return 'Discipliner';
+      case 'types': return 'Tävlingstyper';
+      case 'branches': return 'Orienteringsgrenar';
+      case 'search': return 'Sökord';
+      case 'date': return 'Datumintervall';
+      default: return 'Filter';
+    }
   };
 
   const hasActiveDateFilter = Boolean(filters.dateRange?.from || filters.dateRange?.to);
