@@ -48,9 +48,8 @@ const Search = () => {
   const [searchInputValue, setSearchInputValue] = useState("");
   const searchContainerRef = useRef<HTMLDivElement>(null);
   const [locationChangeCounter, setLocationChangeCounter] = useState(0);
-  const [currentTab, setCurrentTab] = useState<string>("traditional");
+  const [currentTab, setCurrentTab] = useState<string>("ai");
 
-  // Effekt för URL-parametrar
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     
@@ -96,7 +95,6 @@ const Search = () => {
     }
   }, [location.search, toast]);
 
-  // Effekt för att uppdatera filters när userLocation ändras
   useEffect(() => {
     console.log("Location changed, updating filters:", { userLocation, detectedLocationInfo, isManualLocation });
     setFilters(prevFilters => ({
@@ -109,7 +107,6 @@ const Search = () => {
     setLocationChangeCounter(prev => prev + 1);
   }, [userLocation, detectedLocationInfo, isManualLocation]);
 
-  // Loggning av ändringar (för debug)
   useEffect(() => {
     console.log("🚀 userLocation changed in Search:", userLocation);
   }, [userLocation]);
@@ -122,7 +119,6 @@ const Search = () => {
     console.log("🚀 isManualLocation changed in Search:", isManualLocation);
   }, [isManualLocation]);
 
-  // Beräkna avstånd för tävlingar
   const competitionsWithDistance = useMemo(() => {
     console.log("Recalculating distances with userLocation:", userLocation);
     
@@ -146,7 +142,6 @@ const Search = () => {
     });
   }, [userLocation, locationChangeCounter]);
 
-  // Filtrera tävlingar baserat på alla filter
   const filteredCompetitions = useMemo(() => {
     let filtered = filterCompetitions(competitionsWithDistance, {
       ...filters,
@@ -174,7 +169,6 @@ const Search = () => {
     return filtered;
   }, [competitionsWithDistance, filters, userLocation]);
 
-  // Handler för när filtren ändras
   const handleFilterChange = (newFilters: SearchFiltersType) => {
     if (newFilters.isManualLocation !== filters.isManualLocation) {
       if (newFilters.isManualLocation === false && filters.isManualLocation === true) {
@@ -202,7 +196,6 @@ const Search = () => {
     }
   };
 
-  // Handler för söktextfältet
   const handleSearchChange = (value: string) => {
     setSearchInputValue(value);
     
@@ -212,7 +205,6 @@ const Search = () => {
     });
   };
 
-  // Handler för att rensa sökning
   const handleClearSearch = () => {
     setSearchInputValue("");
     setFilters({
@@ -226,12 +218,10 @@ const Search = () => {
     });
   };
 
-  // Handler för att skicka sökformulär
   const handleManualSearch = (e: React.FormEvent) => {
     e.preventDefault();
   };
 
-  // Handler för AI-sökningens callback
   const handleAiSearchComplete = (newFilters: SearchFiltersType) => {
     setFilters(prevFilters => ({
       ...prevFilters,
@@ -245,7 +235,6 @@ const Search = () => {
     setCurrentTab("traditional");
   };
 
-  // UI-renderingsfunktioner
   const renderTraditionalSearch = () => (
     <div className="space-y-4">
       <div className="rounded-lg border bg-card p-4 mb-4">
@@ -292,22 +281,22 @@ const Search = () => {
         <div className="max-w-3xl mx-auto">
           <Tabs value={currentTab} onValueChange={setCurrentTab} className="mb-6">
             <TabsList className="grid w-full grid-cols-2 mb-4">
-              <TabsTrigger value="traditional">
-                <SearchIcon className="h-4 w-4 mr-2" />
-                <span>Filtrera</span>
-              </TabsTrigger>
               <TabsTrigger value="ai">
                 <Sparkles className="h-4 w-4 mr-2" />
                 <span>AI-sökning</span>
               </TabsTrigger>
+              <TabsTrigger value="traditional">
+                <SearchIcon className="h-4 w-4 mr-2" />
+                <span>Filtrera</span>
+              </TabsTrigger>
             </TabsList>
-            
-            <TabsContent value="traditional" className="mt-2">
-              {renderTraditionalSearch()}
-            </TabsContent>
             
             <TabsContent value="ai" className="mt-2">
               <AiSearchCard onSearchComplete={handleAiSearchComplete} initialQuery="" />
+            </TabsContent>
+            
+            <TabsContent value="traditional" className="mt-2">
+              {renderTraditionalSearch()}
             </TabsContent>
           </Tabs>
           
