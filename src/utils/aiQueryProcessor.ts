@@ -1,5 +1,5 @@
 
-import { SearchFilters } from "@/types";
+import { SearchFilters, CompetitionType, CompetitionBranch, Discipline, CompetitionLevel } from "@/types";
 
 // Simple NLP processing to extract key terms from natural language queries
 export const processNaturalLanguageQuery = (query: string): SearchFilters => {
@@ -9,6 +9,8 @@ export const processNaturalLanguageQuery = (query: string): SearchFilters => {
     districts: [],
     disciplines: [],
     levels: [],
+    types: [],
+    branches: [],
     searchQuery: "",
   };
 
@@ -18,7 +20,7 @@ export const processNaturalLanguageQuery = (query: string): SearchFilters => {
     if (query.includes(discipline)) {
       // Convert to proper case for first letter
       const formattedDiscipline = discipline.charAt(0).toUpperCase() + discipline.slice(1);
-      filters.disciplines.push(formattedDiscipline as any);
+      filters.disciplines.push(formattedDiscipline as Discipline);
     }
   });
 
@@ -28,7 +30,28 @@ export const processNaturalLanguageQuery = (query: string): SearchFilters => {
     if (query.includes(level)) {
       // Convert to proper case for first letter
       const formattedLevel = level.charAt(0).toUpperCase() + level.slice(1);
-      filters.levels.push(formattedLevel as any);
+      filters.levels.push(formattedLevel as CompetitionLevel);
+    }
+  });
+
+  // Extract competition types
+  const types = ['värdetävlingar', 'nationella tävlingar', 'distriktstävlingar', 'närtävlingar', 'veckans bana'];
+  types.forEach(type => {
+    if (query.includes(type)) {
+      // Convert to proper case for first letter
+      const formattedType = type.charAt(0).toUpperCase() + type.slice(1);
+      filters.types.push(formattedType as CompetitionType);
+    }
+  });
+
+  // Extract competition branches
+  const branches = ['orienteringslöpning', 'skidorientering', 'mountainbikeorientering', 
+                    'precisionsorientering', 'orienteringsskytte'];
+  branches.forEach(branch => {
+    if (query.includes(branch)) {
+      // Convert to proper case for first letter
+      const formattedBranch = branch.charAt(0).toUpperCase() + branch.slice(1);
+      filters.branches.push(formattedBranch as CompetitionBranch);
     }
   });
 
@@ -60,6 +83,8 @@ export const processNaturalLanguageQuery = (query: string): SearchFilters => {
   const searchTerms = query
     .replace(/sprint|medel|lång|natt|stafett|ultralång/g, '')
     .replace(/klubb|krets|distrikt|nationell|internationell/g, '')
+    .replace(/värdetävlingar|nationella tävlingar|distriktstävlingar|närtävlingar|veckans bana/g, '')
+    .replace(/orienteringslöpning|skidorientering|mountainbikeorientering|precisionsorientering|orienteringsskytte/g, '')
     .replace(/30 dagar|nästa månad|denna vecka|den här veckan/g, '')
     .trim();
 
