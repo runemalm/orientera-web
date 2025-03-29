@@ -44,7 +44,7 @@ const Search = () => {
   const [locationChangeCounter, setLocationChangeCounter] = useState(0);
 
   useEffect(() => {
-    console.log("Location changed, updating filters:", { userLocation, isManualLocation });
+    console.log("Location changed, updating filters:", { userLocation, detectedLocationInfo, isManualLocation });
     setFilters(prevFilters => ({
       ...prevFilters,
       userLocation,
