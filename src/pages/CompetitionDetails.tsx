@@ -31,6 +31,7 @@ const CompetitionDetails = () => {
   const [waitlistOpen, setWaitlistOpen] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
   const leafletMap = useRef<L.Map | null>(null);
+  const userInteractingRef = useRef(false);
   
   const showWaitlist = () => {
     setWaitlistOpen(true);
@@ -55,9 +56,20 @@ const CompetitionDetails = () => {
       
       // Add zoom control to top-right
       L.control.zoom({ position: 'topright' }).addTo(leafletMap.current);
+      
+      // Track user interaction to prevent auto-zoom
+      leafletMap.current.on('zoomstart', () => {
+        userInteractingRef.current = true;
+      });
+      
+      leafletMap.current.on('dragstart', () => {
+        userInteractingRef.current = true;
+      });
     } else {
-      // Update map center if it already exists
-      leafletMap.current.setView([competition.coordinates.lat, competition.coordinates.lng], 13);
+      // Only update the map's center if user is not interacting
+      if (!userInteractingRef.current) {
+        leafletMap.current.setView([competition.coordinates.lat, competition.coordinates.lng], 13);
+      }
     }
     
     // Add marker for competition location

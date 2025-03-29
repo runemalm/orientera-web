@@ -1,16 +1,14 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Competition } from '@/types';
 import { toast } from 'sonner';
 import { Button } from './ui/button';
 import { Info, Map as MapIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
 // Fix for Leaflet marker icons
-// This is needed because Leaflet's default marker images are loaded using relative paths
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
@@ -26,21 +24,6 @@ L.Marker.prototype.options.icon = DefaultIcon;
 interface CompetitionMapViewProps {
   competitions: Competition[];
 }
-
-// Component to adjust map view to fit all markers
-const MapBoundsAdjuster = ({ competitions }: { competitions: Competition[] }) => {
-  const map = L.map('map'); // We won't use this directly, just setting up for type checking
-  
-  useEffect(() => {
-    // The map and bounds adjustment logic will be handled differently
-    const mapElement = document.getElementById('competition-map');
-    if (!mapElement) return;
-    
-    // This is now handled in the main component
-  }, [competitions]);
-  
-  return null;
-};
 
 // Create custom markers for competitions
 const createCustomMarkerIcon = (competition: Competition) => {
@@ -73,7 +56,9 @@ const createCustomMarkerIcon = (competition: Competition) => {
 const CompetitionMapView: React.FC<CompetitionMapViewProps> = ({ competitions }) => {
   const navigate = useNavigate();
   const [mapInitialized, setMapInitialized] = useState(false);
-  const [map, setMap] = useState<L.Map | null>(null);
+  const mapRef = useRef<L.Map | null>(null);
+  const userInteractingRef = useRef(false);
+  const markersRef = useRef<L.Marker[]>([]);
   
   // Filter competitions with coordinates
   const competitionsWithCoordinates = competitions.filter(
@@ -91,18 +76,31 @@ const CompetitionMapView: React.FC<CompetitionMapViewProps> = ({ competitions })
   // Center point for Sweden (default view)
   const swedenCenter: [number, number] = [62.5, 15.5];
   
-  // Initialize map and adjust bounds when component mounts or competitions change
-  useEffect(() => {
-    if (!mapInitialized || !map) return;
+  // Clean up markers
+  const clearMarkers = () => {
+    if (!mapRef.current) return;
     
-    // Add competition markers to map using direct Leaflet methods
+    // Remove existing markers
+    markersRef.current.forEach(marker => {
+      if (mapRef.current) marker.removeFrom(mapRef.current);
+    });
+    markersRef.current = [];
+  };
+  
+  // Add markers to the map
+  const addMarkers = () => {
+    if (!mapRef.current) return;
+    
+    clearMarkers();
+    
+    // Add new markers
     competitionsWithCoordinates.forEach(competition => {
-      if (!map || !competition.coordinates) return;
+      if (!mapRef.current || !competition.coordinates) return;
       
       const marker = L.marker(
         [competition.coordinates.lat, competition.coordinates.lng],
         { icon: createCustomMarkerIcon(competition) }
-      ).addTo(map);
+      ).addTo(mapRef.current);
       
       marker.on('click', () => {
         navigate(`/competition/${competition.id}`);
@@ -120,31 +118,10 @@ const CompetitionMapView: React.FC<CompetitionMapViewProps> = ({ competitions })
       `;
       
       marker.bindPopup(popupContent);
+      markersRef.current.push(marker);
     });
-    
-    // Adjust map bounds to fit all markers
-    if (competitionsWithCoordinates.length > 0) {
-      if (competitionsWithCoordinates.length === 1) {
-        const comp = competitionsWithCoordinates[0];
-        map.setView([comp.coordinates!.lat, comp.coordinates!.lng], 10);
-      } else {
-        const bounds = L.latLngBounds(
-          competitionsWithCoordinates.map(comp => [comp.coordinates!.lat, comp.coordinates!.lng])
-        );
-        map.fitBounds(bounds, { padding: [50, 50] });
-      }
-    }
-    
-    return () => {
-      // Clean up markers when component unmounts or competitions change
-      map.eachLayer(layer => {
-        if (layer instanceof L.Marker) {
-          map.removeLayer(layer);
-        }
-      });
-    };
-  }, [mapInitialized, map, competitionsWithCoordinates, navigate]);
-
+  };
+  
   // Initialize the map
   useEffect(() => {
     if (!mapInitialized) return;
@@ -167,13 +144,60 @@ const CompetitionMapView: React.FC<CompetitionMapViewProps> = ({ competitions })
     // Add zoom control to top-right
     L.control.zoom({ position: 'topright' }).addTo(mapInstance);
     
-    setMap(mapInstance);
+    // Track user interaction to prevent auto-zoom
+    mapInstance.on('zoomstart', () => {
+      userInteractingRef.current = true;
+    });
+    
+    mapInstance.on('dragstart', () => {
+      userInteractingRef.current = true;
+    });
+    
+    mapRef.current = mapInstance;
+    
+    // Add markers
+    addMarkers();
+    
+    // Adjust map bounds to fit all markers
+    if (competitionsWithCoordinates.length > 0 && !userInteractingRef.current) {
+      if (competitionsWithCoordinates.length === 1) {
+        const comp = competitionsWithCoordinates[0];
+        mapInstance.setView([comp.coordinates!.lat, comp.coordinates!.lng], 10);
+      } else {
+        const bounds = L.latLngBounds(
+          competitionsWithCoordinates.map(comp => [comp.coordinates!.lat, comp.coordinates!.lng])
+        );
+        mapInstance.fitBounds(bounds, { padding: [50, 50] });
+      }
+    }
     
     return () => {
       // Clean up map when component unmounts
+      clearMarkers();
       mapInstance.remove();
+      mapRef.current = null;
     };
   }, [mapInitialized]);
+  
+  // Update markers when competitions change
+  useEffect(() => {
+    if (!mapRef.current || !mapInitialized) return;
+    
+    addMarkers();
+    
+    // Only adjust bounds if user is not interacting with the map
+    if (!userInteractingRef.current) {
+      if (competitionsWithCoordinates.length === 1) {
+        const comp = competitionsWithCoordinates[0];
+        mapRef.current.setView([comp.coordinates!.lat, comp.coordinates!.lng], 10);
+      } else if (competitionsWithCoordinates.length > 1) {
+        const bounds = L.latLngBounds(
+          competitionsWithCoordinates.map(comp => [comp.coordinates!.lat, comp.coordinates!.lng])
+        );
+        mapRef.current.fitBounds(bounds, { padding: [50, 50] });
+      }
+    }
+  }, [competitionsWithCoordinates, mapInitialized]);
   
   return (
     <div className="relative">
