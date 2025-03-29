@@ -1,3 +1,4 @@
+
 import { FilterIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -92,6 +93,9 @@ const SearchFiltersComponent = ({
     });
   };
 
+  // Determine if any date filters are active
+  const hasActiveDateFilter = filters.dateRange?.from || filters.dateRange?.to;
+
   return (
     <div className="rounded-lg border bg-card">
       <div className="p-4">
@@ -109,10 +113,11 @@ const SearchFiltersComponent = ({
           </Button>
         </div>
 
-        <Accordion type="multiple" defaultValue={["date-range", "district", "type", "discipline", "branch"]} className="space-y-2">
+        <Accordion type="multiple" className="space-y-2">
           <DateRangeFilter 
             dateRange={filters.dateRange} 
             onDateRangeChange={handleDateRangeChange}
+            hasActiveFilter={hasActiveDateFilter}
           />
           
           <CheckboxFilter

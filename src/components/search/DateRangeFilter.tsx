@@ -19,9 +19,10 @@ type DateRangeValue = {
 interface DateRangeFilterProps {
   dateRange?: DateRangeValue;
   onDateRangeChange: (range: DateRangeValue | undefined) => void;
+  hasActiveFilter?: boolean;
 }
 
-const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilterProps) => {
+const DateRangeFilter = ({ dateRange, onDateRangeChange, hasActiveFilter = false }: DateRangeFilterProps) => {
   const [fromDate, setFromDate] = useState<Date | undefined>(dateRange?.from);
   const [toDate, setToDate] = useState<Date | undefined>(dateRange?.to);
   const [fromDateOpen, setFromDateOpen] = useState(false);
@@ -57,23 +58,6 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilterProps)
     return format(date, "d MMM yyyy", { locale: sv });
   };
 
-  const formatDateRange = (range?: DateRangeValue): string => {
-    if (!range?.from && !range?.to) return "";
-    
-    const fromText = range.from ? formatDate(range.from) : "";
-    const toText = range.to ? formatDate(range.to) : "";
-    
-    if (fromText && toText) {
-      return `${fromText} - ${toText}`;
-    } else if (fromText) {
-      return `Från ${fromText}`;
-    } else if (toText) {
-      return `Till ${toText}`;
-    }
-    
-    return "";
-  };
-
   const clearDateRange = () => {
     setFromDate(undefined);
     setToDate(undefined);
@@ -82,7 +66,8 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilterProps)
     setToDateOpen(false);
   };
 
-  const hasDateFilter = fromDate || toDate;
+  // Count active date filters
+  const activeFilterCount = (dateRange?.from ? 1 : 0) + (dateRange?.to ? 1 : 0);
 
   return (
     <AccordionItem value="date-range">
@@ -90,9 +75,9 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilterProps)
         <div className="flex items-center gap-2">
           <CalendarRange className="h-4 w-4" />
           <span>Datum</span>
-          {hasDateFilter && (
-            <Badge variant="secondary" className="ml-2">
-              {formatDateRange({ from: fromDate, to: toDate })}
+          {activeFilterCount > 0 && (
+            <Badge variant="secondary" className="ml-1 font-normal">
+              {activeFilterCount}
             </Badge>
           )}
         </div>
@@ -159,7 +144,7 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilterProps)
             </div>
           </div>
 
-          {hasDateFilter && (
+          {hasActiveFilter && (
             <Button 
               variant="ghost" 
               size="sm" 
