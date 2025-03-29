@@ -1,3 +1,4 @@
+
 import { FilterIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -93,17 +94,6 @@ const SearchFiltersComponent = ({
       title: "Filter rensade",
       description: "Alla filter har återställts"
     });
-  };
-
-  const handleExpandCollapseAll = () => {
-    if (isAllExpanded) {
-      // Collapse all
-      setExpandedItems([]);
-    } else {
-      // Expand all
-      setExpandedItems(["date-range", "district", "type", "discipline", "branch"]);
-    }
-    setIsAllExpanded(!isAllExpanded);
   };
 
   // Determine if any date filters are active
