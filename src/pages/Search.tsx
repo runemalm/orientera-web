@@ -231,10 +231,15 @@ const Search = () => {
             
             <TabsContent value="ai" className="space-y-4">
               <div className="rounded-lg border bg-card p-4">
+                <div className="mb-4 text-sm text-muted-foreground">
+                  <p className="mb-2">Beskriv den tävling du letar efter med dina egna ord, så hjälper vår AI dig att hitta rätt.</p>
+                  <p>Exempel: "Nationella tävlingar nära Stockholm i juni" eller "Sprint för ungdomar på klubbnivå"</p>
+                </div>
+                
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="relative">
                     <Input
-                      placeholder="Sök efter tävlingar, t.ex. 'Nationella tävlingar nära Stockholm i juni'"
+                      placeholder="Sök efter tävlingar med vanligt språk..."
                       value={searchInputValue}
                       onChange={(e) => handleSearchChange(e.target.value)}
                       className="pr-8 text-base"
