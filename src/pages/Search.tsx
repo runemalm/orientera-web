@@ -221,11 +221,11 @@ const Search = () => {
             <TabsList className="grid w-full grid-cols-2 mb-4">
               <TabsTrigger value="ai">
                 <Sparkles className="mr-2 h-4 w-4" />
-                AI-sökning
+                Sök med AI
               </TabsTrigger>
               <TabsTrigger value="manual">
                 <Filter className="mr-2 h-4 w-4" />
-                Klassisk sök
+                Manuellt filter
               </TabsTrigger>
             </TabsList>
             
