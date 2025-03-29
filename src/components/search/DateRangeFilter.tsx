@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { sv } from "date-fns/locale";
 import { format, isValid, isToday, isYesterday, isTomorrow, addDays, startOfMonth, endOfMonth, isSameDay } from "date-fns";
@@ -25,6 +26,7 @@ const PRESET_OPTIONS = [
   { id: 'tomorrow', label: 'Imorgon' },
   { id: 'thisWeekend', label: 'Helgen' },
   { id: 'next7days', label: '7 dagar' },
+  { id: 'next14days', label: '14 dagar' },
   { id: 'next30days', label: '30 dagar' },
   { id: 'thisMonth', label: 'Denna mån' },
   { id: 'nextMonth', label: 'Nästa mån' },
@@ -80,6 +82,11 @@ const DateRangeFilter = ({
         case 'next7days':
           presetFrom = today;
           presetTo = addDays(today, 6);
+          break;
+          
+        case 'next14days':
+          presetFrom = today;
+          presetTo = addDays(today, 13);
           break;
           
         case 'next30days':
@@ -170,7 +177,7 @@ const DateRangeFilter = ({
     switch (value) {
       case 'today':
         from = new Date(today);
-        to = new Date(today);
+        to = from;
         break;
         
       case 'tomorrow':
@@ -186,6 +193,11 @@ const DateRangeFilter = ({
       case 'next7days':
         from = new Date(today);
         to = addDays(today, 6);
+        break;
+        
+      case 'next14days':
+        from = new Date(today);
+        to = addDays(today, 13);
         break;
         
       case 'next30days':
@@ -212,7 +224,7 @@ const DateRangeFilter = ({
   return (
     <div className="space-y-4">
       <div className="space-y-3">
-        <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-4">
+        <div className="grid grid-cols-3 gap-1.5">
           {PRESET_OPTIONS.map(option => (
             <Button
               key={option.id}
