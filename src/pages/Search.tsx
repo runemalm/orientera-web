@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -38,13 +39,6 @@ const Search = () => {
     const saved = localStorage.getItem('recentAiSearches');
     return saved ? JSON.parse(saved) : [];
   });
-
-  const quickSearches = [
-    { id: 'upcoming', label: 'Kommande tävlingar', query: 'Tävlingar de närmaste 30 dagarna' },
-    { id: 'national', label: 'Nationella tävlingar', query: 'Nationella tävlingar' },
-    { id: 'youth', label: 'Ungdomstävlingar', query: 'Tävlingar för ungdomar' },
-    { id: 'sprint', label: 'Sprinttävlingar', query: 'Sprint tävlingar' },
-  ];
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -230,11 +224,6 @@ const Search = () => {
     processQuery(searchInputValue);
   };
 
-  const handleQuickSearch = (query: string) => {
-    setSearchInputValue(query);
-    processQuery(query);
-  };
-
   const handleShowFilters = () => {
     setShowFilters(true);
   };
@@ -287,26 +276,6 @@ const Search = () => {
               </Button>
             </form>
             
-            <div className="mt-4">
-              <div className="flex items-center gap-2 mb-2">
-                <Sparkles className="h-4 w-4 text-primary" />
-                <h3 className="text-sm font-medium">Snabbval</h3>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {quickSearches.map((search) => (
-                  <Button
-                    key={search.id}
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleQuickSearch(search.query)}
-                    className="text-xs"
-                  >
-                    {search.label}
-                  </Button>
-                ))}
-              </div>
-            </div>
-            
             {recentSearches.length > 0 && (
               <div className="mt-4">
                 <div className="flex items-center gap-2 mb-2">
@@ -319,7 +288,7 @@ const Search = () => {
                       key={index}
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleQuickSearch(search)}
+                      onClick={() => processQuery(search)}
                       className="text-xs justify-start h-auto py-1.5 text-muted-foreground hover:text-foreground"
                     >
                       <SearchIcon className="h-3 w-3 mr-2" />
