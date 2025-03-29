@@ -158,6 +158,14 @@ const Search = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
+  const hasActiveFilters = filters.regions.length > 0 || 
+                          filters.districts.length > 0 || 
+                          filters.disciplines.length > 0 || 
+                          filters.levels.length > 0 || 
+                          filters.types?.length > 0 || 
+                          filters.branches?.length > 0 ||
+                          filters.dateRange?.from !== undefined;
+
   return (
     <div className="flex min-h-screen flex-col">
       <Header />
@@ -173,77 +181,79 @@ const Search = () => {
               onClick={toggleSidebar}
               className="mb-4 flex items-center"
             >
-              <LayoutPanelLeft className="mr-2 h-4 w-4" />
+              <Filter className="mr-2 h-4 w-4" />
               {sidebarOpen ? "Dölj filter" : "Visa filter"}
             </Button>
           )}
           
           {sidebarOpen && (
             <div className="w-full md:w-80 flex-shrink-0">
-              <div className="mb-4">
-                <h2 className="flex items-center gap-2 text-lg font-semibold mb-4">
-                  <Filter className="h-5 w-5" />
-                  Filtrera tävlingar
-                </h2>
-                
+              <div className="mb-4 sticky top-4">
                 <SearchFilters 
                   filters={filters} 
                   onFilterChange={handleFilterChange} 
                   hasLocation={false}
                   hideSearchInput={true}
                 />
-                
-                {(filters.regions.length > 0 || 
-                  filters.districts.length > 0 || 
-                  filters.disciplines.length > 0 || 
-                  filters.levels.length > 0 || 
-                  filters.types.length > 0 || 
-                  filters.branches.length > 0) && (
-                  <Button
-                    variant="outline"
-                    onClick={handleClearAllFilters}
-                    className="w-full mt-4"
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Rensa alla filter
-                  </Button>
-                )}
               </div>
             </div>
           )}
           
           <div className="flex-1">
-            <div className="bg-card rounded-lg border p-4 mb-6">
-              <div className="flex justify-between items-center">
-                <h2 className="font-semibold">
+            <div className="bg-card rounded-lg border p-4 mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+              <div className="flex flex-col">
+                <h2 className="font-semibold text-lg">
                   {filteredCompetitions.length === 0 ? 'Inga tävlingar hittades' : 
-                  `${filteredCompetitions.length} ${filteredCompetitions.length === 1 ? 'tävling' : 'tävlingar'} matchar dina kriterier`}
+                  `${filteredCompetitions.length} ${filteredCompetitions.length === 1 ? 'tävling' : 'tävlingar'}`}
                 </h2>
+                {hasActiveFilters && (
+                  <p className="text-muted-foreground text-sm">Filtrerade resultat</p>
+                )}
+              </div>
+              
+              <div className="flex items-center gap-2">
+                {!isMobile && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={toggleSidebar}
+                    className="mr-2"
+                    title={sidebarOpen ? "Dölj filter" : "Visa filter"}
+                  >
+                    <LayoutPanelLeft className="h-4 w-4" />
+                    <span className="sr-only">{sidebarOpen ? "Dölj filter" : "Visa filter"}</span>
+                  </Button>
+                )}
                 
-                <div className="flex items-center gap-2">
-                  {!isMobile && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={toggleSidebar}
-                      className="mr-2"
-                    >
-                      <LayoutPanelLeft className="h-4 w-4" />
-                      <span className="sr-only">{sidebarOpen ? "Dölj filter" : "Visa filter"}</span>
-                    </Button>
-                  )}
-                  
-                  <ToggleGroup type="single" value={resultsView} onValueChange={(value) => value && setResultsView(value as "calendar" | "map")}>
-                    <ToggleGroupItem value="calendar" aria-label="Visa som kalender">
-                      <Calendar className="h-4 w-4 mr-1" />
-                      Kalender
-                    </ToggleGroupItem>
-                    <ToggleGroupItem value="map" aria-label="Visa på karta">
-                      <Map className="h-4 w-4 mr-1" />
-                      Karta
-                    </ToggleGroupItem>
-                  </ToggleGroup>
-                </div>
+                <ToggleGroup 
+                  type="single" 
+                  value={resultsView} 
+                  onValueChange={(value) => value && setResultsView(value as "calendar" | "map")}
+                  className="bg-muted rounded-md p-0.5"
+                >
+                  <ToggleGroupItem 
+                    value="calendar" 
+                    aria-label="Visa som kalender"
+                    className={cn(
+                      "rounded-sm h-8 px-3 text-xs data-[state=on]:bg-background",
+                      resultsView === "calendar" && "shadow-sm"
+                    )}
+                  >
+                    <Calendar className="h-3.5 w-3.5 mr-1.5" />
+                    Kalender
+                  </ToggleGroupItem>
+                  <ToggleGroupItem 
+                    value="map" 
+                    aria-label="Visa på karta"
+                    className={cn(
+                      "rounded-sm h-8 px-3 text-xs data-[state=on]:bg-background",
+                      resultsView === "map" && "shadow-sm"
+                    )}
+                  >
+                    <Map className="h-3.5 w-3.5 mr-1.5" />
+                    Karta
+                  </ToggleGroupItem>
+                </ToggleGroup>
               </div>
             </div>
             
@@ -271,6 +281,7 @@ const Search = () => {
                   variant="outline"
                   onClick={handleClearAllFilters}
                 >
+                  <Trash2 className="mr-2 h-4 w-4" />
                   Rensa alla filter
                 </Button>
               </div>
