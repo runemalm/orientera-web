@@ -1,12 +1,14 @@
 
-import { useMemo } from "react";
-import { addDays } from "date-fns";
+import { useState } from "react";
 import { sv } from "date-fns/locale";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { CalendarRange } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 type DateRangeValue = {
   from: Date;
@@ -19,55 +21,45 @@ interface DateRangeFilterProps {
 }
 
 const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilterProps) => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const [date, setDate] = useState<DateRangeValue | undefined>(dateRange);
   
-  const periods = useMemo(() => [
-    {
-      label: "Alla datum",
-      value: undefined
-    },
-    {
-      label: "Nästa 7 dagar",
-      value: {
-        from: today,
-        to: addDays(today, 7)
+  const handleSelect = (value: DateRangeValue | undefined) => {
+    setDate(value);
+    
+    if (value?.from) {
+      // If a complete range is selected (both from and to dates), update the parent component
+      if (!value.to || value.from.getTime() <= value.to.getTime()) {
+        onDateRangeChange(value);
       }
-    },
-    {
-      label: "Nästa 30 dagar",
-      value: {
-        from: today,
-        to: addDays(today, 30)
-      }
-    },
-    {
-      label: "Nästa 3 månader",
-      value: {
-        from: today,
-        to: addDays(today, 90)
-      }
+    } else {
+      // If selection is cleared
+      onDateRangeChange(undefined);
     }
-  ], [today]);
+  };
 
   const formatDateRange = (range?: DateRangeValue): string => {
     if (!range?.from) return "";
     
-    const fromFormatted = format(range.from, "d MMM", { locale: sv });
+    const fromFormatted = format(range.from, "d MMM yyyy", { locale: sv });
     
     if (!range.to) {
       return `Från ${fromFormatted}`;
     }
     
-    const toFormatted = format(range.to, "d MMM", { locale: sv });
+    const toFormatted = format(range.to, "d MMM yyyy", { locale: sv });
     return `${fromFormatted} - ${toFormatted}`;
+  };
+
+  const clearDateRange = () => {
+    setDate(undefined);
+    onDateRangeChange(undefined);
   };
 
   return (
     <AccordionItem value="date-range">
       <AccordionTrigger className="py-3">
         <div className="flex items-center gap-2">
-          <CalendarIcon className="h-4 w-4" />
+          <CalendarRange className="h-4 w-4" />
           <span>Datum</span>
           {dateRange && (
             <Badge variant="secondary" className="ml-2">
@@ -77,26 +69,42 @@ const DateRangeFilter = ({ dateRange, onDateRangeChange }: DateRangeFilterProps)
         </div>
       </AccordionTrigger>
       <AccordionContent>
-        <div className="grid grid-cols-2 gap-2 pt-2">
-          {periods.map((period, index) => (
-            <Button
-              key={index}
-              size="sm"
-              variant={
-                !dateRange && period.value === undefined
-                  ? "default"
-                  : dateRange && period.value && 
-                    dateRange.from.getTime() === period.value.from.getTime() && 
-                    (!dateRange.to || !period.value.to || dateRange.to.getTime() === period.value.to.getTime())
-                    ? "default"
-                    : "outline"
-              }
-              className="w-full"
-              onClick={() => onDateRangeChange(period.value)}
+        <div className="pt-2">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-full justify-start text-left font-normal",
+                  !date && "text-muted-foreground"
+                )}
+              >
+                <CalendarRange className="mr-2 h-4 w-4" />
+                {date ? formatDateRange(date) : <span>Välj datumperiod</span>}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="range"
+                selected={date}
+                onSelect={handleSelect}
+                locale={sv}
+                initialFocus
+                className="pointer-events-auto"
+              />
+            </PopoverContent>
+          </Popover>
+
+          {dateRange && (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={clearDateRange} 
+              className="mt-2 w-full"
             >
-              {period.label}
+              Rensa datumfilter
             </Button>
-          ))}
+          )}
         </div>
       </AccordionContent>
     </AccordionItem>
