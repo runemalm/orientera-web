@@ -13,9 +13,9 @@ const AiSearchPage = () => {
         <section className="py-12 md:py-16">
           <div className="container">
             <div className="max-w-4xl mx-auto">
-              <h1 className="text-3xl font-bold mb-6 text-center">Sök tävlingar med AI</h1>
+              <h1 className="text-3xl font-bold mb-6 text-center">Sök tävlingar enkelt</h1>
               <p className="text-center text-muted-foreground mb-8">
-                Beskriv den tävling du letar efter med dina egna ord, så hjälper vår AI dig att hitta rätt.
+                Beskriv vad du söker med egna ord så hittar vi tävlingar som passar dig.
               </p>
               
               <AiSearchComponent className="mt-6" />

@@ -69,8 +69,8 @@ const AiSearch: React.FC<AiSearchProps> = ({ className }) => {
       navigate(`/search?${searchParams.toString()}`);
       
       toast({
-        title: "Sökning bearbetad",
-        description: "Visar resultat baserat på din sökning",
+        title: "Sökning klar",
+        description: "Visar resultat som matchar din sökning",
       });
     } catch (error) {
       console.error("Error processing query:", error);
@@ -85,8 +85,8 @@ const AiSearch: React.FC<AiSearchProps> = ({ className }) => {
   };
 
   const exampleQueries = [
-    "Sprint tävlingar i Stockholm",
-    "Nationella tävlingar nästa månad",
+    "Tävlingar i Stockholm nästa månad",
+    "Nationella tävlingar i höst",
     "Långdistans i Skåne"
   ];
 
@@ -99,7 +99,7 @@ const AiSearch: React.FC<AiSearchProps> = ({ className }) => {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="relative">
           <Textarea
-            placeholder="Exempel: 'Jag letar efter nationella tävlingar i Skåne nästa månad' eller 'Medeldistans tävlingar för ungdomar på klubbnivå'"
+            placeholder="Skriv vad du letar efter, t.ex. 'Tävlingar i Stockholm i juni' eller 'Sprint för juniorer'"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="min-h-[120px] text-base resize-none p-4 pr-12 shadow-md"
@@ -113,12 +113,12 @@ const AiSearch: React.FC<AiSearchProps> = ({ className }) => {
           size="lg"
           disabled={isLoading}
         >
-          {isLoading ? "Bearbetar sökning..." : "Sök med AI"}
+          {isLoading ? "Söker..." : "Hitta tävlingar"}
         </Button>
       </form>
       
       <div className="mt-4">
-        <p className="text-sm text-muted-foreground mb-2">Exempel:</p>
+        <p className="text-sm text-muted-foreground mb-2">Prova dessa:</p>
         <div className="flex flex-wrap gap-2">
           {exampleQueries.map((example, index) => (
             <Button
