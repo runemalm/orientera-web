@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { sv } from "date-fns/locale";
 import { format, isValid, isToday, isYesterday, isTomorrow, addDays, startOfMonth, endOfMonth, isSameDay, nextFriday, nextSunday, getDay } from "date-fns";
@@ -95,7 +96,15 @@ const DateRangeFilter = ({
           
         case 'next7days':
           presetFrom = today;
-          presetTo = addDays(today, 6);
+          const dayOfWeek = getDay(today);
+          
+          if (dayOfWeek === 5) { // Friday
+            presetTo = addDays(today, 9); // Include next Sunday (9 days total)
+          } else if (dayOfWeek === 6) { // Saturday
+            presetTo = addDays(today, 8); // Include next Sunday (8 days total)
+          } else {
+            presetTo = addDays(today, 6); // Regular 7-day period
+          }
           break;
           
         case 'next14days':
@@ -225,10 +234,14 @@ const DateRangeFilter = ({
         
       case 'next7days':
         from = new Date(today);
-        if (getDay(today) === 6) {
-          to = addDays(today, 7);
+        const dayOfWeek = getDay(today);
+        
+        if (dayOfWeek === 5) { // Friday
+          to = addDays(today, 9); // Include next Sunday (9 days total)
+        } else if (dayOfWeek === 6) { // Saturday
+          to = addDays(today, 8); // Include next Sunday (8 days total)
         } else {
-          to = addDays(today, 6);
+          to = addDays(today, 6); // Regular 7-day period
         }
         break;
         
