@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { sv } from "date-fns/locale";
-import { format, isValid, isToday, isYesterday, isTomorrow, addDays, startOfMonth, endOfMonth, isSameDay, nextFriday, nextSunday, getDay } from "date-fns";
+import { format, isValid, isToday, isYesterday, isTomorrow, addDays, startOfMonth, endOfMonth, isSameDay, nextFriday, nextSunday, getDay, subDays } from "date-fns";
 import { X, Calendar as CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -76,21 +76,19 @@ const DateRangeFilter = ({
           break;
           
         case 'thisWeekend':
-          const currentDayOfWeek = getDay(today);
-          let daysUntilFriday = 5 - currentDayOfWeek;
-          if (daysUntilFriday < 0) daysUntilFriday += 7;
+          const dayOfWeek = getDay(today);
           
-          if (currentDayOfWeek === 5 || currentDayOfWeek === 6 || currentDayOfWeek === 0) {
-            if (currentDayOfWeek === 5 || currentDayOfWeek === 6) {
-              presetFrom = today;
-              const daysUntilSunday = currentDayOfWeek === 5 ? 2 : 1;
-              presetTo = addDays(today, daysUntilSunday);
-            } 
-            else if (currentDayOfWeek === 0) {
-              presetFrom = addDays(today, -2);
-              presetTo = today;
-            }
+          if (dayOfWeek === 0) { // Sunday
+            presetFrom = subDays(today, 2); // Friday
+            presetTo = today; // Sunday
+          } else if (dayOfWeek === 6) { // Saturday
+            presetFrom = subDays(today, 1); // Friday
+            presetTo = addDays(today, 1); // Sunday
+          } else if (dayOfWeek === 5) { // Friday
+            presetFrom = today; // Friday
+            presetTo = addDays(today, 2); // Sunday
           } else {
+            const daysUntilFriday = 5 - dayOfWeek;
             presetFrom = addDays(today, daysUntilFriday);
             presetTo = addDays(presetFrom, 2);
           }
@@ -98,20 +96,15 @@ const DateRangeFilter = ({
           
         case 'next7days':
           presetFrom = today;
-          const dayOfWeek = getDay(today);
+          const dayOfWeek7 = getDay(today);
           
-          if (dayOfWeek === 5) { // Friday
-            presetTo = addDays(today, 9); // Include next Sunday (showing 10 days total)
-          } else if (dayOfWeek === 6) { // Saturday
-            presetTo = addDays(today, 8); // Include next Sunday (showing 9 days total)
+          if (dayOfWeek7 === 5) { // Friday
+            presetTo = addDays(today, 9);
+          } else if (dayOfWeek7 === 6) { // Saturday
+            presetTo = addDays(today, 8);
           } else {
-            presetTo = addDays(today, 7); // Regular case: today + 7 days (showing 8 days total)
+            presetTo = addDays(today, 7);
           }
-          break;
-          
-        case 'next14days':
-          presetFrom = today;
-          presetTo = addDays(today, 13);
           break;
           
         case 'next30days':
@@ -211,39 +204,34 @@ const DateRangeFilter = ({
         break;
         
       case 'thisWeekend':
-        const currentDayOfWeek = getDay(today);
+        const dayOfWeek = getDay(today);
         
-        if (currentDayOfWeek >= 1 && currentDayOfWeek <= 4) {
-          from = today;
-          const daysUntilFriday = 5 - currentDayOfWeek;
-          const friday = addDays(today, daysUntilFriday);
-          const sunday = addDays(friday, 2);
-          to = sunday;
-        } 
-        else if (currentDayOfWeek === 5) {
+        if (dayOfWeek === 0) { // Sunday
+          from = subDays(today, 2);
+          to = today;
+        } else if (dayOfWeek === 6) { // Saturday
+          from = subDays(today, 1);
+          to = addDays(today, 1);
+        } else if (dayOfWeek === 5) { // Friday
           from = today;
           to = addDays(today, 2);
-        } 
-        else if (currentDayOfWeek === 6) {
-          from = today;
-          to = addDays(today, 1);
-        } 
-        else if (currentDayOfWeek === 0) {
-          from = addDays(today, -2);
-          to = today;
+        } else {
+          const daysUntilFriday = 5 - dayOfWeek;
+          from = addDays(today, daysUntilFriday);
+          to = addDays(from, 2);
         }
         break;
         
       case 'next7days':
         from = new Date(today);
-        const dayOfWeek = getDay(today);
+        const dayOfWeek7 = getDay(today);
         
-        if (dayOfWeek === 5) { // Friday
-          to = addDays(today, 9); // Include next Sunday (showing 10 days total)
-        } else if (dayOfWeek === 6) { // Saturday
-          to = addDays(today, 8); // Include next Sunday (showing 9 days total)
+        if (dayOfWeek7 === 5) { // Friday
+          to = addDays(today, 9);
+        } else if (dayOfWeek7 === 6) { // Saturday
+          to = addDays(today, 8);
         } else {
-          to = addDays(today, 7); // Regular case: today + 7 days (showing 8 days total)
+          to = addDays(today, 7);
         }
         break;
         
