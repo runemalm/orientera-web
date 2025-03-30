@@ -198,64 +198,6 @@ const SearchFiltersComponent = ({
         </form>
       )}
 
-      {hasActiveFilters && (
-        <div className="bg-muted/50 rounded-md p-2 mb-4 flex flex-wrap gap-1.5">
-          {hasSearchQuery && (
-            <Badge variant="outline" className="flex items-center gap-1 px-1.5 py-1 h-6 bg-background">
-              <span className="text-xs">Sökord: {filters.searchQuery}</span>
-              <Button variant="ghost" size="sm" onClick={() => handleClearFilter('search')} className="h-4 w-4 p-0">
-                <X className="h-3 w-3" />
-              </Button>
-            </Badge>
-          )}
-          
-          {filters.districts.length > 0 && (
-            <Badge variant="outline" className="flex items-center gap-1 px-1.5 py-1 h-6 bg-background">
-              <span className="text-xs">{filters.districts.length} {filters.districts.length === 1 ? 'distrikt' : 'distrikt'}</span>
-              <Button variant="ghost" size="sm" onClick={() => handleClearFilter('districts')} className="h-4 w-4 p-0">
-                <X className="h-3 w-3" />
-              </Button>
-            </Badge>
-          )}
-          
-          {filters.disciplines.length > 0 && (
-            <Badge variant="outline" className="flex items-center gap-1 px-1.5 py-1 h-6 bg-background">
-              <span className="text-xs">{filters.disciplines.length} {filters.disciplines.length === 1 ? 'disciplin' : 'discipliner'}</span>
-              <Button variant="ghost" size="sm" onClick={() => handleClearFilter('disciplines')} className="h-4 w-4 p-0">
-                <X className="h-3 w-3" />
-              </Button>
-            </Badge>
-          )}
-          
-          {typesArray.length > 0 && (
-            <Badge variant="outline" className="flex items-center gap-1 px-1.5 py-1 h-6 bg-background">
-              <span className="text-xs">{typesArray.length} {typesArray.length === 1 ? 'tävlingstyp' : 'tävlingstyper'}</span>
-              <Button variant="ghost" size="sm" onClick={() => handleClearFilter('types')} className="h-4 w-4 p-0">
-                <X className="h-3 w-3" />
-              </Button>
-            </Badge>
-          )}
-          
-          {branchesArray.length > 0 && (
-            <Badge variant="outline" className="flex items-center gap-1 px-1.5 py-1 h-6 bg-background">
-              <span className="text-xs">{branchesArray.length} {branchesArray.length === 1 ? 'gren' : 'grenar'}</span>
-              <Button variant="ghost" size="sm" onClick={() => handleClearFilter('branches')} className="h-4 w-4 p-0">
-                <X className="h-3 w-3" />
-              </Button>
-            </Badge>
-          )}
-          
-          {hasActiveDateFilter && (
-            <Badge variant="outline" className="flex items-center gap-1 px-1.5 py-1 h-6 bg-background">
-              <span className="text-xs">Datumfilter</span>
-              <Button variant="ghost" size="sm" onClick={() => handleClearFilter('date')} className="h-4 w-4 p-0">
-                <X className="h-3 w-3" />
-              </Button>
-            </Badge>
-          )}
-        </div>
-      )}
-
       <Accordion 
         type="single" 
         value={expandedItem}
