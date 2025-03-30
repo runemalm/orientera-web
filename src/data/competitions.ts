@@ -586,6 +586,63 @@ const marchCompetitions: Competition[] = [
     registrationDeadline: '2025-03-25',
     description: 'Medeldistans för att testa vårformen. Varierad banläggning för alla nivåer.',
     website: 'https://gavleok.se/varmonstring'
+  },
+  {
+    id: '43',
+    name: 'Småland Spring Cup - Dag 1',
+    date: '2025-03-28',
+    organizer: 'Smålands OF',
+    region: 'kronoberg',
+    district: 'smaland',
+    location: 'Växjö, Småland',
+    coordinates: {
+      lat: 56.8790,
+      lng: 14.8059
+    },
+    discipline: 'Sprint',
+    level: 'Nationell',
+    registrationDeadline: '2025-03-21',
+    description: 'Första dagen av Smålands Spring Cup. Sprinttävling genom Växjös stadskärna med fokus på snabba vägval och intensiv orientering.',
+    website: 'https://smalandsof.se/springcup',
+    featured: true
+  },
+  {
+    id: '44',
+    name: 'Småland Spring Cup - Dag 2',
+    date: '2025-03-29',
+    organizer: 'Smålands OF',
+    region: 'kronoberg',
+    district: 'smaland',
+    location: 'Alvesta, Småland',
+    coordinates: {
+      lat: 56.8990,
+      lng: 14.5567
+    },
+    discipline: 'Medel',
+    level: 'Nationell',
+    registrationDeadline: '2025-03-21',
+    description: 'Andra dagen av Smålands Spring Cup. Medeldistans i tekniskt krävande småländsk terräng med inslag av både sankmarker och höjdpartier.',
+    website: 'https://smalandsof.se/springcup',
+    featured: true
+  },
+  {
+    id: '45',
+    name: 'Småland Spring Cup - Dag 3',
+    date: '2025-03-31',
+    organizer: 'Smålands OF',
+    region: 'jonkoping',
+    district: 'smaland',
+    location: 'Vaggeryd, Småland',
+    coordinates: {
+      lat: 57.4962,
+      lng: 14.1487
+    },
+    discipline: 'Lång',
+    level: 'Nationell',
+    registrationDeadline: '2025-03-21',
+    description: 'Avslutande dag av Smålands Spring Cup. Långdistans i klassisk småländsk skogsterräng med varierande underlag och utmanande höjdskillnader.',
+    website: 'https://smalandsof.se/springcup',
+    featured: true
   }
 ];
 
