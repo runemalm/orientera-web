@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -145,29 +144,30 @@ const Search = () => {
   const searchFiltersRef = useRef<{ setExpandedItem: (value: string | undefined) => void } | null>(null);
 
   const handleClearAllFilters = () => {
-    const resetFilters: SearchFiltersType = {
-      regions: [],
-      districts: [],
-      disciplines: [],
-      levels: [],
-      types: [],
-      branches: [],
-      searchQuery: "", 
-      dateRange: undefined,
-      showMap: filters.showMap
-    };
-    
-    setFilters(resetFilters);
-    
-    // Ensure all accordions are collapsed when filters are cleared
     if (searchFiltersRef.current) {
       searchFiltersRef.current.setExpandedItem(undefined);
     }
     
-    toast({
-      title: "Filtren har återställts",
-      description: "Alla valda filter har rensats - nu visas alla tävlingar"
-    });
+    setTimeout(() => {
+      const resetFilters: SearchFiltersType = {
+        regions: [],
+        districts: [],
+        disciplines: [],
+        levels: [],
+        types: [],
+        branches: [],
+        searchQuery: "", 
+        dateRange: undefined,
+        showMap: filters.showMap
+      };
+      
+      setFilters(resetFilters);
+      
+      toast({
+        title: "Filtren har återställts",
+        description: "Alla valda filter har rensats - nu visas alla tävlingar"
+      });
+    }, 0);
   };
 
   const toggleSidebar = () => {

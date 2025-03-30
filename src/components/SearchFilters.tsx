@@ -40,7 +40,6 @@ const SearchFiltersComponent = forwardRef<
 
   useImperativeHandle(ref, () => ({
     setExpandedItem: (value: string | undefined) => {
-      console.log("Setting expanded item to:", value);
       setExpandedItem(value);
     }
   }));
@@ -124,16 +123,19 @@ const SearchFiltersComponent = forwardRef<
       showMap: filters.showMap
     };
     
-    onFilterChange(resetFilters);
-    setSearchValue("");
-    
-    // Explicitly collapse all accordions
+    // Important: Set expandedItem to undefined first, then update filters
     setExpandedItem(undefined);
     
-    toast({
-      title: "Filtren har återställts",
-      description: "Alla valda filter har rensats"
-    });
+    // Slight delay to ensure accordion state updates before filter changes
+    setTimeout(() => {
+      onFilterChange(resetFilters);
+      setSearchValue("");
+      
+      toast({
+        title: "Filtren har återställts",
+        description: "Alla valda filter har rensats"
+      });
+    }, 0);
   };
   
   const handleClearFilter = (filterType: 'districts' | 'disciplines' | 'types' | 'branches' | 'search' | 'date') => {
