@@ -1,7 +1,7 @@
 
 import { FilterIcon, X, SearchIcon, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Accordion, AccordionContent } from "@/components/ui/accordion";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import { SearchFilters as SearchFiltersType, CompetitionType, CompetitionBranch } from "@/types";
 import CheckboxFilter from "./search/CheckboxFilter";
@@ -217,43 +217,45 @@ const SearchFiltersComponent = ({
         className="space-y-2"
         collapsible
       >
-        <div className="border rounded-md overflow-hidden bg-background shadow-sm">
-          <div className="flex items-center justify-between w-full px-3 py-2">
-            <div
-              className="flex items-center cursor-pointer flex-1"
-              onClick={() => setExpandedItem(expandedItem === 'dateRange' ? undefined : 'dateRange')}
-            >
-              <span className="text-sm font-medium">Tävlingsperiod</span>
-              {hasActiveDateFilter && (
-                <Badge variant="secondary" className="ml-1 text-xs mr-2">
-                  1
-                </Badge>
-              )}
+        <AccordionItem value="dateRange" className="border rounded-md overflow-hidden">
+          <AccordionTrigger className="px-3 py-2 hover:no-underline min-h-10">
+            <div className="flex items-center justify-between w-full">
+              <div className="flex items-center">
+                <span className="text-sm font-medium">Tävlingsperiod</span>
+              </div>
+              <div className="flex items-center">
+                {hasActiveDateFilter && (
+                  <Badge variant="secondary" className="ml-1 text-xs mr-2">
+                    1
+                  </Badge>
+                )}
+                {hasActiveDateFilter && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleClearFilter('date');
+                    }}
+                    className="h-7 w-7 p-0 mr-4 hover:bg-muted"
+                    title="Rensa datumfilter"
+                  >
+                    <XCircle className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                  </Button>
+                )}
+              </div>
             </div>
-            {hasActiveDateFilter && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleClearFilter('date')}
-                className="h-7 w-7 p-0 hover:bg-muted"
-                title="Rensa datumfilter"
-              >
-                <XCircle className="h-4 w-4 text-muted-foreground hover:text-foreground" />
-              </Button>
-            )}
-          </div>
-          {expandedItem === 'dateRange' && (
-            <AccordionContent className="px-3 pb-3 pt-1 border-t">
-              <DateRangeFilter 
-                dateRange={filters.dateRange} 
-                onDateRangeChange={handleDateRangeChange}
-                hasActiveFilter={hasActiveDateFilter}
-                removeHeader={true}
-                onClearFilter={() => handleClearFilter('date')}
-              />
-            </AccordionContent>
-          )}
-        </div>
+          </AccordionTrigger>
+          <AccordionContent className="px-3 pb-3 pt-1">
+            <DateRangeFilter 
+              dateRange={filters.dateRange} 
+              onDateRangeChange={handleDateRangeChange}
+              hasActiveFilter={hasActiveDateFilter}
+              removeHeader={true}
+              onClearFilter={() => handleClearFilter('date')}
+            />
+          </AccordionContent>
+        </AccordionItem>
 
         <CheckboxFilter
           title="Tävlingstyp"
