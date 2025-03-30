@@ -1,4 +1,3 @@
-
 import { FilterIcon, X, SearchIcon, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
@@ -166,7 +165,6 @@ const SearchFiltersComponent = ({
                            hasActiveDateFilter ||
                            hasSearchQuery;
   
-  // Handle accordion value change based on device type
   const handleAccordionValueChange = (value: string | string[]) => {
     if (Array.isArray(value)) {
       setExpandedItems(value);
@@ -211,88 +209,173 @@ const SearchFiltersComponent = ({
         </form>
       )}
 
-      <Accordion 
-        type={isMobile ? "single" : "multiple"} 
-        value={isMobile ? expandedItems[0] : expandedItems}
-        onValueChange={handleAccordionValueChange}
-        className="space-y-2"
-        collapsible
-      >
-        <AccordionItem value="dateRange" className="border rounded-md overflow-hidden">
-          <AccordionTrigger className="px-3 py-2 hover:no-underline min-h-10">
-            <div className="flex items-center justify-between w-full">
-              <div className="flex items-center">
-                <span className="text-sm font-medium">Tävlingsperiod</span>
+      {isMobile ? (
+        <Accordion 
+          type="single" 
+          value={expandedItems[0]} 
+          onValueChange={(value) => handleAccordionValueChange(value)}
+          className="space-y-2"
+          collapsible
+        >
+          <AccordionItem value="dateRange" className="border rounded-md overflow-hidden">
+            <AccordionTrigger className="px-3 py-2 hover:no-underline min-h-10">
+              <div className="flex items-center justify-between w-full">
+                <div className="flex items-center">
+                  <span className="text-sm font-medium">Tävlingsperiod</span>
+                </div>
+                <div className="flex items-center">
+                  {hasActiveDateFilter && (
+                    <Badge variant="secondary" className="ml-1 text-xs mr-2">
+                      1
+                    </Badge>
+                  )}
+                  {hasActiveDateFilter && (
+                    <div 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleClearFilter('date');
+                      }}
+                      className="h-7 w-7 p-0 mr-4 hover:bg-muted flex items-center justify-center rounded-sm cursor-pointer"
+                      title="Rensa datumfilter"
+                    >
+                      <XCircle className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                    </div>
+                  )}
+                </div>
               </div>
-              <div className="flex items-center">
-                {hasActiveDateFilter && (
-                  <Badge variant="secondary" className="ml-1 text-xs mr-2">
-                    1
-                  </Badge>
-                )}
-                {hasActiveDateFilter && (
-                  <div 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleClearFilter('date');
-                    }}
-                    className="h-7 w-7 p-0 mr-4 hover:bg-muted flex items-center justify-center rounded-sm cursor-pointer"
-                    title="Rensa datumfilter"
-                  >
-                    <XCircle className="h-4 w-4 text-muted-foreground hover:text-foreground" />
-                  </div>
-                )}
+            </AccordionTrigger>
+            <AccordionContent className="px-3 pb-3 pt-1">
+              <DateRangeFilter 
+                dateRange={filters.dateRange} 
+                onDateRangeChange={handleDateRangeChange}
+                hasActiveFilter={hasActiveDateFilter}
+                removeHeader={true}
+                onClearFilter={() => handleClearFilter('date')}
+              />
+            </AccordionContent>
+          </AccordionItem>
+
+          <CheckboxFilter
+            title="Tävlingstyp"
+            items={competitionTypes.map(t => ({ id: t, name: t }))}
+            selectedItems={typesArray}
+            onItemChange={handleTypeChange}
+            accordionValue="type"
+            onClearFilter={() => handleClearFilter('types')}
+          />
+
+          <CheckboxFilter
+            title="Disciplin"
+            items={disciplines.map(d => ({ id: d, name: d }))}
+            selectedItems={filters.disciplines}
+            onItemChange={handleDisciplineChange}
+            accordionValue="discipline"
+            onClearFilter={() => handleClearFilter('disciplines')}
+          />
+
+          <CheckboxFilter
+            title="Distrikt"
+            items={districts.map(d => ({ id: d.id, name: d.name }))}
+            selectedItems={filters.districts}
+            onItemChange={handleDistrictChange}
+            accordionValue="district"
+            hideSearch={true}
+            onClearFilter={() => handleClearFilter('districts')}
+          />
+
+          <CheckboxFilter
+            title="Orienteringsgren"
+            items={competitionBranches.map(b => ({ id: b, name: b }))}
+            selectedItems={branchesArray}
+            onItemChange={handleBranchChange}
+            accordionValue="branch"
+            onClearFilter={() => handleClearFilter('branches')}
+          />
+        </Accordion>
+      ) : (
+        <Accordion 
+          type="multiple" 
+          value={expandedItems} 
+          onValueChange={(value) => handleAccordionValueChange(value)}
+          className="space-y-2"
+          collapsible
+        >
+          <AccordionItem value="dateRange" className="border rounded-md overflow-hidden">
+            <AccordionTrigger className="px-3 py-2 hover:no-underline min-h-10">
+              <div className="flex items-center justify-between w-full">
+                <div className="flex items-center">
+                  <span className="text-sm font-medium">Tävlingsperiod</span>
+                </div>
+                <div className="flex items-center">
+                  {hasActiveDateFilter && (
+                    <Badge variant="secondary" className="ml-1 text-xs mr-2">
+                      1
+                    </Badge>
+                  )}
+                  {hasActiveDateFilter && (
+                    <div 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleClearFilter('date');
+                      }}
+                      className="h-7 w-7 p-0 mr-4 hover:bg-muted flex items-center justify-center rounded-sm cursor-pointer"
+                      title="Rensa datumfilter"
+                    >
+                      <XCircle className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          </AccordionTrigger>
-          <AccordionContent className="px-3 pb-3 pt-1">
-            <DateRangeFilter 
-              dateRange={filters.dateRange} 
-              onDateRangeChange={handleDateRangeChange}
-              hasActiveFilter={hasActiveDateFilter}
-              removeHeader={true}
-              onClearFilter={() => handleClearFilter('date')}
-            />
-          </AccordionContent>
-        </AccordionItem>
+            </AccordionTrigger>
+            <AccordionContent className="px-3 pb-3 pt-1">
+              <DateRangeFilter 
+                dateRange={filters.dateRange} 
+                onDateRangeChange={handleDateRangeChange}
+                hasActiveFilter={hasActiveDateFilter}
+                removeHeader={true}
+                onClearFilter={() => handleClearFilter('date')}
+              />
+            </AccordionContent>
+          </AccordionItem>
 
-        <CheckboxFilter
-          title="Tävlingstyp"
-          items={competitionTypes.map(t => ({ id: t, name: t }))}
-          selectedItems={typesArray}
-          onItemChange={handleTypeChange}
-          accordionValue="type"
-          onClearFilter={() => handleClearFilter('types')}
-        />
+          <CheckboxFilter
+            title="Tävlingstyp"
+            items={competitionTypes.map(t => ({ id: t, name: t }))}
+            selectedItems={typesArray}
+            onItemChange={handleTypeChange}
+            accordionValue="type"
+            onClearFilter={() => handleClearFilter('types')}
+          />
 
-        <CheckboxFilter
-          title="Disciplin"
-          items={disciplines.map(d => ({ id: d, name: d }))}
-          selectedItems={filters.disciplines}
-          onItemChange={handleDisciplineChange}
-          accordionValue="discipline"
-          onClearFilter={() => handleClearFilter('disciplines')}
-        />
+          <CheckboxFilter
+            title="Disciplin"
+            items={disciplines.map(d => ({ id: d, name: d }))}
+            selectedItems={filters.disciplines}
+            onItemChange={handleDisciplineChange}
+            accordionValue="discipline"
+            onClearFilter={() => handleClearFilter('disciplines')}
+          />
 
-        <CheckboxFilter
-          title="Distrikt"
-          items={districts.map(d => ({ id: d.id, name: d.name }))}
-          selectedItems={filters.districts}
-          onItemChange={handleDistrictChange}
-          accordionValue="district"
-          hideSearch={true}
-          onClearFilter={() => handleClearFilter('districts')}
-        />
+          <CheckboxFilter
+            title="Distrikt"
+            items={districts.map(d => ({ id: d.id, name: d.name }))}
+            selectedItems={filters.districts}
+            onItemChange={handleDistrictChange}
+            accordionValue="district"
+            hideSearch={true}
+            onClearFilter={() => handleClearFilter('districts')}
+          />
 
-        <CheckboxFilter
-          title="Orienteringsgren"
-          items={competitionBranches.map(b => ({ id: b, name: b }))}
-          selectedItems={branchesArray}
-          onItemChange={handleBranchChange}
-          accordionValue="branch"
-          onClearFilter={() => handleClearFilter('branches')}
-        />
-      </Accordion>
+          <CheckboxFilter
+            title="Orienteringsgren"
+            items={competitionBranches.map(b => ({ id: b, name: b }))}
+            selectedItems={branchesArray}
+            onItemChange={handleBranchChange}
+            accordionValue="branch"
+            onClearFilter={() => handleClearFilter('branches')}
+          />
+        </Accordion>
+      )}
     </>
   );
 
