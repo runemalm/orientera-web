@@ -1,5 +1,5 @@
 
-import { FilterIcon, X, SearchIcon } from "lucide-react";
+import { FilterIcon, X, SearchIcon, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
@@ -198,7 +198,7 @@ const SearchFiltersComponent = ({
                 onClick={() => {
                   setSearchValue("");
                   if (filters.searchQuery) {
-                    onFilterChange({ ...filters, searchQuery: "" });
+                    handleClearFilter('search');
                   }
                 }}
               >
@@ -223,11 +223,27 @@ const SearchFiltersComponent = ({
               <div className="flex items-center">
                 <span className="text-sm font-medium">Tävlingsperiod</span>
               </div>
-              {hasActiveDateFilter && (
-                <Badge variant="secondary" className="ml-1 text-xs mr-6">
-                  1
-                </Badge>
-              )}
+              <div className="flex items-center">
+                {hasActiveDateFilter && (
+                  <Badge variant="secondary" className="ml-1 text-xs mr-2">
+                    1
+                  </Badge>
+                )}
+                {hasActiveDateFilter && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleClearFilter('date');
+                    }}
+                    className="h-7 w-7 p-0 mr-4 hover:bg-muted"
+                    title="Rensa datumfilter"
+                  >
+                    <XCircle className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                  </Button>
+                )}
+              </div>
             </div>
           </AccordionTrigger>
           <AccordionContent className="px-3 pb-3 pt-1">
@@ -236,6 +252,7 @@ const SearchFiltersComponent = ({
               onDateRangeChange={handleDateRangeChange}
               hasActiveFilter={hasActiveDateFilter}
               removeHeader={true}
+              onClearFilter={() => handleClearFilter('date')}
             />
           </AccordionContent>
         </AccordionItem>
@@ -246,6 +263,7 @@ const SearchFiltersComponent = ({
           selectedItems={typesArray}
           onItemChange={handleTypeChange}
           accordionValue="type"
+          onClearFilter={() => handleClearFilter('types')}
         />
 
         <CheckboxFilter
@@ -254,6 +272,7 @@ const SearchFiltersComponent = ({
           selectedItems={filters.disciplines}
           onItemChange={handleDisciplineChange}
           accordionValue="discipline"
+          onClearFilter={() => handleClearFilter('disciplines')}
         />
 
         <CheckboxFilter
@@ -263,6 +282,7 @@ const SearchFiltersComponent = ({
           onItemChange={handleDistrictChange}
           accordionValue="district"
           hideSearch={true}
+          onClearFilter={() => handleClearFilter('districts')}
         />
 
         <CheckboxFilter
@@ -271,6 +291,7 @@ const SearchFiltersComponent = ({
           selectedItems={branchesArray}
           onItemChange={handleBranchChange}
           accordionValue="branch"
+          onClearFilter={() => handleClearFilter('branches')}
         />
       </Accordion>
     </>

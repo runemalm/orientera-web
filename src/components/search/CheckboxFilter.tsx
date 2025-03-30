@@ -1,3 +1,4 @@
+
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { 
@@ -7,7 +8,7 @@ import {
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { X, Search } from "lucide-react";
+import { X, Search, XCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useMemo, useState } from "react";
 
@@ -18,6 +19,7 @@ interface CheckboxFilterProps {
   onItemChange: (itemId: string, checked: boolean) => void;
   accordionValue: string;
   hideSearch?: boolean;
+  onClearFilter?: () => void;
 }
 
 const CheckboxFilter = ({ 
@@ -26,7 +28,8 @@ const CheckboxFilter = ({
   selectedItems, 
   onItemChange,
   accordionValue,
-  hideSearch = false
+  hideSearch = false,
+  onClearFilter
 }: CheckboxFilterProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const selectedCount = selectedItems.length;
@@ -47,11 +50,27 @@ const CheckboxFilter = ({
           <span className="text-sm font-medium">
             {title}
           </span>
-          {selectedCount > 0 && (
-            <Badge variant="secondary" className="ml-1 text-xs mr-6">
-              {selectedCount}
-            </Badge>
-          )}
+          <div className="flex items-center">
+            {selectedCount > 0 && (
+              <Badge variant="secondary" className="ml-1 text-xs mr-2">
+                {selectedCount}
+              </Badge>
+            )}
+            {selectedCount > 0 && onClearFilter && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onClearFilter();
+                }}
+                className="h-7 w-7 p-0 mr-4 hover:bg-muted"
+                title={`Rensa ${title.toLowerCase()}`}
+              >
+                <XCircle className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+              </Button>
+            )}
+          </div>
         </div>
       </AccordionTrigger>
       <AccordionContent className="px-3 pb-3 border-t pt-3 bg-background">

@@ -1,8 +1,7 @@
-
 import { useState, useEffect } from "react";
 import { sv } from "date-fns/locale";
 import { format, isValid, isToday, isYesterday, isTomorrow, addDays, startOfMonth, endOfMonth, isSameDay, nextFriday, nextSunday, getDay, subDays } from "date-fns";
-import { X, Calendar as CalendarIcon } from "lucide-react";
+import { X, Calendar as CalendarIcon, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
@@ -20,13 +19,15 @@ interface DateRangeFilterProps {
   onDateRangeChange: (range: DateRangeValue | undefined) => void;
   hasActiveFilter?: boolean;
   removeHeader?: boolean;
+  onClearFilter?: () => void;
 }
 
 const DateRangeFilter = ({ 
   dateRange, 
   onDateRangeChange, 
   hasActiveFilter = false,
-  removeHeader = false
+  removeHeader = false,
+  onClearFilter
 }: DateRangeFilterProps) => {
   const isMobile = useIsMobile();
   const [fromDate, setFromDate] = useState<Date | undefined>(dateRange?.from);
@@ -35,7 +36,6 @@ const DateRangeFilter = ({
   const [toDateOpen, setToDateOpen] = useState(false);
   const [selectedPreset, setSelectedPreset] = useState<string | undefined>(undefined);
   
-  // Generate preset options with responsive labels
   const PRESET_OPTIONS = [
     { id: 'today', label: 'Idag' },
     { id: 'tomorrow', label: 'Imorgon' },
@@ -80,14 +80,14 @@ const DateRangeFilter = ({
           const dayOfWeek = getDay(today);
           
           if (dayOfWeek === 0) { // Sunday
-            presetFrom = subDays(today, 2); // Friday
-            presetTo = today; // Sunday
+            presetFrom = subDays(today, 2);
+            presetTo = today;
           } else if (dayOfWeek === 6) { // Saturday
-            presetFrom = subDays(today, 1); // Friday
-            presetTo = addDays(today, 1); // Sunday
+            presetFrom = subDays(today, 1);
+            presetTo = addDays(today, 1);
           } else if (dayOfWeek === 5) { // Friday
-            presetFrom = today; // Friday
-            presetTo = addDays(today, 2); // Sunday
+            presetFrom = today;
+            presetTo = addDays(today, 2);
           } else {
             const daysUntilFriday = 5 - dayOfWeek;
             presetFrom = addDays(today, daysUntilFriday);
@@ -96,23 +96,21 @@ const DateRangeFilter = ({
           break;
           
         case 'next7days':
-          // Start from tomorrow instead of today
           presetFrom = addDays(today, 1);
           const dayOfWeek7 = getDay(today);
           
           if (dayOfWeek7 === 5) { // Friday
-            presetTo = addDays(today, 9);
-          } else if (dayOfWeek7 === 6) { // Saturday
             presetTo = addDays(today, 8);
-          } else {
+          } else if (dayOfWeek7 === 6) { // Saturday
             presetTo = addDays(today, 7);
+          } else {
+            presetTo = addDays(today, 6);
           }
           break;
           
         case 'next30days':
-          // Start from tomorrow instead of today
           presetFrom = addDays(today, 1);
-          presetTo = addDays(today, 30);
+          presetTo = addDays(today, 29);
           break;
           
         case 'thisMonth':
@@ -226,23 +224,21 @@ const DateRangeFilter = ({
         break;
         
       case 'next7days':
-        // Start from tomorrow instead of today
         from = addDays(today, 1);
         const dayOfWeek7 = getDay(today);
         
         if (dayOfWeek7 === 5) { // Friday
-          to = addDays(today, 8); // Changed from 9 to 8 (as we're starting from tomorrow)
+          to = addDays(today, 8);
         } else if (dayOfWeek7 === 6) { // Saturday
-          to = addDays(today, 7); // Changed from 8 to 7 (as we're starting from tomorrow)
+          to = addDays(today, 7);
         } else {
-          to = addDays(from, 6); // 7 days including tomorrow
+          to = addDays(from, 6);
         }
         break;
         
       case 'next30days':
-        // Start from tomorrow instead of today
         from = addDays(today, 1);
-        to = addDays(from, 29); // 30 days including tomorrow
+        to = addDays(from, 29);
         break;
         
       case 'thisMonth':
@@ -263,6 +259,22 @@ const DateRangeFilter = ({
 
   return (
     <div className="space-y-4">
+      {!removeHeader && (
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-sm font-medium">Tävlingsperiod</h3>
+          {hasActiveFilter && onClearFilter && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onClearFilter}
+              className="h-7 w-7 p-0 hover:bg-muted"
+              title="Rensa datumfilter"
+            >
+              <XCircle className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+            </Button>
+          )}
+        </div>
+      )}
       <div className="space-y-3">
         <div className="grid grid-cols-3 gap-1.5">
           {PRESET_OPTIONS.slice(0, 3).map(option => (
