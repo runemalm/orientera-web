@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -226,13 +225,17 @@ const Search = () => {
             <div className="w-full md:w-80 flex-shrink-0" ref={filterRef}>
               <div 
                 ref={filterContentRef}
-                className={`mb-4 ${isFilterSticky ? 'sticky' : ''}`}
+                className={`${isFilterSticky ? 'md:sticky' : ''}`}
                 style={{ 
                   top: isFilterSticky ? `${HEADER_HEIGHT + 4}px` : 'auto',
                   maxHeight: isFilterSticky ? `calc(100vh - ${HEADER_HEIGHT + 8}px)` : 'none',
                   overflow: isFilterSticky ? 'auto' : 'visible',
                   paddingBottom: isFilterSticky ? '8px' : '0',
-                  position: isFilterSticky ? 'sticky' : 'static',
+                  position: isMobile ? 'static' : (isFilterSticky ? 'sticky' : 'static'),
+                  zIndex: 10,
+                  marginBottom: '1rem',
+                  willChange: 'transform',
+                  transform: 'translateZ(0)',
                 }}
               >
                 <SearchFilters 
