@@ -18,6 +18,7 @@ interface CheckboxFilterProps {
   selectedItems: string[];
   onItemChange: (itemId: string, checked: boolean) => void;
   accordionValue: string;
+  hideSearch?: boolean;
 }
 
 const CheckboxFilter = ({ 
@@ -25,7 +26,8 @@ const CheckboxFilter = ({
   items, 
   selectedItems, 
   onItemChange,
-  accordionValue 
+  accordionValue,
+  hideSearch = false
 }: CheckboxFilterProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const selectedCount = selectedItems.length;
@@ -60,7 +62,7 @@ const CheckboxFilter = ({
         </div>
       </AccordionTrigger>
       <AccordionContent className="px-3 pb-3 border-t pt-3 bg-background">
-        {items.length > 6 && (
+        {!hideSearch && items.length > 6 && (
           <div className="mb-3 relative">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
             <Input
