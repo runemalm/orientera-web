@@ -285,11 +285,13 @@ const Search = () => {
                     >
                       <Filter className="h-4 w-4 mr-2" />
                       <span>{sidebarOpen ? "Dölj filter" : "Visa filter"}</span>
-                      {hasActiveFilters && !sidebarOpen && (
-                        <Badge variant="secondary" className="ml-2">
-                          {filters.disciplines.length + filters.districts.length + typesArray.length + branchesArray.length + (filters.dateRange ? 1 : 0)}
-                        </Badge>
-                      )}
+                      <div className="w-6 ml-1 flex justify-start">
+                        {hasActiveFilters && !sidebarOpen && (
+                          <Badge variant="secondary">
+                            {filters.disciplines.length + filters.districts.length + typesArray.length + branchesArray.length + (filters.dateRange ? 1 : 0)}
+                          </Badge>
+                        )}
+                      </div>
                     </Button>
                   )}
                   
