@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -141,6 +142,9 @@ const Search = () => {
     setFilters(newFilters);
   };
 
+  // Create a ref to the SearchFilters component for collapsing all filters
+  const searchFiltersRef = useRef<{ setExpandedItem: (value: string | undefined) => void } | null>(null);
+
   const handleClearAllFilters = () => {
     const resetFilters: SearchFiltersType = {
       regions: [],
@@ -155,6 +159,11 @@ const Search = () => {
     };
     
     setFilters(resetFilters);
+    
+    // If searchFiltersRef is available, collapse all filters
+    if (searchFiltersRef.current) {
+      searchFiltersRef.current.setExpandedItem(undefined);
+    }
     
     toast({
       title: "Filtren har återställts",
@@ -240,6 +249,7 @@ const Search = () => {
                   onFilterChange={handleFilterChange} 
                   hasLocation={false}
                   hideSearchInput={true}
+                  ref={searchFiltersRef}
                 />
               </div>
             </div>

@@ -1,3 +1,4 @@
+
 import { FilterIcon, X, SearchIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
@@ -7,7 +8,7 @@ import CheckboxFilter from "./search/CheckboxFilter";
 import DateRangeFilter from "./search/DateRangeFilter";
 import { useToast } from "@/hooks/use-toast";
 import { districts } from "@/data/districts";
-import { useState, useEffect } from "react";
+import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 
@@ -24,15 +25,23 @@ interface SearchFiltersProps {
 
 const EXPANDED_FILTERS_KEY = "search-expanded-filters";
 
-const SearchFiltersComponent = ({ 
+const SearchFiltersComponent = forwardRef<
+  { setExpandedItem: (value: string | undefined) => void },
+  SearchFiltersProps
+>(({ 
   filters, 
   onFilterChange, 
   hasLocation,
   hideSearchInput = false
-}: SearchFiltersProps) => {
+}, ref) => {
   const { toast } = useToast();
   const [expandedItem, setExpandedItem] = useState<string | undefined>(undefined);
   const [searchValue, setSearchValue] = useState("");
+
+  // Expose setExpandedItem method to parent component via ref
+  useImperativeHandle(ref, () => ({
+    setExpandedItem: (value: string | undefined) => setExpandedItem(value)
+  }));
 
   const typesArray = Array.isArray(filters.types) ? filters.types : [];
   const branchesArray = Array.isArray(filters.branches) ? filters.branches : [];
@@ -115,6 +124,8 @@ const SearchFiltersComponent = ({
     
     onFilterChange(resetFilters);
     setSearchValue("");
+    // Collapse all open filters
+    setExpandedItem(undefined);
     
     toast({
       title: "Filtren har återställts",
@@ -297,6 +308,8 @@ const SearchFiltersComponent = ({
       </div>
     </div>
   );
-};
+});
+
+SearchFiltersComponent.displayName = "SearchFilters";
 
 export default SearchFiltersComponent;
