@@ -1,3 +1,4 @@
+
 import { FilterIcon, X, SearchIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
@@ -21,8 +22,6 @@ interface SearchFiltersProps {
   hasLocation: boolean;
   hideSearchInput?: boolean;
 }
-
-const EXPANDED_FILTERS_KEY = "search-expanded-filters";
 
 const SearchFiltersComponent = ({ 
   filters, 
@@ -119,6 +118,7 @@ const SearchFiltersComponent = ({
   };
 
   const handleClearAllFilters = () => {
+    // First collapse any open accordion
     setExpandedItem(undefined);
     
     const resetFilters: SearchFiltersType = {
@@ -133,15 +133,13 @@ const SearchFiltersComponent = ({
       showMap: filters.showMap
     };
     
-    setTimeout(() => {
-      onFilterChange(resetFilters);
-      setSearchValue("");
-      
-      toast({
-        title: "Filtren har återställts",
-        description: "Alla valda filter har rensats"
-      });
-    }, 100);
+    onFilterChange(resetFilters);
+    setSearchValue("");
+    
+    toast({
+      title: "Filtren har återställts",
+      description: "Alla valda filter har rensats"
+    });
   };
   
   const handleClearFilter = (filterType: 'districts' | 'disciplines' | 'types' | 'branches' | 'search' | 'date') => {
@@ -156,6 +154,7 @@ const SearchFiltersComponent = ({
       updatedFilters[filterType] = [];
     }
     
+    // Reset the expanded state if we're clearing the currently expanded filter
     if ((filterType === 'districts' && expandedItem === 'district') ||
         (filterType === 'disciplines' && expandedItem === 'discipline') ||
         (filterType === 'types' && expandedItem === 'type') ||
@@ -164,14 +163,12 @@ const SearchFiltersComponent = ({
       setExpandedItem(undefined);
     }
     
-    setTimeout(() => {
-      onFilterChange(updatedFilters);
-      
-      toast({
-        title: `${getFilterGroupName(filterType)} borttaget`,
-        description: `Filtret har tagits bort`
-      });
-    }, 50);
+    onFilterChange(updatedFilters);
+    
+    toast({
+      title: `${getFilterGroupName(filterType)} borttaget`,
+      description: `Filtret har tagits bort`
+    });
   };
   
   const getFilterGroupName = (filterType: string): string => {
