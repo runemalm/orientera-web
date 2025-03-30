@@ -11,6 +11,7 @@ import { districts } from "@/data/districts";
 import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { useIsMobile, useBreakpoint } from "@/hooks/use-mobile";
 
 const disciplines = ['Sprint', 'Medel', 'Lång', 'Natt', 'Stafett', 'Ultralång'];
 const competitionTypes: CompetitionType[] = ['Värdetävlingar', 'Nationella tävlingar', 'Distriktstävlingar', 'Närtävlingar', 'Veckans bana'];
@@ -30,8 +31,10 @@ const SearchFiltersComponent = ({
   hideSearchInput = false
 }: SearchFiltersProps) => {
   const { toast } = useToast();
-  const [expandedItem, setExpandedItem] = useState<string | undefined>(undefined);
+  const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [searchValue, setSearchValue] = useState("");
+  const isMobile = useIsMobile();
+  const breakpoint = useBreakpoint();
 
   const typesArray = Array.isArray(filters.types) ? filters.types : [];
   const branchesArray = Array.isArray(filters.branches) ? filters.branches : [];
@@ -39,19 +42,6 @@ const SearchFiltersComponent = ({
   useEffect(() => {
     setSearchValue(filters.searchQuery || "");
   }, [filters.searchQuery]);
-  
-  useEffect(() => {
-    if (filters.districts.length === 0 && expandedItem === 'district') {
-    }
-    if (filters.disciplines.length === 0 && expandedItem === 'discipline') {
-    }
-    if (typesArray.length === 0 && expandedItem === 'type') {
-    }
-    if (branchesArray.length === 0 && expandedItem === 'branch') {
-    }
-    if (!filters.dateRange && expandedItem === 'dateRange') {
-    }
-  }, [filters, expandedItem, typesArray, branchesArray]);
   
   const handleDisciplineChange = (discipline: string, checked: boolean) => {
     let updatedDisciplines = [...filters.disciplines];
@@ -175,6 +165,17 @@ const SearchFiltersComponent = ({
                            branchesArray.length > 0 ||
                            hasActiveDateFilter ||
                            hasSearchQuery;
+  
+  // Handle accordion value change based on device type
+  const handleAccordionValueChange = (value: string | string[]) => {
+    if (Array.isArray(value)) {
+      setExpandedItems(value);
+    } else if (value) {
+      setExpandedItems([value]);
+    } else {
+      setExpandedItems([]);
+    }
+  };
 
   const filterContent = (
     <>
@@ -211,9 +212,9 @@ const SearchFiltersComponent = ({
       )}
 
       <Accordion 
-        type="single" 
-        value={expandedItem}
-        onValueChange={setExpandedItem}
+        type={isMobile ? "single" : "multiple"} 
+        value={isMobile ? expandedItems[0] : expandedItems}
+        onValueChange={handleAccordionValueChange}
         className="space-y-2"
         collapsible
       >
@@ -230,18 +231,16 @@ const SearchFiltersComponent = ({
                   </Badge>
                 )}
                 {hasActiveDateFilter && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
+                  <div 
                     onClick={(e) => {
                       e.stopPropagation();
                       handleClearFilter('date');
                     }}
-                    className="h-7 w-7 p-0 mr-4 hover:bg-muted"
+                    className="h-7 w-7 p-0 mr-4 hover:bg-muted flex items-center justify-center rounded-sm cursor-pointer"
                     title="Rensa datumfilter"
                   >
                     <XCircle className="h-4 w-4 text-muted-foreground hover:text-foreground" />
-                  </Button>
+                  </div>
                 )}
               </div>
             </div>

@@ -7,9 +7,8 @@ import {
   AccordionContent,
 } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { X, Search, XCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { X, Search, XCircle } from "lucide-react";
 import { useMemo, useState } from "react";
 
 interface CheckboxFilterProps {
@@ -57,18 +56,16 @@ const CheckboxFilter = ({
               </Badge>
             )}
             {selectedCount > 0 && onClearFilter && (
-              <Button
-                variant="ghost"
-                size="sm"
+              <div
                 onClick={(e) => {
                   e.stopPropagation();
                   onClearFilter();
                 }}
-                className="h-7 w-7 p-0 mr-4 hover:bg-muted"
+                className="h-7 w-7 p-0 mr-4 hover:bg-muted flex items-center justify-center rounded-sm cursor-pointer"
                 title={`Rensa ${title.toLowerCase()}`}
               >
                 <XCircle className="h-4 w-4 text-muted-foreground hover:text-foreground" />
-              </Button>
+              </div>
             )}
           </div>
         </div>
@@ -84,14 +81,12 @@ const CheckboxFilter = ({
               className="h-8 text-sm pl-8"
             />
             {searchQuery && (
-              <Button
-                variant="ghost"
-                size="sm"
+              <div
                 onClick={() => setSearchQuery("")}
-                className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 p-0"
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-6 w-6 p-0 flex items-center justify-center cursor-pointer"
               >
                 <X className="h-3 w-3" />
-              </Button>
+              </div>
             )}
           </div>
         )}
