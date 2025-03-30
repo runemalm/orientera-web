@@ -41,11 +41,7 @@ const CheckboxFilter = ({
     );
   }, [items, searchQuery]);
   
-  const clearAllSelected = () => {
-    selectedItems.forEach(itemId => {
-      onItemChange(itemId, false);
-    });
-  };
+  // Removed clearAllSelected function and "clear selections" button
   
   return (
     <AccordionItem value={accordionValue} className="border rounded-md bg-background shadow-sm">
@@ -84,19 +80,7 @@ const CheckboxFilter = ({
           </div>
         )}
         
-        {selectedCount > 0 && (
-          <div className="flex justify-end mb-2">
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={clearAllSelected}
-              className="h-7 text-xs px-2 text-muted-foreground hover:text-foreground"
-            >
-              <X className="h-3 w-3 mr-1" />
-              Rensa {selectedCount} {selectedCount === 1 ? 'val' : 'val'}
-            </Button>
-          </div>
-        )}
+        {/* Removed the "clear selections" button that was here */}
         
         <div className="max-h-48 overflow-y-auto pr-1 space-y-1">
           {filteredItems.length === 0 ? (

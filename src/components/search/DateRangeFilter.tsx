@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { sv } from "date-fns/locale";
 import { format, isValid, isToday, isYesterday, isTomorrow, addDays, startOfMonth, endOfMonth, isSameDay, nextFriday, nextSunday, getDay } from "date-fns";
@@ -389,18 +388,6 @@ const DateRangeFilter = ({
           </div>
         </div>
       </div>
-
-      {hasActiveFilter && (
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={clearDateRange}
-          className="w-full text-sm justify-center h-8"
-        >
-          <X className="h-3.5 w-3.5 mr-1.5" />
-          Rensa datumval
-        </Button>
-      )}
     </div>
   );
 };
