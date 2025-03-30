@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { sv } from "date-fns/locale";
 import { format, isValid, isToday, isYesterday, isTomorrow, addDays, startOfMonth, endOfMonth, isSameDay, nextFriday, nextSunday, getDay } from "date-fns";
@@ -74,27 +73,21 @@ const DateRangeFilter = ({
           break;
           
         case 'thisWeekend':
-          // Figure out the correct weekend range based on today
           const currentDayOfWeek = getDay(today);
           let daysUntilFriday = 5 - currentDayOfWeek;
           if (daysUntilFriday < 0) daysUntilFriday += 7;
           
-          // If today is Friday, Saturday, or Sunday (5, 6, 0), we're already in the weekend
           if (currentDayOfWeek === 5 || currentDayOfWeek === 6 || currentDayOfWeek === 0) {
-            // If we're Friday or Saturday, the weekend is today through Sunday
             if (currentDayOfWeek === 5 || currentDayOfWeek === 6) {
               presetFrom = today;
-              // Calculate days until Sunday (0)
               const daysUntilSunday = currentDayOfWeek === 5 ? 2 : 1;
               presetTo = addDays(today, daysUntilSunday);
             } 
-            // If we're Sunday, the weekend is Friday through today
             else if (currentDayOfWeek === 0) {
               presetFrom = addDays(today, -2);
               presetTo = today;
             }
           } else {
-            // It's Mon-Thu, so the weekend is the upcoming Fri-Sun
             presetFrom = addDays(today, daysUntilFriday);
             presetTo = addDays(presetFrom, 2);
           }
@@ -207,29 +200,23 @@ const DateRangeFilter = ({
         break;
         
       case 'thisWeekend':
-        // Calculate the dates for the weekend
         const currentDayOfWeek = getDay(today);
         
-        // If today is weekday (Mon-Thu), show from today to upcoming Sunday
         if (currentDayOfWeek >= 1 && currentDayOfWeek <= 4) {
           from = today;
-          // Calculate days until next Sunday
           const daysUntilFriday = 5 - currentDayOfWeek;
           const friday = addDays(today, daysUntilFriday);
           const sunday = addDays(friday, 2);
           to = sunday;
         } 
-        // If today is Friday, show from today to Sunday
         else if (currentDayOfWeek === 5) {
           from = today;
           to = addDays(today, 2);
         } 
-        // If today is Saturday, show from today to tomorrow (Sunday)
         else if (currentDayOfWeek === 6) {
           from = today;
           to = addDays(today, 1);
         } 
-        // If today is Sunday, show from this past Friday to today
         else if (currentDayOfWeek === 0) {
           from = addDays(today, -2);
           to = today;
@@ -238,7 +225,11 @@ const DateRangeFilter = ({
         
       case 'next7days':
         from = new Date(today);
-        to = addDays(today, 6);
+        if (getDay(today) === 6) {
+          to = addDays(today, 7);
+        } else {
+          to = addDays(today, 6);
+        }
         break;
         
       case 'next30days':
@@ -265,7 +256,6 @@ const DateRangeFilter = ({
   return (
     <div className="space-y-4">
       <div className="space-y-3">
-        {/* First row: Idag, Imorgon, Helgen */}
         <div className="grid grid-cols-3 gap-1.5">
           {PRESET_OPTIONS.slice(0, 3).map(option => (
             <Button
@@ -281,7 +271,6 @@ const DateRangeFilter = ({
           ))}
         </div>
         
-        {/* Second row: Kommande 7 dagar, Kommande 30 dagar */}
         <div className="grid grid-cols-2 gap-1.5">
           {PRESET_OPTIONS.slice(3, 5).map(option => (
             <Button
@@ -297,7 +286,6 @@ const DateRangeFilter = ({
           ))}
         </div>
         
-        {/* Third row: Denna månad, Nästa månad */}
         <div className="grid grid-cols-2 gap-1.5">
           {PRESET_OPTIONS.slice(5, 7).map(option => (
             <Button
