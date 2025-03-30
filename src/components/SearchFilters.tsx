@@ -286,12 +286,14 @@ const SearchFiltersComponent = forwardRef<
           <div className="flex items-center gap-2">
             <FilterIcon className="h-4 w-4" />
             <h3 className="font-medium">Filtrera</h3>
-            {hasActiveFilters && (
-              <Badge variant="secondary" className="ml-1">
-                {(filters.disciplines.length + filters.districts.length + typesArray.length + branchesArray.length) + 
-                (hasActiveDateFilter ? 1 : 0) + (hasSearchQuery ? 1 : 0)}
-              </Badge>
-            )}
+            <div className="w-6 h-6 flex items-center justify-center">
+              {hasActiveFilters && (
+                <Badge variant="secondary" className="ml-1">
+                  {(filters.disciplines.length + filters.districts.length + typesArray.length + branchesArray.length) + 
+                  (hasActiveDateFilter ? 1 : 0) + (hasSearchQuery ? 1 : 0)}
+                </Badge>
+              )}
+            </div>
           </div>
           {hasActiveFilters && (
             <Button 
