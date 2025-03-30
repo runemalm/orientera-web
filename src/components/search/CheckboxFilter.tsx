@@ -1,4 +1,3 @@
-
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { 
@@ -48,13 +47,11 @@ const CheckboxFilter = ({
           <span className="text-sm font-medium">
             {title}
           </span>
-          <div className="w-6 h-6 flex items-center justify-center">
-            {selectedCount > 0 && (
-              <Badge variant="secondary" className="ml-1 text-xs">
-                {selectedCount}
-              </Badge>
-            )}
-          </div>
+          {selectedCount > 0 && (
+            <Badge variant="secondary" className="ml-1 text-xs mr-6">
+              {selectedCount}
+            </Badge>
+          )}
         </div>
       </AccordionTrigger>
       <AccordionContent className="px-3 pb-3 border-t pt-3 bg-background">

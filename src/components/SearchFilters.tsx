@@ -1,4 +1,3 @@
-
 import { FilterIcon, X, SearchIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
@@ -42,7 +41,6 @@ const SearchFiltersComponent = ({
     setSearchValue(filters.searchQuery || "");
   }, [filters.searchQuery]);
   
-  // This useEffect ensures accordion state resets when specific filter fields are cleared
   useEffect(() => {
     if (filters.districts.length === 0 && expandedItem === 'district') {
       setExpandedItem(undefined);
@@ -121,10 +119,8 @@ const SearchFiltersComponent = ({
   };
 
   const handleClearAllFilters = () => {
-    // First collapse the accordion by setting expandedItem to undefined
     setExpandedItem(undefined);
     
-    // Then clear all filters
     const resetFilters: SearchFiltersType = {
       regions: [],
       districts: [],
@@ -137,7 +133,6 @@ const SearchFiltersComponent = ({
       showMap: filters.showMap
     };
     
-    // Give a tiny delay to ensure UI updates correctly
     setTimeout(() => {
       onFilterChange(resetFilters);
       setSearchValue("");
@@ -161,7 +156,6 @@ const SearchFiltersComponent = ({
       updatedFilters[filterType] = [];
     }
     
-    // If we're clearing the filter that's currently expanded, collapse it
     if ((filterType === 'districts' && expandedItem === 'district') ||
         (filterType === 'disciplines' && expandedItem === 'discipline') ||
         (filterType === 'types' && expandedItem === 'type') ||
@@ -170,7 +164,6 @@ const SearchFiltersComponent = ({
       setExpandedItem(undefined);
     }
     
-    // Small delay to ensure UI updates correctly
     setTimeout(() => {
       onFilterChange(updatedFilters);
       
@@ -250,13 +243,11 @@ const SearchFiltersComponent = ({
               <div className="flex items-center">
                 <span className="text-sm font-medium">Tävlingsperiod</span>
               </div>
-              <div className="w-6 h-6 flex items-center justify-center">
-                {hasActiveDateFilter && (
-                  <Badge variant="secondary" className="ml-1 text-xs">
-                    1
-                  </Badge>
-                )}
-              </div>
+              {hasActiveDateFilter && (
+                <Badge variant="secondary" className="ml-1 text-xs mr-6">
+                  1
+                </Badge>
+              )}
             </div>
           </AccordionTrigger>
           <AccordionContent className="px-3 pb-3 pt-1">
