@@ -42,37 +42,41 @@ const CheckboxFilter = ({
       item.name.toLowerCase().includes(normalizedQuery)
     );
   }, [items, searchQuery]);
+
+  const handleClearClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onClearFilter) {
+      onClearFilter();
+    }
+  };
   
   return (
     <AccordionItem value={accordionValue} className="border rounded-md bg-background shadow-sm">
-      <AccordionTrigger className="px-3 py-2 hover:no-underline min-h-10">
-        <div className="flex items-center justify-between w-full">
-          <span className="text-sm font-medium">
-            {title}
-          </span>
-          <div className="flex items-center">
+      <div className="flex items-center justify-between w-full px-3 py-2">
+        <AccordionTrigger className="hover:no-underline min-h-10 flex-1">
+          <div className="flex items-center justify-between w-full">
+            <span className="text-sm font-medium">
+              {title}
+            </span>
             {selectedCount > 0 && (
               <Badge variant="secondary" className="ml-1 text-xs mr-2">
                 {selectedCount}
               </Badge>
             )}
-            {selectedCount > 0 && onClearFilter && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onClearFilter();
-                }}
-                className="h-7 w-7 p-0 mr-4 hover:bg-muted"
-                title={`Rensa ${title.toLowerCase()}`}
-              >
-                <XCircle className="h-4 w-4 text-muted-foreground hover:text-foreground" />
-              </Button>
-            )}
           </div>
-        </div>
-      </AccordionTrigger>
+        </AccordionTrigger>
+        {selectedCount > 0 && onClearFilter && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleClearClick}
+            className="h-7 w-7 p-0 hover:bg-muted"
+            title={`Rensa ${title.toLowerCase()}`}
+          >
+            <XCircle className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+          </Button>
+        )}
+      </div>
       <AccordionContent className="px-3 pb-3 border-t pt-3 bg-background">
         {!hideSearch && items.length > 6 && (
           <div className="mb-3 relative">
