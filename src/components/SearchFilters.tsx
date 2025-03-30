@@ -219,16 +219,18 @@ const SearchFiltersComponent = forwardRef<
         collapsible
       >
         <AccordionItem value="dateRange" className="border rounded-md overflow-hidden">
-          <AccordionTrigger className="px-3 py-2 hover:no-underline">
+          <AccordionTrigger className="px-3 py-2 hover:no-underline min-h-10">
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center">
                 <span className="text-sm font-medium">Tävlingsperiod</span>
               </div>
-              {hasActiveDateFilter && (
-                <Badge variant="secondary" className="ml-1 text-xs">
-                  1
-                </Badge>
-              )}
+              <div className="w-6 h-6 flex items-center justify-center">
+                {hasActiveDateFilter && (
+                  <Badge variant="secondary" className="ml-1 text-xs">
+                    1
+                  </Badge>
+                )}
+              </div>
             </div>
           </AccordionTrigger>
           <AccordionContent className="px-3 pb-3 pt-1">

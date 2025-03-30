@@ -11,7 +11,6 @@ import { Button } from "@/components/ui/button";
 import { X, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useMemo, useState } from "react";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface CheckboxFilterProps {
   title: string;
@@ -42,20 +41,20 @@ const CheckboxFilter = ({
     );
   }, [items, searchQuery]);
   
-  // Removed clearAllSelected function and "clear selections" button
-  
   return (
     <AccordionItem value={accordionValue} className="border rounded-md bg-background shadow-sm">
-      <AccordionTrigger className="px-3 py-2 hover:no-underline">
+      <AccordionTrigger className="px-3 py-2 hover:no-underline min-h-10">
         <div className="flex items-center justify-between w-full">
           <span className="text-sm font-medium">
             {title}
           </span>
-          {selectedCount > 0 && (
-            <Badge variant="secondary" className="ml-1 text-xs">
-              {selectedCount}
-            </Badge>
-          )}
+          <div className="w-6 h-6 flex items-center justify-center">
+            {selectedCount > 0 && (
+              <Badge variant="secondary" className="ml-1 text-xs">
+                {selectedCount}
+              </Badge>
+            )}
+          </div>
         </div>
       </AccordionTrigger>
       <AccordionContent className="px-3 pb-3 border-t pt-3 bg-background">
@@ -80,8 +79,6 @@ const CheckboxFilter = ({
             )}
           </div>
         )}
-        
-        {/* Removed the "clear selections" button that was here */}
         
         <div className="space-y-1">
           {filteredItems.length === 0 ? (
