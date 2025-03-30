@@ -42,6 +42,25 @@ const SearchFiltersComponent = ({
     setSearchValue(filters.searchQuery || "");
   }, [filters.searchQuery]);
   
+  // This useEffect ensures accordion state resets when specific filter fields are cleared
+  useEffect(() => {
+    if (filters.districts.length === 0 && expandedItem === 'district') {
+      setExpandedItem(undefined);
+    }
+    if (filters.disciplines.length === 0 && expandedItem === 'discipline') {
+      setExpandedItem(undefined);
+    }
+    if (typesArray.length === 0 && expandedItem === 'type') {
+      setExpandedItem(undefined);
+    }
+    if (branchesArray.length === 0 && expandedItem === 'branch') {
+      setExpandedItem(undefined);
+    }
+    if (!filters.dateRange && expandedItem === 'dateRange') {
+      setExpandedItem(undefined);
+    }
+  }, [filters, expandedItem, typesArray, branchesArray]);
+  
   const handleDisciplineChange = (discipline: string, checked: boolean) => {
     let updatedDisciplines = [...filters.disciplines];
     if (checked) {
@@ -105,20 +124,21 @@ const SearchFiltersComponent = ({
     // First collapse the accordion by setting expandedItem to undefined
     setExpandedItem(undefined);
     
-    // Then clear all filters after a small delay to ensure UI updates properly
+    // Then clear all filters
+    const resetFilters: SearchFiltersType = {
+      regions: [],
+      districts: [],
+      disciplines: [],
+      levels: [],
+      types: [],
+      branches: [],
+      searchQuery: "", 
+      dateRange: undefined,
+      showMap: filters.showMap
+    };
+    
+    // Give a tiny delay to ensure UI updates correctly
     setTimeout(() => {
-      const resetFilters: SearchFiltersType = {
-        regions: [],
-        districts: [],
-        disciplines: [],
-        levels: [],
-        types: [],
-        branches: [],
-        searchQuery: "", 
-        dateRange: undefined,
-        showMap: filters.showMap
-      };
-      
       onFilterChange(resetFilters);
       setSearchValue("");
       
@@ -126,7 +146,7 @@ const SearchFiltersComponent = ({
         title: "Filtren har återställts",
         description: "Alla valda filter har rensats"
       });
-    }, 50); // Increased timeout to 50ms for more reliable accordion collapse
+    }, 100);
   };
   
   const handleClearFilter = (filterType: 'districts' | 'disciplines' | 'types' | 'branches' | 'search' | 'date') => {
@@ -141,12 +161,24 @@ const SearchFiltersComponent = ({
       updatedFilters[filterType] = [];
     }
     
-    onFilterChange(updatedFilters);
+    // If we're clearing the filter that's currently expanded, collapse it
+    if ((filterType === 'districts' && expandedItem === 'district') ||
+        (filterType === 'disciplines' && expandedItem === 'discipline') ||
+        (filterType === 'types' && expandedItem === 'type') ||
+        (filterType === 'branches' && expandedItem === 'branch') ||
+        (filterType === 'date' && expandedItem === 'dateRange')) {
+      setExpandedItem(undefined);
+    }
     
-    toast({
-      title: `${getFilterGroupName(filterType)} borttaget`,
-      description: `Filtret har tagits bort`
-    });
+    // Small delay to ensure UI updates correctly
+    setTimeout(() => {
+      onFilterChange(updatedFilters);
+      
+      toast({
+        title: `${getFilterGroupName(filterType)} borttaget`,
+        description: `Filtret har tagits bort`
+      });
+    }, 50);
   };
   
   const getFilterGroupName = (filterType: string): string => {
