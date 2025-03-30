@@ -8,7 +8,7 @@ import CheckboxFilter from "./search/CheckboxFilter";
 import DateRangeFilter from "./search/DateRangeFilter";
 import { useToast } from "@/hooks/use-toast";
 import { districts } from "@/data/districts";
-import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
+import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 
@@ -25,24 +25,15 @@ interface SearchFiltersProps {
 
 const EXPANDED_FILTERS_KEY = "search-expanded-filters";
 
-const SearchFiltersComponent = forwardRef<
-  { setExpandedItem: (value: string | undefined) => void },
-  SearchFiltersProps
->(({ 
+const SearchFiltersComponent = ({ 
   filters, 
   onFilterChange, 
   hasLocation,
   hideSearchInput = false
-}, ref) => {
+}: SearchFiltersProps) => {
   const { toast } = useToast();
   const [expandedItem, setExpandedItem] = useState<string | undefined>(undefined);
   const [searchValue, setSearchValue] = useState("");
-
-  useImperativeHandle(ref, () => ({
-    setExpandedItem: (value: string | undefined) => {
-      setExpandedItem(value);
-    }
-  }));
 
   const typesArray = Array.isArray(filters.types) ? filters.types : [];
   const branchesArray = Array.isArray(filters.branches) ? filters.branches : [];
@@ -111,23 +102,23 @@ const SearchFiltersComponent = forwardRef<
   };
 
   const handleClearAllFilters = () => {
-    const resetFilters: SearchFiltersType = {
-      regions: [],
-      districts: [],
-      disciplines: [],
-      levels: [],
-      types: [],
-      branches: [],
-      searchQuery: "", 
-      dateRange: undefined,
-      showMap: filters.showMap
-    };
-    
-    // Important: Set expandedItem to undefined first, then update filters
+    // First collapse the accordion by setting expandedItem to undefined
     setExpandedItem(undefined);
     
-    // Slight delay to ensure accordion state updates before filter changes
+    // Then clear all filters after a small delay to ensure UI updates properly
     setTimeout(() => {
+      const resetFilters: SearchFiltersType = {
+        regions: [],
+        districts: [],
+        disciplines: [],
+        levels: [],
+        types: [],
+        branches: [],
+        searchQuery: "", 
+        dateRange: undefined,
+        showMap: filters.showMap
+      };
+      
       onFilterChange(resetFilters);
       setSearchValue("");
       
@@ -135,7 +126,7 @@ const SearchFiltersComponent = forwardRef<
         title: "Filtren har återställts",
         description: "Alla valda filter har rensats"
       });
-    }, 0);
+    }, 50); // Increased timeout to 50ms for more reliable accordion collapse
   };
   
   const handleClearFilter = (filterType: 'districts' | 'disciplines' | 'types' | 'branches' | 'search' | 'date') => {
@@ -319,7 +310,7 @@ const SearchFiltersComponent = forwardRef<
       </div>
     </div>
   );
-});
+};
 
 SearchFiltersComponent.displayName = "SearchFilters";
 

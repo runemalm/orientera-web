@@ -6,7 +6,7 @@ import SearchFilters from "@/components/SearchFilters";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
-import { Filter, Trash2, Map, LayoutPanelLeft, MapPin } from "lucide-react";
+import { Filter, Trash2, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import CompetitionMapView from "@/components/CompetitionMapView";
@@ -141,33 +141,25 @@ const Search = () => {
     setFilters(newFilters);
   };
 
-  const searchFiltersRef = useRef<{ setExpandedItem: (value: string | undefined) => void } | null>(null);
-
   const handleClearAllFilters = () => {
-    if (searchFiltersRef.current) {
-      searchFiltersRef.current.setExpandedItem(undefined);
-    }
+    const resetFilters: SearchFiltersType = {
+      regions: [],
+      districts: [],
+      disciplines: [],
+      levels: [],
+      types: [],
+      branches: [],
+      searchQuery: "", 
+      dateRange: undefined,
+      showMap: filters.showMap
+    };
     
-    setTimeout(() => {
-      const resetFilters: SearchFiltersType = {
-        regions: [],
-        districts: [],
-        disciplines: [],
-        levels: [],
-        types: [],
-        branches: [],
-        searchQuery: "", 
-        dateRange: undefined,
-        showMap: filters.showMap
-      };
-      
-      setFilters(resetFilters);
-      
-      toast({
-        title: "Filtren har återställts",
-        description: "Alla valda filter har rensats - nu visas alla tävlingar"
-      });
-    }, 0);
+    setFilters(resetFilters);
+    
+    toast({
+      title: "Filtren har återställts",
+      description: "Alla valda filter har rensats - nu visas alla tävlingar"
+    });
   };
 
   const toggleSidebar = () => {
@@ -247,7 +239,6 @@ const Search = () => {
                   onFilterChange={handleFilterChange} 
                   hasLocation={false}
                   hideSearchInput={true}
-                  ref={searchFiltersRef}
                 />
               </div>
             </div>
