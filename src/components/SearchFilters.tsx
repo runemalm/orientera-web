@@ -1,3 +1,4 @@
+
 import { FilterIcon, X, SearchIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
@@ -31,7 +32,7 @@ const SearchFiltersComponent = ({
   hideSearchInput = false
 }: SearchFiltersProps) => {
   const { toast } = useToast();
-  const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  const [expandedItem, setExpandedItem] = useState<string | undefined>(undefined);
   const [searchValue, setSearchValue] = useState("");
 
   const typesArray = Array.isArray(filters.types) ? filters.types : [];
@@ -257,10 +258,11 @@ const SearchFiltersComponent = ({
       )}
 
       <Accordion 
-        type="multiple" 
-        value={expandedItems}
-        onValueChange={setExpandedItems}
+        type="single" 
+        value={expandedItem}
+        onValueChange={setExpandedItem}
         className="space-y-2"
+        collapsible
       >
         <AccordionItem value="dateRange" className="border rounded-md overflow-hidden">
           <AccordionTrigger className="px-3 py-2 hover:no-underline">
