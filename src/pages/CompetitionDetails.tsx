@@ -36,6 +36,11 @@ const CompetitionDetails = () => {
     setWaitlistOpen(true);
   };
 
+  const handleBackClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    window.history.back();
+  };
+
   useEffect(() => {
     if (!competition || !mapRef.current) return;
     
@@ -119,9 +124,13 @@ const CompetitionDetails = () => {
       <main className="flex-1">
         <div className="bg-orienteering-green/5 py-12">
           <div className="container">
-            <Link to="/search" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4">
+            <a 
+              href="#" 
+              onClick={handleBackClick} 
+              className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4"
+            >
               ← Tillbaka till sökning
-            </Link>
+            </a>
             
             <div className="flex flex-col md:flex-row justify-between gap-6">
               <div>
