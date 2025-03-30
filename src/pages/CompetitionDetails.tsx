@@ -129,12 +129,8 @@ const CompetitionDetails = () => {
               className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4"
               onClick={goBack}
             >
-              <ArrowLeft className="mr-1 h-4 w-4" /> Tillbaka till sökning
+              <ArrowLeft className="mr-1 h-4 w-4" /> Tillbaka
             </Button>
-            
-            <Link to="/search" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4">
-              ← Tillbaka till sökning
-            </Link>
             
             <div className="flex flex-col md:flex-row justify-between gap-6">
               <div>

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -31,10 +30,9 @@ const Search = () => {
   // Restore scroll position when returning to the search page
   useEffect(() => {
     if (location.pathname === '/search') {
-      // Small delay to ensure the component is fully rendered
       setTimeout(() => {
         restoreScrollPosition('/search');
-      }, 0);
+      }, 100);
     }
   }, [location.pathname, restoreScrollPosition]);
   

@@ -22,7 +22,7 @@ const CompetitionCalendarView: React.FC<CompetitionCalendarViewProps> = ({
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { saveScrollPosition, restoreScrollPosition } = useScrollPosition();
+  const { saveScrollPosition } = useScrollPosition();
   
   // Sort competitions by date in ascending order
   const sortedCompetitions = useMemo(() => 
@@ -30,13 +30,6 @@ const CompetitionCalendarView: React.FC<CompetitionCalendarViewProps> = ({
       new Date(a.date).getTime() - new Date(b.date).getTime()
     )
   , [competitions]);
-
-  // Restore scroll position when returning to search page
-  useEffect(() => {
-    if (location.pathname === '/search') {
-      restoreScrollPosition('/search');
-    }
-  }, [location.pathname, restoreScrollPosition]);
 
   // Group competitions by month
   const competitionsByMonth = useMemo(() => {
@@ -61,7 +54,7 @@ const CompetitionCalendarView: React.FC<CompetitionCalendarViewProps> = ({
   }, [sortedCompetitions]);
 
   const handleCompetitionClick = (competitionId: string) => {
-    // Save current scroll position before navigating
+    // Save scroll position before navigating
     saveScrollPosition('/search');
     navigate(`/competition/${competitionId}`);
   };

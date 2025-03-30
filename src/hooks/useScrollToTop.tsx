@@ -18,8 +18,8 @@ export const useScrollToTop = () => {
         }
       }, 100);
     } else if (pathname !== '/search') {
-      // Only scroll to top for non-search pages
-      // Search page will handle its own scroll position
+      // Scroll to top for all pages except search
+      // Search page will handle its own scroll position with useScrollPosition
       window.scrollTo(0, 0);
     }
   }, [pathname, hash]);
