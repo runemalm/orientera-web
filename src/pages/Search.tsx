@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -28,6 +27,7 @@ const Search = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [isFilterSticky, setIsFilterSticky] = useState(false);
   const filterRef = useRef<HTMLDivElement>(null);
+  const filterContentRef = useRef<HTMLDivElement>(null);
   
   const [filters, setFilters] = useState<SearchFiltersType>({
     regions: [],
@@ -173,18 +173,22 @@ const Search = () => {
     const handleScroll = () => {
       if (filterRef.current) {
         const filterPosition = filterRef.current.getBoundingClientRect().top;
-        setIsFilterSticky(filterPosition <= HEADER_HEIGHT + 4); // 4px is the top offset
+        const newIsSticky = filterPosition <= HEADER_HEIGHT + 4;
+        
+        if (newIsSticky !== isFilterSticky) {
+          setIsFilterSticky(newIsSticky);
+        }
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     // Initial check
     handleScroll();
     
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
-  }, []);
+  }, [isFilterSticky]);
 
   const typesArray = Array.isArray(filters.types) ? filters.types : [];
   const branchesArray = Array.isArray(filters.branches) ? filters.branches : [];
@@ -243,13 +247,14 @@ const Search = () => {
           {sidebarOpen && (
             <div className="w-full md:w-80 flex-shrink-0" ref={filterRef}>
               <div 
+                ref={filterContentRef}
                 className={`mb-4 ${isFilterSticky ? 'sticky' : ''}`}
                 style={{ 
-                  top: isFilterSticky ? `${HEADER_HEIGHT + 4}px` : '4px',
+                  top: isFilterSticky ? `${HEADER_HEIGHT + 4}px` : 'auto',
                   maxHeight: isFilterSticky ? `calc(100vh - ${HEADER_HEIGHT + 8}px)` : 'none',
                   overflow: isFilterSticky ? 'auto' : 'visible',
                   paddingBottom: isFilterSticky ? '8px' : '0',
-                  transition: 'top 0.2s ease-in-out',
+                  position: isFilterSticky ? 'sticky' : 'static',
                 }}
               >
                 <SearchFilters 
@@ -356,4 +361,3 @@ const Search = () => {
 };
 
 export default Search;
-
