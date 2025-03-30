@@ -99,11 +99,11 @@ const DateRangeFilter = ({
           const dayOfWeek = getDay(today);
           
           if (dayOfWeek === 5) { // Friday
-            presetTo = addDays(today, 9); // Include next Sunday (9 days total)
+            presetTo = addDays(today, 9); // Include next Sunday (showing 10 days total)
           } else if (dayOfWeek === 6) { // Saturday
-            presetTo = addDays(today, 8); // Include next Sunday (8 days total)
+            presetTo = addDays(today, 8); // Include next Sunday (showing 9 days total)
           } else {
-            presetTo = addDays(today, 6); // Regular 7-day period
+            presetTo = addDays(today, 7); // Regular case: today + 7 days (showing 8 days total)
           }
           break;
           
@@ -237,11 +237,11 @@ const DateRangeFilter = ({
         const dayOfWeek = getDay(today);
         
         if (dayOfWeek === 5) { // Friday
-          to = addDays(today, 9); // Include next Sunday (9 days total)
+          to = addDays(today, 9); // Include next Sunday (showing 10 days total)
         } else if (dayOfWeek === 6) { // Saturday
-          to = addDays(today, 8); // Include next Sunday (8 days total)
+          to = addDays(today, 8); // Include next Sunday (showing 9 days total)
         } else {
-          to = addDays(today, 6); // Regular 7-day period
+          to = addDays(today, 7); // Regular case: today + 7 days (showing 8 days total)
         }
         break;
         
