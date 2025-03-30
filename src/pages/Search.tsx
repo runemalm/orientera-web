@@ -188,7 +188,7 @@ const Search = () => {
       <main className="flex-1 container py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Tävlingskalender</h1>
-          <p className="text-muted-foreground">Bläddra bland orienteringstävlingar och filtrera efter datum, plats och disciplin</p>
+          <p className="text-muted-foreground">Upptäck orienteringsutmaningar baserat på datum, plats och disciplin</p>
         </div>
         
         <div className="flex flex-col md:flex-row gap-6 w-full max-w-full">

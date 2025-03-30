@@ -67,7 +67,7 @@ const Index = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold mb-2">Filtrera kalendern</h3>
+                <h3 className="text-xl font-bold mb-2">Filtrera</h3>
                 <p className="text-muted-foreground">
                   Hitta tävlingar nära dig, filtrera efter län, distrikt, disciplin eller nivå.
                 </p>
