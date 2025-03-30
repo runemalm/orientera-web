@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { X, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useMemo, useState } from "react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface CheckboxFilterProps {
   title: string;
@@ -82,7 +83,7 @@ const CheckboxFilter = ({
         
         {/* Removed the "clear selections" button that was here */}
         
-        <div className="max-h-48 overflow-y-auto pr-1 space-y-1">
+        <div className="space-y-1">
           {filteredItems.length === 0 ? (
             <div className="text-sm text-muted-foreground p-2 text-center bg-muted/30 rounded-md">
               Inga matchande {title.toLowerCase()} hittades

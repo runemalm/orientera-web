@@ -37,7 +37,6 @@ const SearchFiltersComponent = forwardRef<
   const [expandedItem, setExpandedItem] = useState<string | undefined>(undefined);
   const [searchValue, setSearchValue] = useState("");
 
-  // Expose setExpandedItem method to parent component via ref
   useImperativeHandle(ref, () => ({
     setExpandedItem: (value: string | undefined) => {
       console.log("Setting expanded item to:", value);
