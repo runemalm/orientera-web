@@ -77,7 +77,9 @@ const Search = () => {
 
   useEffect(() => {
     const savedSidebarState = localStorage.getItem(SEARCH_SIDEBAR_OPEN_KEY);
-    if (savedSidebarState !== null) {
+    if (isMobile) {
+      setSidebarOpen(true);
+    } else if (savedSidebarState !== null) {
       setSidebarOpen(savedSidebarState === "true");
     } else {
       setSidebarOpen(!isMobile);
@@ -85,8 +87,10 @@ const Search = () => {
   }, [isMobile]);
 
   useEffect(() => {
-    localStorage.setItem(SEARCH_SIDEBAR_OPEN_KEY, sidebarOpen.toString());
-  }, [sidebarOpen]);
+    if (!isMobile) {
+      localStorage.setItem(SEARCH_SIDEBAR_OPEN_KEY, sidebarOpen.toString());
+    }
+  }, [sidebarOpen, isMobile]);
 
   useEffect(() => {
     if (filters.showMap !== undefined) {
@@ -159,7 +163,9 @@ const Search = () => {
   };
 
   const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
+    if (!isMobile) {
+      setSidebarOpen(!sidebarOpen);
+    }
   };
 
   const toggleMapVisibility = () => {
@@ -216,35 +222,7 @@ const Search = () => {
         </div>
         
         <div className="flex flex-col md:flex-row gap-6 w-full max-w-full">
-          {/* Mobile filter button - enhanced with fixed positioning when scrolling */}
-          {isMobile && (
-            <div className={`${isFilterSticky ? 'fixed bottom-4 right-4 z-30' : 'mb-4'} md:hidden`}>
-              <Button
-                variant={sidebarOpen ? "default" : "outline"}
-                size="sm"
-                onClick={toggleSidebar}
-                className={`flex items-center active:bg-primary focus:bg-primary active:text-primary-foreground focus:text-primary-foreground ${isFilterSticky ? 'shadow-lg rounded-full w-12 h-12 p-0' : ''}`}
-                onTouchEnd={(e) => {
-                  e.currentTarget.blur();
-                }}
-              >
-                <Filter className={`${isFilterSticky ? '' : 'mr-2'} h-4 w-4`} />
-                {!isFilterSticky && (sidebarOpen ? "Dölj filter" : "Visa filter")}
-                {hasActiveFilters && !sidebarOpen && !isFilterSticky && (
-                  <Badge variant="secondary" className="ml-2 h-5 px-1.5">
-                    {filters.disciplines.length + filters.districts.length + typesArray.length + branchesArray.length + (filters.dateRange ? 1 : 0)}
-                  </Badge>
-                )}
-                {hasActiveFilters && !sidebarOpen && isFilterSticky && (
-                  <Badge variant="secondary" className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center">
-                    {filters.disciplines.length + filters.districts.length + typesArray.length + branchesArray.length + (filters.dateRange ? 1 : 0)}
-                  </Badge>
-                )}
-              </Button>
-            </div>
-          )}
-          
-          {sidebarOpen && (
+          {(sidebarOpen || isMobile) && (
             <div className="w-full md:w-80 flex-shrink-0" ref={filterRef}>
               <div 
                 ref={filterContentRef}
@@ -281,7 +259,6 @@ const Search = () => {
                 </div>
                 
                 <div className="flex items-center gap-2">
-                  {/* Only show filter toggle on desktop */}
                   {!isMobile && (
                     <Button
                       variant={sidebarOpen ? "default" : "outline"}
