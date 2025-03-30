@@ -1,9 +1,8 @@
-
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
 // This hook scrolls the window to the top when the route changes
-// and handles scrolling to hash fragments, but respects saved scroll positions
+// and handles scrolling to hash fragments
 export const useScrollToTop = () => {
   const { pathname, hash } = useLocation();
 
@@ -17,9 +16,8 @@ export const useScrollToTop = () => {
           element.scrollIntoView({ behavior: "smooth" });
         }
       }, 100);
-    } else if (pathname !== '/search') {
-      // Scroll to top for all pages except search
-      // Search page will handle its own scroll position with useScrollPosition
+    } else {
+      // Otherwise, scroll to the top of the page
       window.scrollTo(0, 0);
     }
   }, [pathname, hash]);

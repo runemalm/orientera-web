@@ -13,7 +13,6 @@ import CompetitionMapView from "@/components/CompetitionMapView";
 import CompetitionCalendarView from "@/components/CompetitionCalendarView";
 import { useIsMobile, useBreakpoint } from "@/hooks/use-mobile";
 import { Badge } from "@/components/ui/badge";
-import { useScrollPosition } from "@/hooks/useScrollPosition"; 
 
 const SEARCH_SIDEBAR_OPEN_KEY = "search-sidebar-open";
 const SEARCH_FILTERS_KEY = "search-filters";
@@ -25,16 +24,6 @@ const Search = () => {
   const isMobile = useIsMobile();
   const breakpoint = useBreakpoint();
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const { restoreScrollPosition } = useScrollPosition();
-  
-  // Restore scroll position when returning to the search page
-  useEffect(() => {
-    if (location.pathname === '/search') {
-      setTimeout(() => {
-        restoreScrollPosition('/search');
-      }, 100);
-    }
-  }, [location.pathname, restoreScrollPosition]);
   
   const [filters, setFilters] = useState<SearchFiltersType>({
     regions: [],

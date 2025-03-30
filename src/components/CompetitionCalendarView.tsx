@@ -1,4 +1,5 @@
-import React, { useMemo, useEffect } from "react";
+
+import React, { useMemo } from "react";
 import { Competition } from "@/types";
 import { 
   Card, 
@@ -8,10 +9,9 @@ import { Badge } from "@/components/ui/badge";
 import { format, isWeekend, parseISO, isSameMonth } from "date-fns";
 import { sv } from "date-fns/locale";
 import { formatDate } from "@/lib/utils";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Calendar, MapPin, Flag, Star, Navigation } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useScrollPosition } from "@/hooks/useScrollPosition";
 
 interface CompetitionCalendarViewProps {
   competitions: Competition[];
@@ -21,8 +21,6 @@ const CompetitionCalendarView: React.FC<CompetitionCalendarViewProps> = ({
   competitions 
 }) => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { saveScrollPosition } = useScrollPosition();
   
   // Sort competitions by date in ascending order
   const sortedCompetitions = useMemo(() => 
@@ -52,12 +50,6 @@ const CompetitionCalendarView: React.FC<CompetitionCalendarViewProps> = ({
       competitions: comps
     }));
   }, [sortedCompetitions]);
-
-  const handleCompetitionClick = (competitionId: string) => {
-    // Save scroll position before navigating
-    saveScrollPosition('/search');
-    navigate(`/competition/${competitionId}`);
-  };
 
   if (competitions.length === 0) {
     return (
@@ -90,7 +82,7 @@ const CompetitionCalendarView: React.FC<CompetitionCalendarViewProps> = ({
                     isWeekendDay ? "border-l-4 border-l-amber-400" : "",
                     competition.featured ? "border-accent border-l-4" : ""
                   )}
-                  onClick={() => handleCompetitionClick(competition.id)}
+                  onClick={() => navigate(`/competition/${competition.id}`)}
                 >
                   <CardContent className="p-4">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">

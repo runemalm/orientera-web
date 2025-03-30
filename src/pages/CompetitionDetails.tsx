@@ -1,6 +1,6 @@
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
-import { Calendar, MapPin, Flag, Star, Users, Globe, ArrowUp, ArrowLeft } from "lucide-react";
+import { Calendar, MapPin, Flag, Star, Users, Globe, ArrowUp } from "lucide-react";
 import { competitions } from "@/data/competitions";
 import { formatDate, formatDistance } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -26,17 +26,12 @@ L.Marker.prototype.options.icon = DefaultIcon;
 
 const CompetitionDetails = () => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const competition = competitions.find(comp => comp.id === id);
   const [waitlistOpen, setWaitlistOpen] = useState(false);
   const mapRef = useRef<HTMLDivElement>(null);
   const leafletMap = useRef<L.Map | null>(null);
   const userInteractingRef = useRef(false);
   
-  const goBack = () => {
-    navigate(-1);
-  };
-
   const showWaitlist = () => {
     setWaitlistOpen(true);
   };
@@ -124,13 +119,9 @@ const CompetitionDetails = () => {
       <main className="flex-1">
         <div className="bg-orienteering-green/5 py-12">
           <div className="container">
-            <Button 
-              variant="ghost" 
-              className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4"
-              onClick={goBack}
-            >
-              <ArrowLeft className="mr-1 h-4 w-4" /> Tillbaka
-            </Button>
+            <Link to="/search" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4">
+              ← Tillbaka till sökning
+            </Link>
             
             <div className="flex flex-col md:flex-row justify-between gap-6">
               <div>

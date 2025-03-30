@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+
+import React from "react";
 import { Competition } from "@/types";
 import { 
   Card, 
@@ -6,10 +7,9 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { formatDate, formatDistance } from "@/lib/utils";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Calendar, MapPin, Flag, Star, Navigation } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useScrollPosition } from "@/hooks/useScrollPosition";
 
 interface CompetitionListViewProps {
   competitions: Competition[];
@@ -19,26 +19,11 @@ const CompetitionListView: React.FC<CompetitionListViewProps> = ({
   competitions 
 }) => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { saveScrollPosition, restoreScrollPosition } = useScrollPosition();
   
   // Sort competitions by date in ascending order
   const sortedCompetitions = [...competitions].sort((a, b) => 
     new Date(a.date).getTime() - new Date(b.date).getTime()
   );
-
-  // Restore scroll position when returning to search page
-  useEffect(() => {
-    if (location.pathname === '/search') {
-      restoreScrollPosition('/search');
-    }
-  }, [location.pathname, restoreScrollPosition]);
-
-  const handleCompetitionClick = (competitionId: string) => {
-    // Save current scroll position before navigating
-    saveScrollPosition('/search');
-    navigate(`/competition/${competitionId}`);
-  };
 
   return (
     <div className="space-y-4">
@@ -48,7 +33,7 @@ const CompetitionListView: React.FC<CompetitionListViewProps> = ({
           className={`overflow-hidden transition-all hover:shadow-md cursor-pointer ${
             competition.featured ? 'border-accent border-l-4' : ''
           }`}
-          onClick={() => handleCompetitionClick(competition.id)}
+          onClick={() => navigate(`/competition/${competition.id}`)}
         >
           <CardContent className="p-4">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
