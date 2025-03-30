@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Competition } from "@/types";
 import { 
   Card, 
@@ -25,6 +25,12 @@ const CompetitionListView: React.FC<CompetitionListViewProps> = ({
     new Date(a.date).getTime() - new Date(b.date).getTime()
   );
 
+  const handleCompetitionClick = (competitionId: string) => {
+    // Save current scroll position to sessionStorage before navigation
+    sessionStorage.setItem('scrollPosition', window.scrollY.toString());
+    navigate(`/competition/${competitionId}`);
+  };
+
   return (
     <div className="space-y-4">
       {sortedCompetitions.map((competition) => (
@@ -33,7 +39,7 @@ const CompetitionListView: React.FC<CompetitionListViewProps> = ({
           className={`overflow-hidden transition-all hover:shadow-md cursor-pointer ${
             competition.featured ? 'border-accent border-l-4' : ''
           }`}
-          onClick={() => navigate(`/competition/${competition.id}`)}
+          onClick={() => handleCompetitionClick(competition.id)}
         >
           <CardContent className="p-4">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -77,7 +83,14 @@ const CompetitionListView: React.FC<CompetitionListViewProps> = ({
                 </p>
               </div>
               
-              <Button size="sm" className="self-end md:self-center shrink-0">
+              <Button 
+                size="sm" 
+                className="self-end md:self-center shrink-0"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleCompetitionClick(competition.id);
+                }}
+              >
                 Visa detaljer
               </Button>
             </div>
