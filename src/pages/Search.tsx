@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -187,7 +186,7 @@ const Search = () => {
       
       <main className="flex-1 container py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Tävlingskalender</h1>
+          <h1 className="text-3xl font-bold mb-2">Hitta tävlingar</h1>
           <p className="text-muted-foreground">Upptäck orienteringsutmaningar baserat på datum, plats och disciplin</p>
         </div>
         
@@ -235,7 +234,7 @@ const Search = () => {
                     `${filteredCompetitions.length} ${filteredCompetitions.length === 1 ? 'tävling' : 'tävlingar'}`}
                   </h2>
                   {hasActiveFilters && (
-                    <p className="text-muted-foreground text-sm">Filtrerade resultat enligt dina val</p>
+                    <p className="text-muted-foreground text-sm">Anpassade resultat baserat på dina val</p>
                   )}
                 </div>
                 
@@ -289,9 +288,9 @@ const Search = () => {
               </div>
             ) : (
               <div className="bg-card rounded-lg border p-8 text-center">
-                <h3 className="text-lg font-medium mb-2">Inga tävlingar hittades</h3>
+                <h3 className="text-lg font-medium mb-2">Vi hittade inga tävlingar</h3>
                 <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-                  Inga tävlingar matchar dina nuvarande filter. Prova att justera filtren för att se fler tävlingar i kalendern.
+                  Inga tävlingar matchar dina nuvarande filter. Prova att justera dem för att se fler resultat.
                 </p>
                 <ul className="text-left text-sm text-muted-foreground max-w-xs mx-auto mb-6 space-y-2">
                   <li className="flex items-start">

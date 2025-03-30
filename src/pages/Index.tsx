@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Compass, Search, Calendar } from "lucide-react";
+import { Compass, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -35,7 +35,7 @@ const Index = () => {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button asChild size="lg" className="text-md">
-                  <Link to="/search"><Calendar className="mr-2 h-4 w-4" /> Tävlingskalender</Link>
+                  <Link to="/search"><Search className="mr-2 h-4 w-4" /> Sök tävlingar</Link>
                 </Button>
                 <Button 
                   variant="outline" 
@@ -67,7 +67,7 @@ const Index = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold mb-2">Filtrera</h3>
+                <h3 className="text-xl font-bold mb-2">Sök & filtrera</h3>
                 <p className="text-muted-foreground">
                   Hitta tävlingar nära dig, filtrera efter län, distrikt, disciplin eller nivå.
                 </p>
@@ -113,7 +113,7 @@ const Index = () => {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button asChild size="lg">
-                  <Link to="/search"><Calendar className="mr-2 h-4 w-4" /> Tävlingskalender</Link>
+                  <Link to="/search"><Search className="mr-2 h-4 w-4" /> Sök tävlingar</Link>
                 </Button>
                 <Button 
                   variant="outline" 
