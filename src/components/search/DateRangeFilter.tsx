@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 type DateRangeValue = {
   from?: Date;
@@ -21,27 +22,29 @@ interface DateRangeFilterProps {
   removeHeader?: boolean;
 }
 
-const PRESET_OPTIONS = [
-  { id: 'today', label: 'Idag' },
-  { id: 'tomorrow', label: 'Imorgon' },
-  { id: 'thisWeekend', label: 'Helgen' },
-  { id: 'next7days', label: 'Kommande 7 dagar' },
-  { id: 'next30days', label: 'Kommande 30 dagar' },
-  { id: 'thisMonth', label: 'Denna månad' },
-  { id: 'nextMonth', label: 'Nästa månad' },
-];
-
 const DateRangeFilter = ({ 
   dateRange, 
   onDateRangeChange, 
   hasActiveFilter = false,
   removeHeader = false
 }: DateRangeFilterProps) => {
+  const isMobile = useIsMobile();
   const [fromDate, setFromDate] = useState<Date | undefined>(dateRange?.from);
   const [toDate, setToDate] = useState<Date | undefined>(dateRange?.to);
   const [fromDateOpen, setFromDateOpen] = useState(false);
   const [toDateOpen, setToDateOpen] = useState(false);
   const [selectedPreset, setSelectedPreset] = useState<string | undefined>(undefined);
+  
+  // Generate preset options with responsive labels
+  const PRESET_OPTIONS = [
+    { id: 'today', label: 'Idag' },
+    { id: 'tomorrow', label: 'Imorgon' },
+    { id: 'thisWeekend', label: 'Helgen' },
+    { id: 'next7days', label: isMobile ? 'Kommande 7 dgr' : 'Kommande 7 dagar' },
+    { id: 'next30days', label: isMobile ? 'Kommande 30 dgr' : 'Kommande 30 dagar' },
+    { id: 'thisMonth', label: 'Denna månad' },
+    { id: 'nextMonth', label: 'Nästa månad' },
+  ];
   
   useEffect(() => {
     setFromDate(dateRange?.from);
