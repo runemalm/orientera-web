@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -195,10 +194,13 @@ const Search = () => {
           {/* Only show this button on mobile */}
           {isMobile && (
             <Button
-              variant="outline"
+              variant={sidebarOpen ? "default" : "outline"}
               size="sm"
               onClick={toggleSidebar}
-              className="mb-4 flex items-center"
+              className="mb-4 flex items-center active:bg-primary focus:bg-primary active:text-primary-foreground focus:text-primary-foreground"
+              onTouchEnd={(e) => {
+                e.currentTarget.blur();
+              }}
             >
               <Filter className="mr-2 h-4 w-4" />
               {sidebarOpen ? "Dölj filter" : "Visa filter"}
@@ -240,11 +242,13 @@ const Search = () => {
                   {/* Only show filter toggle on desktop */}
                   {!isMobile && (
                     <Button
-                      variant="outline"
+                      variant={sidebarOpen ? "default" : "outline"}
                       size="sm"
                       onClick={toggleSidebar}
-                      className="h-9"
-                      title={sidebarOpen ? "Dölj filter" : "Visa filter"}
+                      className="h-9 active:bg-primary focus:bg-primary active:text-primary-foreground focus:text-primary-foreground"
+                      onTouchEnd={(e) => {
+                        e.currentTarget.blur();
+                      }}
                     >
                       <Filter className="h-4 w-4 mr-2" />
                       <span>{sidebarOpen ? "Dölj filter" : "Visa filter"}</span>
@@ -260,8 +264,10 @@ const Search = () => {
                     variant={filters.showMap ? "default" : "outline"}
                     size="sm"
                     onClick={toggleMapVisibility}
-                    className="h-9"
-                    title={filters.showMap ? "Dölj karta" : "Visa karta"}
+                    className="h-9 active:bg-primary focus:bg-primary active:text-primary-foreground focus:text-primary-foreground"
+                    onTouchEnd={(e) => {
+                      e.currentTarget.blur();
+                    }}
                   >
                     <MapPin className="h-4 w-4 mr-2" />
                     <span>{filters.showMap ? "Dölj karta" : "Visa karta"}</span>
