@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -17,6 +17,7 @@ import { Badge } from "@/components/ui/badge";
 const SEARCH_SIDEBAR_OPEN_KEY = "search-sidebar-open";
 const SEARCH_FILTERS_KEY = "search-filters";
 const SEARCH_MAP_VISIBLE_KEY = "search-map-visible";
+const HEADER_HEIGHT = 64; // Height of the header in pixels
 
 const Search = () => {
   const location = useLocation();
@@ -24,6 +25,8 @@ const Search = () => {
   const isMobile = useIsMobile();
   const breakpoint = useBreakpoint();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [isFilterSticky, setIsFilterSticky] = useState(false);
+  const filterRef = useRef<HTMLDivElement>(null);
   
   const [filters, setFilters] = useState<SearchFiltersType>({
     regions: [],
@@ -165,6 +168,23 @@ const Search = () => {
     }));
   };
 
+  useEffect(() => {
+    const handleScroll = () => {
+      if (filterRef.current) {
+        const filterPosition = filterRef.current.getBoundingClientRect().top;
+        setIsFilterSticky(filterPosition <= HEADER_HEIGHT + 4); // 4px is the top offset
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    // Initial check
+    handleScroll();
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
   const typesArray = Array.isArray(filters.types) ? filters.types : [];
   const branchesArray = Array.isArray(filters.branches) ? filters.branches : [];
   
@@ -191,30 +211,47 @@ const Search = () => {
         </div>
         
         <div className="flex flex-col md:flex-row gap-6 w-full max-w-full">
-          {/* Only show this button on mobile */}
+          {/* Mobile filter button - enhanced with fixed positioning when scrolling */}
           {isMobile && (
-            <Button
-              variant={sidebarOpen ? "default" : "outline"}
-              size="sm"
-              onClick={toggleSidebar}
-              className="mb-4 flex items-center active:bg-primary focus:bg-primary active:text-primary-foreground focus:text-primary-foreground"
-              onTouchEnd={(e) => {
-                e.currentTarget.blur();
-              }}
-            >
-              <Filter className="mr-2 h-4 w-4" />
-              {sidebarOpen ? "Dölj filter" : "Visa filter"}
-              {hasActiveFilters && !sidebarOpen && (
-                <Badge variant="secondary" className="ml-2 h-5 px-1.5">
-                  {filters.disciplines.length + filters.districts.length + typesArray.length + branchesArray.length + (filters.dateRange ? 1 : 0)}
-                </Badge>
-              )}
-            </Button>
+            <div className={`${isFilterSticky ? 'fixed bottom-4 right-4 z-30' : 'mb-4'} md:hidden`}>
+              <Button
+                variant={sidebarOpen ? "default" : "outline"}
+                size="sm"
+                onClick={toggleSidebar}
+                className={`flex items-center active:bg-primary focus:bg-primary active:text-primary-foreground focus:text-primary-foreground ${isFilterSticky ? 'shadow-lg rounded-full w-12 h-12 p-0' : ''}`}
+                onTouchEnd={(e) => {
+                  e.currentTarget.blur();
+                }}
+              >
+                <Filter className={`${isFilterSticky ? '' : 'mr-2'} h-4 w-4`} />
+                {!isFilterSticky && (sidebarOpen ? "Dölj filter" : "Visa filter")}
+                {hasActiveFilters && !sidebarOpen && !isFilterSticky && (
+                  <Badge variant="secondary" className="ml-2 h-5 px-1.5">
+                    {filters.disciplines.length + filters.districts.length + typesArray.length + branchesArray.length + (filters.dateRange ? 1 : 0)}
+                  </Badge>
+                )}
+                {hasActiveFilters && !sidebarOpen && isFilterSticky && (
+                  <Badge variant="secondary" className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center">
+                    {filters.disciplines.length + filters.districts.length + typesArray.length + branchesArray.length + (filters.dateRange ? 1 : 0)}
+                  </Badge>
+                )}
+              </Button>
+            </div>
           )}
           
           {sidebarOpen && (
-            <div className="w-full md:w-80 flex-shrink-0">
-              <div className="mb-4 sticky top-4">
+            <div className="w-full md:w-80 flex-shrink-0" ref={filterRef}>
+              <div 
+                className={`mb-4 ${isFilterSticky ? 'sticky shadow-md' : ''}`}
+                style={{ 
+                  top: isFilterSticky ? `${HEADER_HEIGHT + 4}px` : '4px',
+                  maxHeight: isFilterSticky ? `calc(100vh - ${HEADER_HEIGHT + 8}px)` : 'none',
+                  overflow: isFilterSticky ? 'auto' : 'visible',
+                  paddingBottom: isFilterSticky ? '8px' : '0',
+                  transition: 'box-shadow 0.2s ease-in-out, background-color 0.2s ease-in-out',
+                  backgroundColor: isFilterSticky ? 'var(--background)' : 'transparent'
+                }}
+              >
                 <SearchFilters 
                   filters={filters} 
                   onFilterChange={handleFilterChange} 
