@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -242,14 +243,13 @@ const Search = () => {
           {sidebarOpen && (
             <div className="w-full md:w-80 flex-shrink-0" ref={filterRef}>
               <div 
-                className={`mb-4 ${isFilterSticky ? 'sticky shadow-md' : ''}`}
+                className={`mb-4 ${isFilterSticky ? 'sticky' : ''}`}
                 style={{ 
                   top: isFilterSticky ? `${HEADER_HEIGHT + 4}px` : '4px',
                   maxHeight: isFilterSticky ? `calc(100vh - ${HEADER_HEIGHT + 8}px)` : 'none',
                   overflow: isFilterSticky ? 'auto' : 'visible',
                   paddingBottom: isFilterSticky ? '8px' : '0',
-                  transition: 'box-shadow 0.2s ease-in-out, background-color 0.2s ease-in-out',
-                  backgroundColor: isFilterSticky ? 'var(--background)' : 'transparent'
+                  transition: 'top 0.2s ease-in-out',
                 }}
               >
                 <SearchFilters 
@@ -356,3 +356,4 @@ const Search = () => {
 };
 
 export default Search;
+
