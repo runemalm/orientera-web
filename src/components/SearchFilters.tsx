@@ -1,7 +1,7 @@
-
 import { FilterIcon, X, SearchIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Accordion } from "@/components/ui/accordion";
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import { SearchFilters as SearchFiltersType, CompetitionType, CompetitionBranch } from "@/types";
 import CheckboxFilter from "./search/CheckboxFilter";
 import DateRangeFilter from "./search/DateRangeFilter";
@@ -34,7 +34,6 @@ const SearchFiltersComponent = ({
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [searchValue, setSearchValue] = useState("");
 
-  // Ensure types and branches are always arrays
   const typesArray = Array.isArray(filters.types) ? filters.types : [];
   const branchesArray = Array.isArray(filters.branches) ? filters.branches : [];
   
@@ -123,7 +122,6 @@ const SearchFiltersComponent = ({
     });
   };
   
-  // Add the missing handleClearFilter function
   const handleClearFilter = (filterType: 'districts' | 'disciplines' | 'types' | 'branches' | 'search' | 'date') => {
     const updatedFilters = {...filters};
     
@@ -144,7 +142,6 @@ const SearchFiltersComponent = ({
     });
   };
   
-  // Add the missing getFilterGroupName function
   const getFilterGroupName = (filterType: string): string => {
     switch(filterType) {
       case 'districts': return 'Distrikt';
@@ -259,24 +256,35 @@ const SearchFiltersComponent = ({
         </div>
       )}
 
-      <div className="mb-4">
-        <h4 className="text-sm font-medium mb-2">Tävlingsperiod</h4>
-        <div className="bg-background rounded-md border p-3">
-          <DateRangeFilter 
-            dateRange={filters.dateRange} 
-            onDateRangeChange={handleDateRangeChange}
-            hasActiveFilter={hasActiveDateFilter}
-            removeHeader={true}
-          />
-        </div>
-      </div>
-
       <Accordion 
         type="multiple" 
         value={expandedItems}
         onValueChange={setExpandedItems}
         className="space-y-2"
       >
+        <AccordionItem value="dateRange" className="border rounded-md overflow-hidden">
+          <AccordionTrigger className="px-3 py-2 hover:no-underline">
+            <div className="flex items-center justify-between w-full">
+              <div className="flex items-center">
+                <span className="text-sm font-medium">Tävlingsperiod</span>
+              </div>
+              {hasActiveDateFilter && (
+                <Badge variant="secondary" className="ml-auto mr-2">
+                  Filter aktivt
+                </Badge>
+              )}
+            </div>
+          </AccordionTrigger>
+          <AccordionContent className="px-3 pb-3 pt-1">
+            <DateRangeFilter 
+              dateRange={filters.dateRange} 
+              onDateRangeChange={handleDateRangeChange}
+              hasActiveFilter={hasActiveDateFilter}
+              removeHeader={true}
+            />
+          </AccordionContent>
+        </AccordionItem>
+
         <CheckboxFilter
           title="Tävlingstyp"
           items={competitionTypes.map(t => ({ id: t, name: t }))}
