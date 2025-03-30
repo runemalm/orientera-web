@@ -1,4 +1,3 @@
-
 import { FilterIcon, X, SearchIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
@@ -42,19 +41,14 @@ const SearchFiltersComponent = ({
   
   useEffect(() => {
     if (filters.districts.length === 0 && expandedItem === 'district') {
-      setExpandedItem(undefined);
     }
     if (filters.disciplines.length === 0 && expandedItem === 'discipline') {
-      setExpandedItem(undefined);
     }
     if (typesArray.length === 0 && expandedItem === 'type') {
-      setExpandedItem(undefined);
     }
     if (branchesArray.length === 0 && expandedItem === 'branch') {
-      setExpandedItem(undefined);
     }
     if (!filters.dateRange && expandedItem === 'dateRange') {
-      setExpandedItem(undefined);
     }
   }, [filters, expandedItem, typesArray, branchesArray]);
   
@@ -118,9 +112,6 @@ const SearchFiltersComponent = ({
   };
 
   const handleClearAllFilters = () => {
-    // First collapse any open accordion
-    setExpandedItem(undefined);
-    
     const resetFilters: SearchFiltersType = {
       regions: [],
       districts: [],
@@ -152,15 +143,6 @@ const SearchFiltersComponent = ({
       updatedFilters.dateRange = undefined;
     } else {
       updatedFilters[filterType] = [];
-    }
-    
-    // Reset the expanded state if we're clearing the currently expanded filter
-    if ((filterType === 'districts' && expandedItem === 'district') ||
-        (filterType === 'disciplines' && expandedItem === 'discipline') ||
-        (filterType === 'types' && expandedItem === 'type') ||
-        (filterType === 'branches' && expandedItem === 'branch') ||
-        (filterType === 'date' && expandedItem === 'dateRange')) {
-      setExpandedItem(undefined);
     }
     
     onFilterChange(updatedFilters);
