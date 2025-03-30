@@ -1,5 +1,5 @@
 
-import React, { useEffect } from "react";
+import React from "react";
 import { Competition } from "@/types";
 import { 
   Card, 
@@ -10,6 +10,7 @@ import { formatDate, formatDistance } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { Calendar, MapPin, Flag, Star, Navigation } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useScrollPosition } from "@/hooks/useScrollPosition";
 
 interface CompetitionListViewProps {
   competitions: Competition[];
@@ -19,6 +20,7 @@ const CompetitionListView: React.FC<CompetitionListViewProps> = ({
   competitions 
 }) => {
   const navigate = useNavigate();
+  const { saveScrollPosition } = useScrollPosition();
   
   // Sort competitions by date in ascending order
   const sortedCompetitions = [...competitions].sort((a, b) => 
@@ -27,7 +29,7 @@ const CompetitionListView: React.FC<CompetitionListViewProps> = ({
 
   const handleCompetitionClick = (competitionId: string) => {
     // Save current scroll position to sessionStorage before navigation
-    sessionStorage.setItem('scrollPosition', window.scrollY.toString());
+    saveScrollPosition();
     navigate(`/competition/${competitionId}`);
   };
 
