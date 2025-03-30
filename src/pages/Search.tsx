@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -13,12 +14,15 @@ import CompetitionMapView from "@/components/CompetitionMapView";
 import CompetitionCalendarView from "@/components/CompetitionCalendarView";
 import { useIsMobile, useBreakpoint } from "@/hooks/use-mobile";
 import { Badge } from "@/components/ui/badge";
+import { useScrollToTop } from "@/hooks/useScrollToTop";
 
 const SEARCH_SIDEBAR_OPEN_KEY = "search-sidebar-open";
 const SEARCH_FILTERS_KEY = "search-filters";
 const SEARCH_MAP_VISIBLE_KEY = "search-map-visible";
 
 const Search = () => {
+  // Use the ScrollToTop hook to handle scroll behavior
+  useScrollToTop();
   const location = useLocation();
   const { toast } = useToast();
   const isMobile = useIsMobile();
