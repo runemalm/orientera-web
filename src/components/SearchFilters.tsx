@@ -1,4 +1,3 @@
-
 import { FilterIcon, X, SearchIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
@@ -40,7 +39,10 @@ const SearchFiltersComponent = forwardRef<
 
   // Expose setExpandedItem method to parent component via ref
   useImperativeHandle(ref, () => ({
-    setExpandedItem: (value: string | undefined) => setExpandedItem(value)
+    setExpandedItem: (value: string | undefined) => {
+      console.log("Setting expanded item to:", value);
+      setExpandedItem(value);
+    }
   }));
 
   const typesArray = Array.isArray(filters.types) ? filters.types : [];
@@ -124,7 +126,8 @@ const SearchFiltersComponent = forwardRef<
     
     onFilterChange(resetFilters);
     setSearchValue("");
-    // Collapse all open filters
+    
+    console.log("Collapsing all filters from SearchFilters component");
     setExpandedItem(undefined);
     
     toast({

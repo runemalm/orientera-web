@@ -161,8 +161,12 @@ const Search = () => {
     setFilters(resetFilters);
     
     // If searchFiltersRef is available, collapse all filters
+    console.log("Trying to collapse filters from Search component");
     if (searchFiltersRef.current) {
+      console.log("SearchFiltersRef is available, calling setExpandedItem");
       searchFiltersRef.current.setExpandedItem(undefined);
+    } else {
+      console.log("SearchFiltersRef is NOT available");
     }
     
     toast({
