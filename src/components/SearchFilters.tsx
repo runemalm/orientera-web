@@ -1,3 +1,4 @@
+
 import { FilterIcon, X, SearchIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
@@ -126,7 +127,7 @@ const SearchFiltersComponent = forwardRef<
     onFilterChange(resetFilters);
     setSearchValue("");
     
-    console.log("Collapsing all filters from SearchFilters component");
+    // Explicitly collapse all accordions
     setExpandedItem(undefined);
     
     toast({

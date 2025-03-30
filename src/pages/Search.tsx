@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -158,6 +159,7 @@ const Search = () => {
     
     setFilters(resetFilters);
     
+    // Ensure all accordions are collapsed when filters are cleared
     if (searchFiltersRef.current) {
       searchFiltersRef.current.setExpandedItem(undefined);
     }
