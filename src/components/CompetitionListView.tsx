@@ -10,7 +10,6 @@ import { formatDate, formatDistance } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { Calendar, MapPin, Flag, Star, Navigation } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useScrollPosition } from "@/hooks/useScrollPosition";
 
 interface CompetitionListViewProps {
   competitions: Competition[];
@@ -20,18 +19,11 @@ const CompetitionListView: React.FC<CompetitionListViewProps> = ({
   competitions 
 }) => {
   const navigate = useNavigate();
-  const { saveScrollPosition } = useScrollPosition();
   
   // Sort competitions by date in ascending order
   const sortedCompetitions = [...competitions].sort((a, b) => 
     new Date(a.date).getTime() - new Date(b.date).getTime()
   );
-
-  const handleCompetitionClick = (competitionId: string) => {
-    // Save current scroll position to sessionStorage before navigation
-    saveScrollPosition();
-    navigate(`/competition/${competitionId}`);
-  };
 
   return (
     <div className="space-y-4">
@@ -41,7 +33,7 @@ const CompetitionListView: React.FC<CompetitionListViewProps> = ({
           className={`overflow-hidden transition-all hover:shadow-md cursor-pointer ${
             competition.featured ? 'border-accent border-l-4' : ''
           }`}
-          onClick={() => handleCompetitionClick(competition.id)}
+          onClick={() => navigate(`/competition/${competition.id}`)}
         >
           <CardContent className="p-4">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -85,14 +77,7 @@ const CompetitionListView: React.FC<CompetitionListViewProps> = ({
                 </p>
               </div>
               
-              <Button 
-                size="sm" 
-                className="self-end md:self-center shrink-0"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleCompetitionClick(competition.id);
-                }}
-              >
+              <Button size="sm" className="self-end md:self-center shrink-0">
                 Visa detaljer
               </Button>
             </div>

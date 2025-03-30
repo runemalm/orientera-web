@@ -1,25 +1,12 @@
+
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { Competition, SearchFilters } from "@/types";
-import { isAfter, isBefore, isEqual, parseISO, format } from "date-fns";
+import { isAfter, isBefore, isEqual, parseISO } from "date-fns";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
-
-export const groupCompetitionsByMonth = (competitions: Competition[]): Record<string, Competition[]> => {
-  return competitions.reduce((acc: Record<string, Competition[]>, competition) => {
-    const date = parseISO(competition.date);
-    const monthName = format(date, 'MMMM yyyy');
-    
-    if (!acc[monthName]) {
-      acc[monthName] = [];
-    }
-    
-    acc[monthName].push(competition);
-    return acc;
-  }, {});
-};
 
 export const filterCompetitions = (
   competitions: Competition[],

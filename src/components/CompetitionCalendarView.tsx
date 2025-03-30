@@ -1,13 +1,17 @@
 
-import React from "react";
+import React, { useMemo } from "react";
 import { Competition } from "@/types";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, List } from "lucide-react";
-import CompetitionListView from "@/components/CompetitionListView";
-import { groupCompetitionsByMonth } from "@/lib/utils";
+import { 
+  Card, 
+  CardContent
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { format, isWeekend, parseISO, isSameMonth } from "date-fns";
+import { sv } from "date-fns/locale";
+import { formatDate } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
-import { useScrollPosition } from "@/hooks/useScrollPosition";
+import { Calendar, MapPin, Flag, Star, Navigation } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface CompetitionCalendarViewProps {
   competitions: Competition[];
@@ -17,51 +21,117 @@ const CompetitionCalendarView: React.FC<CompetitionCalendarViewProps> = ({
   competitions 
 }) => {
   const navigate = useNavigate();
-  const { saveScrollPosition } = useScrollPosition();
-  const [activeView, setActiveView] = React.useState("list");
-  const groupedCompetitions = groupCompetitionsByMonth(competitions);
+  
+  // Sort competitions by date in ascending order
+  const sortedCompetitions = useMemo(() => 
+    [...competitions].sort((a, b) => 
+      new Date(a.date).getTime() - new Date(b.date).getTime()
+    )
+  , [competitions]);
 
-  const handleCompetitionClick = (competitionId: string) => {
-    // Save current scroll position to sessionStorage before navigation
-    saveScrollPosition();
-    navigate(`/competition/${competitionId}`);
-  };
+  // Group competitions by month
+  const competitionsByMonth = useMemo(() => {
+    const grouped = new Map<string, Competition[]>();
+    
+    sortedCompetitions.forEach(competition => {
+      const date = parseISO(competition.date);
+      const monthKey = format(date, 'yyyy-MM');
+      const monthName = format(date, 'MMMM yyyy', { locale: sv });
+      
+      if (!grouped.has(monthKey)) {
+        grouped.set(monthKey, []);
+      }
+      grouped.get(monthKey)?.push(competition);
+    });
+    
+    return Array.from(grouped.entries()).map(([key, comps]) => ({
+      monthKey: key,
+      monthName: format(parseISO(`${key}-01`), 'MMMM yyyy', { locale: sv }),
+      competitions: comps
+    }));
+  }, [sortedCompetitions]);
+
+  if (competitions.length === 0) {
+    return (
+      <Card>
+        <CardContent className="p-8 text-center">
+          <p className="text-muted-foreground">Inga tävlingar hittades med dessa filter</p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
-    <Tabs defaultValue="list" value={activeView} onValueChange={setActiveView}>
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Kommande tävlingar</h2>
-        <TabsList>
-          <TabsTrigger value="list" className="flex items-center">
-            <List className="h-4 w-4 mr-2" />
-            Lista
-          </TabsTrigger>
-          <TabsTrigger value="calendar" className="flex items-center">
-            <Calendar className="h-4 w-4 mr-2" />
-            Kalender
-          </TabsTrigger>
-        </TabsList>
-      </div>
-
-      <TabsContent value="list" className="mt-0">
-        <CompetitionListView competitions={competitions} />
-      </TabsContent>
-
-      <TabsContent value="calendar" className="mt-0">
-        <div className="space-y-8">
-          {Object.entries(groupedCompetitions).map(([month, monthCompetitions]) => (
-            <div key={month}>
-              <h3 className="text-lg font-medium mb-4 sticky top-0 bg-background py-2 z-10">
-                {month}
-              </h3>
-              <ScrollArea className="h-[calc(100vh-300px)] pr-4">
-                <CompetitionListView competitions={monthCompetitions} />
-              </ScrollArea>
-            </div>
-          ))}
+    <div className="space-y-8">
+      {competitionsByMonth.map(({ monthKey, monthName, competitions }) => (
+        <div key={monthKey} className="space-y-4">
+          <div className="sticky top-0 z-10 bg-background pt-2 pb-1">
+            <h3 className="text-xl font-semibold capitalize border-b pb-2">{monthName}</h3>
+          </div>
+          
+          <div className="space-y-3">
+            {competitions.map((competition) => {
+              const date = parseISO(competition.date);
+              const isWeekendDay = isWeekend(date);
+              
+              return (
+                <Card 
+                  key={competition.id}
+                  className={cn(
+                    "overflow-hidden transition-all hover:shadow-md cursor-pointer",
+                    isWeekendDay ? "border-l-4 border-l-amber-400" : "",
+                    competition.featured ? "border-accent border-l-4" : ""
+                  )}
+                  onClick={() => navigate(`/competition/${competition.id}`)}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div className="flex-1">
+                        <div className="flex items-center mb-1.5">
+                          <div className={cn(
+                            "flex items-center justify-center min-w-[40px] h-10 mr-3 rounded font-medium text-sm",
+                            isWeekendDay ? "bg-amber-100 text-amber-700" : "bg-muted text-muted-foreground"
+                          )}>
+                            <div className="flex flex-col items-center leading-tight">
+                              <span>{format(date, 'd')}</span>
+                              <span className="text-xs capitalize">{format(date, 'EEE', { locale: sv })}</span>
+                            </div>
+                          </div>
+                          
+                          <div>
+                            <h4 className="font-medium flex items-center">
+                              {competition.featured && (
+                                <Star className="h-4 w-4 text-accent mr-1.5" />
+                              )}
+                              {competition.name}
+                            </h4>
+                            <div className="text-sm text-muted-foreground flex items-center gap-1">
+                              <MapPin className="h-3 w-3" />
+                              <span>{competition.location}</span>
+                              {competition.distance !== undefined && (
+                                <Badge variant="outline" className="ml-1 text-xs">
+                                  <Navigation className="h-3 w-3 mr-1" />
+                                  {competition.distance} km
+                                </Badge>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-2 sm:ml-4">
+                        <Badge variant="secondary">{competition.discipline}</Badge>
+                        <Badge variant="muted">{competition.level}</Badge>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
         </div>
-      </TabsContent>
-    </Tabs>
+      ))}
+    </div>
   );
 };
 
