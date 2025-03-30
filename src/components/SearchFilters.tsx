@@ -1,4 +1,3 @@
-
 import { FilterIcon, X, SearchIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
@@ -284,10 +283,12 @@ const SearchFiltersComponent = forwardRef<
     <div className="rounded-lg border bg-card">
       <div className="p-4">
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center h-6">
-            <FilterIcon className="h-4 w-4" />
-            <h3 className="font-medium ml-2">Filtrera</h3>
-            <div className="w-10 flex justify-start ml-1">
+          <div className="flex items-center h-9">
+            <div className="flex items-center">
+              <FilterIcon className="h-4 w-4" />
+              <h3 className="font-medium ml-2">Filtrera</h3>
+            </div>
+            <div className="w-10 flex justify-start ml-1 h-6">
               {hasActiveFilters && (
                 <Badge variant="secondary">
                   {(filters.disciplines.length + filters.districts.length + typesArray.length + branchesArray.length) + 

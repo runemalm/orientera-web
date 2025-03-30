@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -18,7 +17,7 @@ import { Badge } from "@/components/ui/badge";
 const SEARCH_SIDEBAR_OPEN_KEY = "search-sidebar-open";
 const SEARCH_FILTERS_KEY = "search-filters";
 const SEARCH_MAP_VISIBLE_KEY = "search-map-visible";
-const HEADER_HEIGHT = 64; // Height of the header in pixels
+const HEADER_HEIGHT = 64;
 
 const Search = () => {
   const location = useLocation();
@@ -142,7 +141,6 @@ const Search = () => {
     setFilters(newFilters);
   };
 
-  // Create a ref to the SearchFilters component for collapsing all filters
   const searchFiltersRef = useRef<{ setExpandedItem: (value: string | undefined) => void } | null>(null);
 
   const handleClearAllFilters = () => {
@@ -155,18 +153,13 @@ const Search = () => {
       branches: [],
       searchQuery: "", 
       dateRange: undefined,
-      showMap: filters.showMap // Preserve map visibility setting
+      showMap: filters.showMap
     };
     
     setFilters(resetFilters);
     
-    // If searchFiltersRef is available, collapse all filters
-    console.log("Trying to collapse filters from Search component");
     if (searchFiltersRef.current) {
-      console.log("SearchFiltersRef is available, calling setExpandedItem");
       searchFiltersRef.current.setExpandedItem(undefined);
-    } else {
-      console.log("SearchFiltersRef is NOT available");
     }
     
     toast({
@@ -201,7 +194,6 @@ const Search = () => {
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    // Initial check
     handleScroll();
     
     return () => {
@@ -278,14 +270,16 @@ const Search = () => {
                       variant={sidebarOpen ? "default" : "outline"}
                       size="sm"
                       onClick={toggleSidebar}
-                      className="h-9 active:bg-primary focus:bg-primary active:text-primary-foreground focus:text-primary-foreground"
+                      className="h-9 active:bg-primary focus:bg-primary active:text-primary-foreground focus:text-primary-foreground flex items-center"
                       onTouchEnd={(e) => {
                         e.currentTarget.blur();
                       }}
                     >
-                      <Filter className="h-4 w-4 mr-2" />
-                      <span>{sidebarOpen ? "Dölj filter" : "Visa filter"}</span>
-                      <div className="w-6 ml-1 flex justify-start">
+                      <div className="flex items-center">
+                        <Filter className="h-4 w-4 mr-2" />
+                        <span>{sidebarOpen ? "Dölj filter" : "Visa filter"}</span>
+                      </div>
+                      <div className="w-6 ml-1 flex justify-start h-full">
                         {hasActiveFilters && !sidebarOpen && (
                           <Badge variant="secondary">
                             {filters.disciplines.length + filters.districts.length + typesArray.length + branchesArray.length + (filters.dateRange ? 1 : 0)}
