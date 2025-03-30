@@ -298,7 +298,6 @@ const SearchFiltersComponent = ({
           value={expandedItems} 
           onValueChange={(value) => handleAccordionValueChange(value)}
           className="space-y-2"
-          collapsible
         >
           <AccordionItem value="dateRange" className="border rounded-md overflow-hidden">
             <AccordionTrigger className="px-3 py-2 hover:no-underline min-h-10">
