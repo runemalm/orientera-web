@@ -11,13 +11,6 @@ import CompetitionDetails from "./pages/CompetitionDetails";
 import NotFound from "./pages/NotFound";
 import AboutUs from "./pages/AboutUs";
 import Profile from "./pages/Profile";
-import { useScrollToTop } from "./hooks/useScrollToTop";
-
-// ScrollToTop component that uses our custom hook
-const ScrollToTop = () => {
-  useScrollToTop();
-  return null;
-};
 
 const App = () => {
   // Create QueryClient instance inside the component using useState
@@ -30,7 +23,6 @@ const App = () => {
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <ScrollToTop />
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/search" element={<Search />} />
