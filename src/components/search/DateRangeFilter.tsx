@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { sv } from "date-fns/locale";
 import { format, isValid, isToday, isYesterday, isTomorrow, addDays, startOfMonth, endOfMonth, isSameDay, nextFriday, nextSunday, getDay, subDays } from "date-fns";
@@ -95,7 +96,8 @@ const DateRangeFilter = ({
           break;
           
         case 'next7days':
-          presetFrom = today;
+          // Start from tomorrow instead of today
+          presetFrom = addDays(today, 1);
           const dayOfWeek7 = getDay(today);
           
           if (dayOfWeek7 === 5) { // Friday
@@ -108,8 +110,9 @@ const DateRangeFilter = ({
           break;
           
         case 'next30days':
-          presetFrom = today;
-          presetTo = addDays(today, 29);
+          // Start from tomorrow instead of today
+          presetFrom = addDays(today, 1);
+          presetTo = addDays(today, 30);
           break;
           
         case 'thisMonth':
@@ -223,21 +226,23 @@ const DateRangeFilter = ({
         break;
         
       case 'next7days':
-        from = new Date(today);
+        // Start from tomorrow instead of today
+        from = addDays(today, 1);
         const dayOfWeek7 = getDay(today);
         
         if (dayOfWeek7 === 5) { // Friday
-          to = addDays(today, 9);
+          to = addDays(today, 8); // Changed from 9 to 8 (as we're starting from tomorrow)
         } else if (dayOfWeek7 === 6) { // Saturday
-          to = addDays(today, 8);
+          to = addDays(today, 7); // Changed from 8 to 7 (as we're starting from tomorrow)
         } else {
-          to = addDays(today, 7);
+          to = addDays(from, 6); // 7 days including tomorrow
         }
         break;
         
       case 'next30days':
-        from = new Date(today);
-        to = addDays(today, 29);
+        // Start from tomorrow instead of today
+        from = addDays(today, 1);
+        to = addDays(from, 29); // 30 days including tomorrow
         break;
         
       case 'thisMonth':
