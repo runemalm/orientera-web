@@ -270,8 +270,8 @@ const SearchFiltersComponent = ({
                 <span className="text-sm font-medium">Tävlingsperiod</span>
               </div>
               {hasActiveDateFilter && (
-                <Badge variant="secondary" className="ml-auto mr-2">
-                  Filter aktivt
+                <Badge variant="secondary" className="ml-1 text-xs">
+                  1
                 </Badge>
               )}
             </div>
