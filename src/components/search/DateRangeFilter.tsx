@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { sv } from "date-fns/locale";
-import { format, isValid, isToday, isYesterday, isTomorrow, addDays, startOfMonth, endOfMonth, isSameDay } from "date-fns";
+import { format, isValid, isToday, isYesterday, isTomorrow, addDays, startOfMonth, endOfMonth, isSameDay, nextFriday, nextSunday, getDay } from "date-fns";
 import { X, Calendar as CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -74,8 +74,30 @@ const DateRangeFilter = ({
           break;
           
         case 'thisWeekend':
-          presetFrom = addDays(today, (5 - today.getDay() + 7) % 7);
-          presetTo = addDays(presetFrom, 2);
+          // Figure out the correct weekend range based on today
+          const currentDayOfWeek = getDay(today);
+          let daysUntilFriday = 5 - currentDayOfWeek;
+          if (daysUntilFriday < 0) daysUntilFriday += 7;
+          
+          // If today is Friday, Saturday, or Sunday (5, 6, 0), we're already in the weekend
+          if (currentDayOfWeek === 5 || currentDayOfWeek === 6 || currentDayOfWeek === 0) {
+            // If we're Friday or Saturday, the weekend is today through Sunday
+            if (currentDayOfWeek === 5 || currentDayOfWeek === 6) {
+              presetFrom = today;
+              // Calculate days until Sunday (0)
+              const daysUntilSunday = currentDayOfWeek === 5 ? 2 : 1;
+              presetTo = addDays(today, daysUntilSunday);
+            } 
+            // If we're Sunday, the weekend is Friday through today
+            else if (currentDayOfWeek === 0) {
+              presetFrom = addDays(today, -2);
+              presetTo = today;
+            }
+          } else {
+            // It's Mon-Thu, so the weekend is the upcoming Fri-Sun
+            presetFrom = addDays(today, daysUntilFriday);
+            presetTo = addDays(presetFrom, 2);
+          }
           break;
           
         case 'next7days':
@@ -185,8 +207,33 @@ const DateRangeFilter = ({
         break;
         
       case 'thisWeekend':
-        from = addDays(today, (5 - today.getDay() + 7) % 7);
-        to = addDays(from, 2);
+        // Calculate the dates for the weekend
+        const currentDayOfWeek = getDay(today);
+        
+        // If today is weekday (Mon-Thu), show from today to upcoming Sunday
+        if (currentDayOfWeek >= 1 && currentDayOfWeek <= 4) {
+          from = today;
+          // Calculate days until next Sunday
+          const daysUntilFriday = 5 - currentDayOfWeek;
+          const friday = addDays(today, daysUntilFriday);
+          const sunday = addDays(friday, 2);
+          to = sunday;
+        } 
+        // If today is Friday, show from today to Sunday
+        else if (currentDayOfWeek === 5) {
+          from = today;
+          to = addDays(today, 2);
+        } 
+        // If today is Saturday, show from today to tomorrow (Sunday)
+        else if (currentDayOfWeek === 6) {
+          from = today;
+          to = addDays(today, 1);
+        } 
+        // If today is Sunday, show from this past Friday to today
+        else if (currentDayOfWeek === 0) {
+          from = addDays(today, -2);
+          to = today;
+        }
         break;
         
       case 'next7days':
