@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -228,8 +229,10 @@ const Search = () => {
                 className={`${isFilterSticky ? 'md:sticky' : ''}`}
                 style={{ 
                   top: isFilterSticky ? `${HEADER_HEIGHT + 4}px` : 'auto',
-                  maxHeight: isFilterSticky ? `calc(100vh - ${HEADER_HEIGHT + 8}px)` : 'none',
-                  overflow: isFilterSticky ? 'auto' : 'visible',
+                  // Removed maxHeight restriction to allow the filter to show at full height
+                  // maxHeight: isFilterSticky ? `calc(100vh - ${HEADER_HEIGHT + 8}px)` : 'none',
+                  // Removed overflow property that was causing scrolling
+                  // overflow: isFilterSticky ? 'auto' : 'visible',
                   paddingBottom: isFilterSticky ? '8px' : '0',
                   position: isMobile ? 'static' : (isFilterSticky ? 'sticky' : 'static'),
                   zIndex: 10,
