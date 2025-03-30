@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react";
 import { Competition } from "@/types";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -6,6 +7,7 @@ import { Calendar, List } from "lucide-react";
 import CompetitionListView from "@/components/CompetitionListView";
 import { groupCompetitionsByMonth } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
+import { useScrollPosition } from "@/hooks/useScrollPosition";
 
 interface CompetitionCalendarViewProps {
   competitions: Competition[];
@@ -15,12 +17,13 @@ const CompetitionCalendarView: React.FC<CompetitionCalendarViewProps> = ({
   competitions 
 }) => {
   const navigate = useNavigate();
+  const { saveScrollPosition } = useScrollPosition();
   const [activeView, setActiveView] = React.useState("list");
   const groupedCompetitions = groupCompetitionsByMonth(competitions);
 
   const handleCompetitionClick = (competitionId: string) => {
     // Save current scroll position to sessionStorage before navigation
-    sessionStorage.setItem('scrollPosition', window.scrollY.toString());
+    saveScrollPosition();
     navigate(`/competition/${competitionId}`);
   };
 
