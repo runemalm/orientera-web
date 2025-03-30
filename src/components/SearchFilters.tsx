@@ -1,3 +1,4 @@
+
 import { FilterIcon, X, SearchIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
@@ -172,7 +173,7 @@ const SearchFiltersComponent = ({
             <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               type="text"
-              placeholder="Sök tävlingar..."
+              placeholder="Sök i tävlingskalendern..."
               value={searchValue}
               onChange={handleSearchChange}
               className="pl-9 pr-10"
@@ -326,7 +327,7 @@ const SearchFiltersComponent = ({
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <FilterIcon className="h-4 w-4" />
-            <h3 className="font-medium">Filtrera</h3>
+            <h3 className="font-medium">Filtrera kalendern</h3>
             {hasActiveFilters && (
               <Badge variant="secondary" className="ml-1">
                 {(filters.disciplines.length + filters.districts.length + typesArray.length + branchesArray.length) + 

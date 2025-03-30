@@ -41,7 +41,7 @@ const Header = () => {
                     Hem
                   </Link>
                   <Link to="/search" className="text-lg font-medium hover:text-foreground transition-colors">
-                    Sök tävlingar
+                    Tävlingskalender
                   </Link>
                   <Link to="/profil" className="text-lg font-medium hover:text-foreground transition-colors">
                     Min profil
@@ -68,7 +68,7 @@ const Header = () => {
                 Hem
               </Link>
               <Link to="/search" className="text-muted-foreground hover:text-foreground transition-colors">
-                Sök tävlingar
+                Tävlingskalender
               </Link>
               <Link to="/profil" className="text-muted-foreground hover:text-foreground transition-colors">
                 Min profil
