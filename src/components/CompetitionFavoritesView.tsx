@@ -8,7 +8,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
-import { Calendar, MapPin, Flag, Star, Heart } from "lucide-react";
+import { Calendar, MapPin, Flag, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 // Key for storing favorites in localStorage
@@ -66,11 +66,11 @@ const CompetitionFavoritesView: React.FC<CompetitionFavoritesViewProps> = ({
     return (
       <Card>
         <CardContent className="p-8 text-center">
-          <Heart className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <Star className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
           <h3 className="text-lg font-medium mb-2">Inga favorittävlingar</h3>
           <p className="text-muted-foreground mb-6 max-w-md mx-auto">
             Du har inte markerat några tävlingar som favoriter än. 
-            Klicka på hjärtikonen på en tävling för att lägga till den i dina favoriter.
+            Klicka på stjärnikonen på en tävling för att lägga till den i dina favoriter.
           </p>
         </CardContent>
       </Card>
@@ -132,11 +132,11 @@ const CompetitionFavoritesView: React.FC<CompetitionFavoritesViewProps> = ({
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="text-rose-500 hover:text-rose-600 hover:bg-rose-50"
+                  className="text-amber-500 hover:text-amber-600 hover:bg-amber-50"
                   onClick={(e) => toggleFavorite(e, competition.id)}
                   aria-label="Ta bort från favoriter"
                 >
-                  <Heart className="h-5 w-5 fill-current" />
+                  <Star className="h-5 w-5 fill-current" />
                 </Button>
                 
                 <Button size="sm" className="self-end md:self-center shrink-0">

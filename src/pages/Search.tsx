@@ -6,7 +6,7 @@ import SearchFilters from "@/components/SearchFilters";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
-import { Filter, Trash2, MapPin, CalendarDays, List, Heart } from "lucide-react";
+import { Filter, Trash2, MapPin, CalendarDays, List, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import CompetitionMapView from "@/components/CompetitionMapView";
@@ -330,7 +330,7 @@ const Search = () => {
                           <span className="hidden sm:inline">Kalender</span>
                         </TabsTrigger>
                         <TabsTrigger value="favorites" className="px-3 py-1.5">
-                          <Heart className="h-4 w-4 mr-1" />
+                          <Star className="h-4 w-4 mr-1" />
                           <span className="hidden sm:inline">Favoriter</span>
                         </TabsTrigger>
                       </TabsList>

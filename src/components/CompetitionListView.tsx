@@ -8,7 +8,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { formatDate, formatDistance } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
-import { Calendar, MapPin, Flag, Star, Navigation, Heart } from "lucide-react";
+import { Calendar, MapPin, Flag, Star, Navigation } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 // Key for storing favorites in localStorage
@@ -114,12 +114,12 @@ const CompetitionListView: React.FC<CompetitionListViewProps> = ({
                   variant="ghost" 
                   size="icon" 
                   className={favorites.includes(competition.id) 
-                    ? "text-rose-500 hover:text-rose-600 hover:bg-rose-50" 
-                    : "text-muted-foreground hover:text-rose-500"}
+                    ? "text-amber-500 hover:text-amber-600 hover:bg-amber-50" 
+                    : "text-muted-foreground hover:text-amber-500"}
                   onClick={(e) => toggleFavorite(e, competition.id)}
                   aria-label={favorites.includes(competition.id) ? "Ta bort från favoriter" : "Lägg till som favorit"}
                 >
-                  <Heart className={`h-5 w-5 ${favorites.includes(competition.id) ? "fill-current" : ""}`} />
+                  <Star className={`h-5 w-5 ${favorites.includes(competition.id) ? "fill-current" : ""}`} />
                 </Button>
                 
                 <Button size="sm" className="self-end md:self-center shrink-0">
