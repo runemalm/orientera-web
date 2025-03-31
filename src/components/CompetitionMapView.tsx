@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Competition } from '@/types';
 import { toast } from 'sonner';
 import { Button } from './ui/button';
-import { Info, Map as MapIcon } from 'lucide-react';
+import { Info, Map as MapIcon, ZoomIn, ZoomOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -96,6 +96,9 @@ const CompetitionMapView: React.FC<CompetitionMapViewProps> = ({ competitions })
   const mapRef = useRef<L.Map | null>(null);
   const userInteractingRef = useRef(false);
   const markersRef = useRef<L.Marker[]>([]);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const [isMapHovering, setIsMapHovering] = useState(false);
+  const [isCtrlPressed, setIsCtrlPressed] = useState(false);
   
   // Filter competitions with coordinates
   const competitionsWithCoordinates = competitions.filter(
@@ -159,6 +162,19 @@ const CompetitionMapView: React.FC<CompetitionMapViewProps> = ({ competitions })
     });
   };
   
+  // Zoom in and out functions
+  const handleZoomIn = () => {
+    if (mapRef.current) {
+      mapRef.current.zoomIn();
+    }
+  };
+  
+  const handleZoomOut = () => {
+    if (mapRef.current) {
+      mapRef.current.zoomOut();
+    }
+  };
+  
   // Initialize the map
   useEffect(() => {
     if (!mapInitialized) return;
@@ -170,7 +186,8 @@ const CompetitionMapView: React.FC<CompetitionMapViewProps> = ({ competitions })
     const mapInstance = L.map('competition-map', {
       center: swedenCenter,
       zoom: 4.5,
-      zoomControl: false
+      zoomControl: false,
+      scrollWheelZoom: false // Disable scroll wheel zoom by default
     });
     
     // Add tile layer
@@ -236,11 +253,110 @@ const CompetitionMapView: React.FC<CompetitionMapViewProps> = ({ competitions })
     }
   }, [competitionsWithCoordinates, mapInitialized]);
   
+  // Handle keyboard events for Ctrl key press
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        setIsCtrlPressed(true);
+        if (mapRef.current && isMapHovering) {
+          mapRef.current.scrollWheelZoom.enable();
+        }
+      }
+    };
+    
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (!e.ctrlKey && !e.metaKey) {
+        setIsCtrlPressed(false);
+        if (mapRef.current) {
+          mapRef.current.scrollWheelZoom.disable();
+        }
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, [isMapHovering]);
+  
+  // Handle mouse events for the map container
+  const handleMouseEnter = () => {
+    setIsMapHovering(true);
+  };
+  
+  const handleMouseLeave = () => {
+    setIsMapHovering(false);
+    if (mapRef.current) {
+      mapRef.current.scrollWheelZoom.disable();
+    }
+  };
+  
   return (
     <div className="relative">
-      <div className="w-full h-[600px] rounded-lg border border-border shadow-sm">
+      <div 
+        className="w-full h-[600px] rounded-lg border border-border shadow-sm" 
+        ref={mapContainerRef}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
         {/* The map container */}
-        <div id="competition-map" style={{ height: '100%', width: '100%', borderRadius: '0.5rem' }}></div>
+        <div 
+          id="competition-map" 
+          style={{ height: '100%', width: '100%', borderRadius: '0.5rem' }}
+        ></div>
+        
+        {/* Custom zoom controls */}
+        <div className="absolute top-4 right-4 flex flex-col gap-2 z-[1000]">
+          <Button 
+            size="icon" 
+            variant="default" 
+            className="bg-white text-black hover:bg-gray-100 shadow-md"
+            onMouseDown={() => {
+              if (mapRef.current) {
+                mapRef.current.scrollWheelZoom.enable();
+              }
+            }}
+            onMouseUp={() => {
+              if (mapRef.current) {
+                mapRef.current.scrollWheelZoom.disable();
+              }
+            }}
+            onMouseLeave={() => {
+              if (mapRef.current) {
+                mapRef.current.scrollWheelZoom.disable();
+              }
+            }}
+            onClick={handleZoomIn}
+          >
+            <ZoomIn className="h-4 w-4" />
+          </Button>
+          <Button 
+            size="icon" 
+            variant="default" 
+            className="bg-white text-black hover:bg-gray-100 shadow-md"
+            onMouseDown={() => {
+              if (mapRef.current) {
+                mapRef.current.scrollWheelZoom.enable();
+              }
+            }}
+            onMouseUp={() => {
+              if (mapRef.current) {
+                mapRef.current.scrollWheelZoom.disable();
+              }
+            }}
+            onMouseLeave={() => {
+              if (mapRef.current) {
+                mapRef.current.scrollWheelZoom.disable();
+              }
+            }}
+            onClick={handleZoomOut}
+          >
+            <ZoomOut className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
       
       {/* Message for no competitions with coordinates */}
@@ -261,6 +377,14 @@ const CompetitionMapView: React.FC<CompetitionMapViewProps> = ({ competitions })
       <div className="absolute bottom-4 right-4 p-2 bg-background/80 rounded-sm text-xs text-muted-foreground shadow-sm">
         OpenStreetMap
       </div>
+      
+      {/* Instructions */}
+      {isMapHovering && (
+        <div className="absolute bottom-4 left-4 p-2 bg-background/90 rounded-md text-xs text-muted-foreground shadow-sm transition-opacity">
+          <p>Håll musknappen nedtryckt på zoom-knapparna för att zooma med scrollhjulet</p>
+          <p className="text-xs opacity-75 mt-1">Eller håll ned CTRL-knappen</p>
+        </div>
+      )}
     </div>
   );
 };
