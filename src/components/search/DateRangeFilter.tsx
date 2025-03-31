@@ -61,80 +61,85 @@ const DateRangeFilter = ({
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
-    const isMatchingPreset = (presetId: string): boolean => {
-      let presetFrom: Date | undefined;
-      let presetTo: Date | undefined;
-      
-      switch (presetId) {
-        case 'today':
-          presetFrom = today;
-          presetTo = today;
-          break;
-          
-        case 'tomorrow':
-          presetFrom = addDays(today, 1);
-          presetTo = addDays(today, 1);
-          break;
-          
-        case 'thisWeekend':
-          const dayOfWeek = getDay(today);
-          
-          if (dayOfWeek === 0) { // Sunday
-            presetFrom = subDays(today, 2);
-            presetTo = today;
-          } else if (dayOfWeek === 6) { // Saturday
-            presetFrom = subDays(today, 1);
-            presetTo = addDays(today, 1);
-          } else if (dayOfWeek === 5) { // Friday
-            presetFrom = today;
-            presetTo = addDays(today, 2);
-          } else {
-            const daysUntilFriday = 5 - dayOfWeek;
-            presetFrom = addDays(today, daysUntilFriday);
-            presetTo = addDays(presetFrom, 2);
-          }
-          break;
-          
-        case 'next7days':
-          presetFrom = addDays(today, 1);
-          presetTo = addDays(today, 7);
-          break;
-          
-        case 'next30days':
-          presetFrom = addDays(today, 1);
-          presetTo = addDays(today, 30);
-          break;
-          
-        case 'thisMonth':
-          presetFrom = startOfMonth(today);
-          presetTo = endOfMonth(today);
-          break;
-          
-        case 'nextMonth':
-          presetFrom = startOfMonth(addDays(endOfMonth(today), 1));
-          presetTo = endOfMonth(presetFrom);
-          break;
-          
-        default:
-          return false;
-      }
-      
-      const fromMatches = presetFrom && from && isSameDay(from, presetFrom);
-      const toMatches = 
-        (presetTo && to && isSameDay(to, presetTo)) || 
-        (!presetTo && !to);
-        
-      return fromMatches && toMatches;
+    // Helper function to compare dates for preset matching
+    const datesMatch = (date1: Date | undefined, date2: Date | undefined): boolean => {
+      if (!date1 && !date2) return true;
+      if (!date1 || !date2) return false;
+      return isSameDay(date1, date2);
     };
     
+    // Check each preset against the provided dates
     for (const preset of PRESET_OPTIONS) {
-      if (isMatchingPreset(preset.id)) {
+      const presetRange = getPresetDateRange(preset.id);
+      if (datesMatch(from, presetRange.from) && datesMatch(to, presetRange.to)) {
         setSelectedPreset(preset.id);
         return;
       }
     }
     
     setSelectedPreset(undefined);
+  };
+  
+  // Get date range for a specific preset
+  const getPresetDateRange = (presetId: string): DateRangeValue => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    let from: Date | undefined;
+    let to: Date | undefined;
+    
+    switch (presetId) {
+      case 'today':
+        from = new Date(today);
+        to = from;
+        break;
+        
+      case 'tomorrow':
+        from = addDays(today, 1);
+        to = from;
+        break;
+        
+      case 'thisWeekend':
+        const dayOfWeek = getDay(today);
+        
+        if (dayOfWeek === 0) { // Sunday
+          from = subDays(today, 2);
+          to = today;
+        } else if (dayOfWeek === 6) { // Saturday
+          from = subDays(today, 1);
+          to = addDays(today, 1);
+        } else if (dayOfWeek === 5) { // Friday
+          from = today;
+          to = addDays(today, 2);
+        } else {
+          const daysUntilFriday = 5 - dayOfWeek;
+          from = addDays(today, daysUntilFriday);
+          to = addDays(from, 2);
+        }
+        break;
+        
+      case 'next7days':
+        from = addDays(today, 1);
+        to = addDays(today, 7);
+        break;
+        
+      case 'next30days':
+        from = addDays(today, 1);
+        to = addDays(today, 30);
+        break;
+        
+      case 'thisMonth':
+        from = startOfMonth(today);
+        to = endOfMonth(today);
+        break;
+        
+      case 'nextMonth':
+        from = startOfMonth(addDays(endOfMonth(today), 1));
+        to = endOfMonth(from);
+        break;
+    }
+    
+    return { from, to };
   };
   
   const handleFromDateSelect = (date: Date | undefined) => {
@@ -188,66 +193,11 @@ const DateRangeFilter = ({
   
   const handlePresetChange = (value: string) => {
     setSelectedPreset(value);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
+    const dateRange = getPresetDateRange(value);
     
-    let from: Date | undefined;
-    let to: Date | undefined;
-    
-    switch (value) {
-      case 'today':
-        from = new Date(today);
-        to = from;
-        break;
-        
-      case 'tomorrow':
-        from = addDays(today, 1);
-        to = from;
-        break;
-        
-      case 'thisWeekend':
-        const dayOfWeek = getDay(today);
-        
-        if (dayOfWeek === 0) { // Sunday
-          from = subDays(today, 2);
-          to = today;
-        } else if (dayOfWeek === 6) { // Saturday
-          from = subDays(today, 1);
-          to = addDays(today, 1);
-        } else if (dayOfWeek === 5) { // Friday
-          from = today;
-          to = addDays(today, 2);
-        } else {
-          const daysUntilFriday = 5 - dayOfWeek;
-          from = addDays(today, daysUntilFriday);
-          to = addDays(from, 2);
-        }
-        break;
-        
-      case 'next7days':
-        from = addDays(today, 1);
-        to = addDays(today, 7);
-        break;
-        
-      case 'next30days':
-        from = addDays(today, 1);
-        to = addDays(today, 30);
-        break;
-        
-      case 'thisMonth':
-        from = startOfMonth(today);
-        to = endOfMonth(today);
-        break;
-        
-      case 'nextMonth':
-        from = startOfMonth(addDays(endOfMonth(today), 1));
-        to = endOfMonth(from);
-        break;
-    }
-    
-    setFromDate(from);
-    setToDate(to);
-    updateDateRange(from, to);
+    setFromDate(dateRange.from);
+    setToDate(dateRange.to);
+    updateDateRange(dateRange.from, dateRange.to);
   };
 
   return (
