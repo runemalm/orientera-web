@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -6,7 +7,7 @@ import SearchFilters from "@/components/SearchFilters";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
-import { Filter, Trash2, MapPin, PanelLeftClose, PanelLeft, Map, MapPinOff, CalendarDays, List } from "lucide-react";
+import { Filter, Trash2, MapPin, PanelLeftClose, PanelLeft, MapPinOff, CalendarDays, List, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import CompetitionMapView from "@/components/CompetitionMapView";
@@ -256,7 +257,7 @@ const Search = () => {
                             onClick={toggleSidebar}
                             className="h-9 w-9 relative"
                           >
-                            {sidebarOpen ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeft className="h-4 w-4" />}
+                            {sidebarOpen ? <SlidersHorizontal className="h-4 w-4" /> : <SlidersHorizontal className="h-4 w-4" />}
                             {hasActiveFilters && !sidebarOpen && (
                               <Badge 
                                 variant="secondary"
@@ -296,10 +297,12 @@ const Search = () => {
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
-                          variant={calendarView === 'wall' ? "default" : "outline"}
+                          variant="outline"
                           size="icon"
                           onClick={toggleCalendarView}
                           className="h-9 w-9 relative"
+                          aria-pressed={calendarView === 'wall'}
+                          aria-label={calendarView === 'wall' ? "Visa lista" : "Visa kalender"}
                         >
                           {calendarView === 'wall' ? <List className="h-4 w-4" /> : <CalendarDays className="h-4 w-4" />}
                         </Button>
