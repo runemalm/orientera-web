@@ -6,11 +6,12 @@ import SearchFilters from "@/components/SearchFilters";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
-import { Filter, Trash2, MapPin, PanelLeftClose, PanelLeft, Map, MapPinOff } from "lucide-react";
+import { Filter, Trash2, MapPin, PanelLeftClose, PanelLeft, Map, MapPinOff, CalendarDays, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import CompetitionMapView from "@/components/CompetitionMapView";
 import CompetitionCalendarView from "@/components/CompetitionCalendarView";
+import CompetitionWallCalendarView from "@/components/CompetitionWallCalendarView";
 import { useIsMobile, useBreakpoint } from "@/hooks/use-mobile";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -18,6 +19,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 const SEARCH_SIDEBAR_OPEN_KEY = "search-sidebar-open";
 const SEARCH_FILTERS_KEY = "search-filters";
 const SEARCH_MAP_VISIBLE_KEY = "search-map-visible";
+const SEARCH_CALENDAR_VIEW_KEY = "search-calendar-view";
 const HEADER_HEIGHT = 64;
 
 const Search = () => {
@@ -28,6 +30,7 @@ const Search = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const filterRef = useRef<HTMLDivElement>(null);
   const filterContentRef = useRef<HTMLDivElement>(null);
+  const [calendarView, setCalendarView] = useState<'list' | 'wall'>('list');
   
   const [filters, setFilters] = useState<SearchFiltersType>({
     regions: [],
@@ -97,6 +100,17 @@ const Search = () => {
       localStorage.setItem(SEARCH_MAP_VISIBLE_KEY, filters.showMap.toString());
     }
   }, [filters.showMap]);
+
+  useEffect(() => {
+    const savedCalendarView = localStorage.getItem(SEARCH_CALENDAR_VIEW_KEY);
+    if (savedCalendarView === 'wall' || savedCalendarView === 'list') {
+      setCalendarView(savedCalendarView);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(SEARCH_CALENDAR_VIEW_KEY, calendarView);
+  }, [calendarView]);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -173,6 +187,10 @@ const Search = () => {
       ...prev,
       showMap: !prev.showMap
     }));
+  };
+
+  const toggleCalendarView = () => {
+    setCalendarView(prev => prev === 'list' ? 'wall' : 'list');
   };
 
   const typesArray = Array.isArray(filters.types) ? filters.types : [];
@@ -273,6 +291,24 @@ const Search = () => {
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
+                  
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant={calendarView === 'wall' ? "default" : "outline"}
+                          size="icon"
+                          onClick={toggleCalendarView}
+                          className="h-9 w-9 relative"
+                        >
+                          {calendarView === 'wall' ? <List className="h-4 w-4" /> : <CalendarDays className="h-4 w-4" />}
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">
+                        {calendarView === 'wall' ? "Visa lista" : "Visa kalender"}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
               </div>
             </div>
@@ -285,7 +321,11 @@ const Search = () => {
                   </div>
                 )}
                 
-                <CompetitionCalendarView competitions={filteredCompetitions} />
+                {calendarView === 'list' ? (
+                  <CompetitionCalendarView competitions={filteredCompetitions} />
+                ) : (
+                  <CompetitionWallCalendarView competitions={filteredCompetitions} />
+                )}
               </div>
             ) : (
               <div className="bg-card rounded-lg border p-8 text-center">
