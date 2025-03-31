@@ -50,10 +50,10 @@ const DateRangeFilter = ({
     setFromDate(dateRange?.from);
     setToDate(dateRange?.to);
     
-    if (dateRange?.from) {
+    // Only try to match a preset if we don't already have one selected
+    // or if the dates have changed from outside this component
+    if (dateRange?.from && !selectedPreset) {
       checkAndSetPreset(dateRange.from, dateRange.to);
-    } else {
-      setSelectedPreset(undefined);
     }
   }, [dateRange]);
   
@@ -68,16 +68,15 @@ const DateRangeFilter = ({
       return isSameDay(date1, date2);
     };
     
-    // Check each preset against the provided dates
+    // We'll match but not set a preset here - this is just for detection
     for (const preset of PRESET_OPTIONS) {
       const presetRange = getPresetDateRange(preset.id);
       if (datesMatch(from, presetRange.from) && datesMatch(to, presetRange.to)) {
-        setSelectedPreset(preset.id);
-        return;
+        return preset.id;
       }
     }
     
-    setSelectedPreset(undefined);
+    return undefined;
   };
   
   // Get date range for a specific preset
