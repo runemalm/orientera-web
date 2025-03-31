@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { sv } from "date-fns/locale";
 import { format, isValid, isToday, isYesterday, isTomorrow, addDays, startOfMonth, endOfMonth, isSameDay, nextFriday, nextSunday, getDay, subDays } from "date-fns";
@@ -231,9 +232,11 @@ const DateRangeFilter = ({
               key={option.id}
               pressed={selectedPreset === option.id}
               onPressedChange={() => handlePresetChange(option.id)}
+              variant="outline"
               className={cn(
-                "text-xs h-7 w-full px-2 truncate",
-                selectedPreset === option.id && "bg-orienteering-green hover:bg-orienteering-green/90 text-white data-[state=on]:bg-orienteering-green data-[state=on]:text-white"
+                "text-xs h-7 w-full px-2 truncate border-input hover:bg-muted/60",
+                selectedPreset === option.id && 
+                "bg-orienteering-green hover:bg-orienteering-green/90 text-white border-orienteering-green data-[state=on]:bg-orienteering-green data-[state=on]:text-white data-[state=on]:border-orienteering-green"
               )}
             >
               {option.label}
@@ -247,9 +250,11 @@ const DateRangeFilter = ({
               key={option.id}
               pressed={selectedPreset === option.id}
               onPressedChange={() => handlePresetChange(option.id)}
+              variant="outline"
               className={cn(
-                "text-xs h-7 w-full px-2 truncate",
-                selectedPreset === option.id && "bg-orienteering-green hover:bg-orienteering-green/90 text-white data-[state=on]:bg-orienteering-green data-[state=on]:text-white"
+                "text-xs h-7 w-full px-2 truncate border-input hover:bg-muted/60",
+                selectedPreset === option.id && 
+                "bg-orienteering-green hover:bg-orienteering-green/90 text-white border-orienteering-green data-[state=on]:bg-orienteering-green data-[state=on]:text-white data-[state=on]:border-orienteering-green"
               )}
             >
               {option.label}
@@ -263,9 +268,11 @@ const DateRangeFilter = ({
               key={option.id}
               pressed={selectedPreset === option.id}
               onPressedChange={() => handlePresetChange(option.id)}
+              variant="outline"
               className={cn(
-                "text-xs h-7 w-full px-2 truncate",
-                selectedPreset === option.id && "bg-orienteering-green hover:bg-orienteering-green/90 text-white data-[state=on]:bg-orienteering-green data-[state=on]:text-white"
+                "text-xs h-7 w-full px-2 truncate border-input hover:bg-muted/60",
+                selectedPreset === option.id && 
+                "bg-orienteering-green hover:bg-orienteering-green/90 text-white border-orienteering-green data-[state=on]:bg-orienteering-green data-[state=on]:text-white data-[state=on]:border-orienteering-green"
               )}
             >
               {option.label}
