@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -26,7 +25,6 @@ const Search = () => {
   const isMobile = useIsMobile();
   const breakpoint = useBreakpoint();
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [isFilterSticky, setIsFilterSticky] = useState(false);
   const filterRef = useRef<HTMLDivElement>(null);
   const filterContentRef = useRef<HTMLDivElement>(null);
   
@@ -176,26 +174,6 @@ const Search = () => {
     }));
   };
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (filterRef.current) {
-        const filterPosition = filterRef.current.getBoundingClientRect().top;
-        const newIsSticky = filterPosition <= HEADER_HEIGHT + 4;
-        
-        if (newIsSticky !== isFilterSticky) {
-          setIsFilterSticky(newIsSticky);
-        }
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, [isFilterSticky]);
-
   const typesArray = Array.isArray(filters.types) ? filters.types : [];
   const branchesArray = Array.isArray(filters.branches) ? filters.branches : [];
   
@@ -224,23 +202,7 @@ const Search = () => {
         <div className="flex flex-col md:flex-row gap-6 w-full max-w-full">
           {(sidebarOpen || isMobile) && (
             <div className="w-full md:w-80 flex-shrink-0" ref={filterRef}>
-              <div 
-                ref={filterContentRef}
-                className={`${isFilterSticky ? 'md:sticky' : ''}`}
-                style={{ 
-                  top: isFilterSticky ? `${HEADER_HEIGHT + 4}px` : 'auto',
-                  // Removed maxHeight restriction to allow the filter to show at full height
-                  // maxHeight: isFilterSticky ? `calc(100vh - ${HEADER_HEIGHT + 8}px)` : 'none',
-                  // Removed overflow property that was causing scrolling
-                  // overflow: isFilterSticky ? 'auto' : 'visible',
-                  paddingBottom: isFilterSticky ? '8px' : '0',
-                  position: isMobile ? 'static' : (isFilterSticky ? 'sticky' : 'static'),
-                  zIndex: 10,
-                  marginBottom: '1rem',
-                  willChange: 'transform',
-                  transform: 'translateZ(0)',
-                }}
-              >
+              <div ref={filterContentRef} className="mb-4">
                 <SearchFilters 
                   filters={filters} 
                   onFilterChange={handleFilterChange} 
