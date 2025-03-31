@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useRef } from 'react';
 import { Competition } from '@/types';
 import { toast } from 'sonner';
@@ -378,9 +377,9 @@ const CompetitionMapView: React.FC<CompetitionMapViewProps> = ({ competitions })
         OpenStreetMap
       </div>
       
-      {/* Instructions */}
+      {/* Instructions - Fixed z-index to ensure visibility */}
       {isMapHovering && (
-        <div className="absolute bottom-4 left-4 p-2 bg-background/90 rounded-md text-xs text-muted-foreground shadow-sm transition-opacity">
+        <div className="absolute bottom-4 left-4 p-2 bg-background/90 rounded-md text-xs text-muted-foreground shadow-sm z-[1000]">
           <p>Håll musknappen nedtryckt på zoom-knapparna för att zooma med scrollhjulet</p>
           <p className="text-xs opacity-75 mt-1">Eller håll ned CTRL-knappen</p>
         </div>
