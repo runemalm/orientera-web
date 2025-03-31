@@ -6,13 +6,14 @@ import SearchFilters from "@/components/SearchFilters";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
-import { Filter, Trash2, MapPin } from "lucide-react";
+import { Filter, Trash2, MapPin, PanelLeftClose, PanelLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import CompetitionMapView from "@/components/CompetitionMapView";
 import CompetitionCalendarView from "@/components/CompetitionCalendarView";
 import { useIsMobile, useBreakpoint } from "@/hooks/use-mobile";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const SEARCH_SIDEBAR_OPEN_KEY = "search-sidebar-open";
 const SEARCH_FILTERS_KEY = "search-filters";
@@ -228,27 +229,31 @@ const Search = () => {
                 
                 <div className="flex items-center gap-2">
                   {!isMobile && (
-                    <Button
-                      variant={sidebarOpen ? "default" : "outline"}
-                      size="sm"
-                      onClick={toggleSidebar}
-                      className="h-9 active:bg-primary focus:bg-primary active:text-primary-foreground focus:text-primary-foreground flex items-center"
-                      onTouchEnd={(e) => {
-                        e.currentTarget.blur();
-                      }}
-                    >
-                      <div className="flex items-center">
-                        <Filter className="h-4 w-4 mr-2" />
-                        <span>{sidebarOpen ? "Dölj filter" : "Visa filter"}</span>
-                      </div>
-                      <div className="w-6 ml-1 flex justify-start h-full">
-                        {hasActiveFilters && !sidebarOpen && (
-                          <Badge variant="secondary">
-                            {filters.disciplines.length + filters.districts.length + typesArray.length + branchesArray.length + (filters.dateRange ? 1 : 0)}
-                          </Badge>
-                        )}
-                      </div>
-                    </Button>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant={sidebarOpen ? "default" : "outline"}
+                            size="icon"
+                            onClick={toggleSidebar}
+                            className="h-9 w-9 active:bg-primary focus:bg-primary active:text-primary-foreground focus:text-primary-foreground relative"
+                          >
+                            {sidebarOpen ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeft className="h-4 w-4" />}
+                            {hasActiveFilters && !sidebarOpen && (
+                              <Badge 
+                                variant="secondary"
+                                className="absolute -top-2 -right-2 h-5 min-w-5 flex items-center justify-center p-0 text-xs"
+                              >
+                                {filters.disciplines.length + filters.districts.length + typesArray.length + branchesArray.length + (filters.dateRange ? 1 : 0)}
+                              </Badge>
+                            )}
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom">
+                          {sidebarOpen ? "Dölj filter" : "Visa filter"}
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   )}
                   
                   <Button
