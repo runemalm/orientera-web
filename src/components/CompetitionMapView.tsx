@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState, useRef } from 'react';
 import { Competition } from '@/types';
 import { toast } from 'sonner';
@@ -185,7 +186,7 @@ const CompetitionMapView: React.FC<CompetitionMapViewProps> = ({ competitions })
     const mapInstance = L.map('competition-map', {
       center: swedenCenter,
       zoom: 4.5,
-      zoomControl: false,
+      zoomControl: false, // Disable the native zoom controls
       scrollWheelZoom: false // Disable scroll wheel zoom by default
     });
     
@@ -194,8 +195,8 @@ const CompetitionMapView: React.FC<CompetitionMapViewProps> = ({ competitions })
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(mapInstance);
     
-    // Add zoom control to top-right
-    L.control.zoom({ position: 'topright' }).addTo(mapInstance);
+    // Remove the native zoom control (not adding it)
+    // L.control.zoom({ position: 'topright' }).addTo(mapInstance);
     
     // Track user interaction to prevent auto-zoom
     mapInstance.on('zoomstart', () => {
