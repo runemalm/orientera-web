@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { sv } from "date-fns/locale";
 import { format, isValid, isToday, isYesterday, isTomorrow, addDays, startOfMonth, endOfMonth, isSameDay, nextFriday, nextSunday, getDay, subDays } from "date-fns";
@@ -349,39 +348,20 @@ const DateRangeFilter = ({
                 <CalendarIcon className="mr-2 h-4 w-4" />
                 {formatDateRange()}
                 {(fromDate || toDate) && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
+                  <X 
+                    className="ml-auto h-3 w-3 cursor-pointer" 
                     onClick={(e) => {
                       e.stopPropagation();
                       clearDateRange();
                     }}
-                    className="ml-auto h-6 w-6 p-0 hover:bg-muted"
-                  >
-                    <X className="h-3 w-3" />
-                  </Button>
+                  />
                 )}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
-              <div className="p-3 border-b">
-                <div className="space-y-1">
-                  <div className="font-medium text-sm">Från</div>
-                  <div className="text-sm">{fromDate ? formatDate(fromDate) : "Välj datum"}</div>
-                </div>
-                {fromDate && (
-                  <div className="space-y-1 mt-3">
-                    <div className="font-medium text-sm">Till</div>
-                    <div className="text-sm">{toDate ? formatDate(toDate) : "Välj datum"}</div>
-                  </div>
-                )}
-              </div>
               <Calendar
                 mode="range"
-                selected={{ 
-                  from: fromDate, 
-                  to: toDate 
-                }}
+                selected={{ from: fromDate, to: toDate }}
                 onSelect={(range) => {
                   if (!range) {
                     setFromDate(undefined);
