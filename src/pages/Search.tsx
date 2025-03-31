@@ -6,7 +6,7 @@ import SearchFilters from "@/components/SearchFilters";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
-import { Filter, Trash2, MapPin, MapPinOff, CalendarDays, List } from "lucide-react";
+import { Filter, Trash2, MapPin, CalendarDays, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import CompetitionMapView from "@/components/CompetitionMapView";
@@ -287,7 +287,7 @@ const Search = () => {
                             onClick={toggleMapVisibility}
                             className="h-9 w-9 relative"
                           >
-                            {filters.showMap ? <MapPinOff className="h-4 w-4" /> : <MapPin className="h-4 w-4" />}
+                            <MapPin className="h-4 w-4" />
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent side="bottom">
