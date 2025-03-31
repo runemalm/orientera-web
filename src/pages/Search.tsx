@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -299,46 +298,19 @@ const Search = () => {
                   </div>
                   
                   <div className="flex items-center">
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <ToggleGroup 
-                            type="single" 
-                            value={calendarView}
-                            onValueChange={handleViewChange}
-                          >
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <ToggleGroupItem value="list" aria-label="Visa lista">
-                                    <List className="h-4 w-4" />
-                                  </ToggleGroupItem>
-                                </TooltipTrigger>
-                                <TooltipContent side="bottom">
-                                  Visa lista
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                            
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <ToggleGroupItem value="wall" aria-label="Visa kalender">
-                                    <CalendarDays className="h-4 w-4" />
-                                  </ToggleGroupItem>
-                                </TooltipTrigger>
-                                <TooltipContent side="bottom">
-                                  Visa kalender
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          </ToggleGroup>
-                        </TooltipTrigger>
-                        <TooltipContent side="bottom">
-                          Visa {calendarView === 'wall' ? "lista" : "kalender"}
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
+                    <ToggleGroup 
+                      type="single" 
+                      value={calendarView}
+                      onValueChange={handleViewChange}
+                      className="shadow-sm"
+                    >
+                      <ToggleGroupItem value="list" aria-label="Visa lista">
+                        <List className="h-4 w-4" />
+                      </ToggleGroupItem>
+                      <ToggleGroupItem value="wall" aria-label="Visa kalender">
+                        <CalendarDays className="h-4 w-4" />
+                      </ToggleGroupItem>
+                    </ToggleGroup>
                   </div>
                 </div>
               </div>
