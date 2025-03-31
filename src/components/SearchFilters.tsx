@@ -1,8 +1,9 @@
+
 import { FilterIcon, X, SearchIcon, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
-import { SearchFilters as SearchFiltersType, CompetitionType, CompetitionBranch } from "@/types";
+import { SearchFilters as SearchFiltersType, CompetitionType, CompetitionBranch, Discipline } from "@/types";
 import CheckboxFilter from "./search/CheckboxFilter";
 import DateRangeFilter from "./search/DateRangeFilter";
 import { useToast } from "@/hooks/use-toast";
@@ -12,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useIsMobile, useBreakpoint } from "@/hooks/use-mobile";
 
-const disciplines = ['Sprint', 'Medel', 'Lång', 'Natt', 'Stafett', 'Ultralång'];
+const disciplines: Discipline[] = ['Sprint', 'Medel', 'Lång', 'Natt', 'Stafett', 'Ultralång'];
 const competitionTypes: CompetitionType[] = ['Värdetävlingar', 'Nationella tävlingar', 'Distriktstävlingar', 'Närtävlingar', 'Veckans bana'];
 const competitionBranches: CompetitionBranch[] = ['Orienteringslöpning', 'Skidorientering', 'Mountainbikeorientering', 'Precisionsorientering', 'Orienteringsskytte'];
 
@@ -44,10 +45,10 @@ const SearchFiltersComponent = ({
     setSearchValue(filters.searchQuery || "");
   }, [filters.searchQuery]);
   
-  const handleDisciplineChange = (discipline: string, checked: boolean) => {
+  const handleDisciplineChange = (discipline: Discipline, checked: boolean) => {
     let updatedDisciplines = [...filters.disciplines];
     if (checked) {
-      updatedDisciplines.push(discipline as any);
+      updatedDisciplines.push(discipline);
     } else {
       updatedDisciplines = updatedDisciplines.filter(d => d !== discipline);
     }
