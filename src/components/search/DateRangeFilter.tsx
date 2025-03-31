@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { sv } from "date-fns/locale";
 import { format, isValid, isToday, isYesterday, isTomorrow, addDays, startOfMonth, endOfMonth, isSameDay, nextFriday, nextSunday, getDay, subDays } from "date-fns";
@@ -255,7 +254,7 @@ const DateRangeFilter = ({
               className="h-7 w-7 p-0 hover:bg-muted"
               title="Rensa datumfilter"
             >
-              <XCircle className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+              
             </Button>
           )}
         </div>
@@ -359,4 +358,3 @@ const DateRangeFilter = ({
 };
 
 export default DateRangeFilter;
-
