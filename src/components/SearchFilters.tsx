@@ -1,4 +1,3 @@
-
 import { FilterIcon, X, SearchIcon, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
@@ -35,7 +34,6 @@ const SearchFiltersComponent = ({
   const isMobile = useIsMobile();
   const breakpoint = useBreakpoint();
   
-  // Create always-expanded items array with all filter values
   const expandedItems = ['dateRange', 'type', 'discipline', 'district', 'branch'];
 
   const typesArray = Array.isArray(filters.types) ? filters.types : [];
@@ -345,14 +343,6 @@ const SearchFiltersComponent = ({
             <div className="flex items-center">
               <FilterIcon className="h-4 w-4" />
               <h3 className="font-medium ml-2">Filtrera</h3>
-            </div>
-            <div className="w-10 flex justify-start ml-1 h-6">
-              {hasActiveFilters && (
-                <Badge variant="secondary">
-                  {(filters.disciplines.length + filters.districts.length + typesArray.length + branchesArray.length) + 
-                  (hasActiveDateFilter ? 1 : 0) + (hasSearchQuery ? 1 : 0)}
-                </Badge>
-              )}
             </div>
           </div>
           {hasActiveFilters && (
