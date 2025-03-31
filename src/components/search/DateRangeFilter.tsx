@@ -1,11 +1,9 @@
-
 import { useState, useEffect } from "react";
 import { sv } from "date-fns/locale";
 import { format, isValid, isToday, isYesterday, isTomorrow, addDays, startOfMonth, endOfMonth, isSameDay, nextFriday, nextSunday, getDay, subDays } from "date-fns";
 import { X, Calendar as CalendarIcon, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -87,7 +85,6 @@ const DateRangeFilter = ({
     return undefined;
   };
   
-  // Get date range for a specific preset
   const getPresetDateRange = (presetId: string): DateRangeValue => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -286,60 +283,53 @@ const DateRangeFilter = ({
           ))}
         </div>
         
-        <div className="text-center text-sm text-muted-foreground">
-          eller
-        </div>
-        
-        <div className="space-y-1.5">
-          <Label htmlFor="date-range" className="text-xs">Välj intervall</Label>
-          <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                id="date-range"
-                variant="outline"
-                className={cn(
-                  "w-full justify-start text-left font-normal text-sm h-9",
-                  !fromDate && !toDate && "text-muted-foreground",
-                  (fromDate || toDate) && "border-orienteering-green focus:ring-orienteering-green"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {formatDateRange()}
-                {(fromDate || toDate) && (
-                  <X 
-                    className="ml-auto h-3 w-3 cursor-pointer text-muted-foreground hover:text-foreground" 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      clearDateRange();
-                    }}
-                  />
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="range"
-                selected={{ from: fromDate, to: toDate }}
-                onSelect={(range) => {
-                  if (!range) {
-                    setFromDate(undefined);
-                    setToDate(undefined);
-                    updateDateRange(undefined, undefined);
-                  } else {
-                    setFromDate(range.from);
-                    setToDate(range.to);
-                    updateDateRange(range.from, range.to);
-                  }
-                  setSelectedPreset(undefined);
-                }}
-                locale={sv}
-                initialFocus
-                className="pointer-events-auto"
-                disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
+        <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              id="date-range"
+              variant="outline"
+              className={cn(
+                "w-full justify-start text-left font-normal text-sm h-9",
+                !fromDate && !toDate && "text-muted-foreground",
+                (fromDate || toDate) && "border-orienteering-green focus:ring-orienteering-green"
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {formatDateRange()}
+              {(fromDate || toDate) && (
+                <X 
+                  className="ml-auto h-3 w-3 cursor-pointer text-muted-foreground hover:text-foreground" 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    clearDateRange();
+                  }}
+                />
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="range"
+              selected={{ from: fromDate, to: toDate }}
+              onSelect={(range) => {
+                if (!range) {
+                  setFromDate(undefined);
+                  setToDate(undefined);
+                  updateDateRange(undefined, undefined);
+                } else {
+                  setFromDate(range.from);
+                  setToDate(range.to);
+                  updateDateRange(range.from, range.to);
+                }
+                setSelectedPreset(undefined);
+              }}
+              locale={sv}
+              initialFocus
+              className="pointer-events-auto"
+              disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+            />
+          </PopoverContent>
+        </Popover>
       </div>
     </div>
   );
