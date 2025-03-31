@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -248,94 +249,97 @@ const Search = () => {
                   )}
                 </div>
                 
-                <div className="flex items-center gap-2">
-                  {!isMobile && (
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    {!isMobile && (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant={sidebarOpen ? "default" : "outline"}
+                              size="icon"
+                              onClick={toggleSidebar}
+                              className="h-9 w-9 relative"
+                            >
+                              <Filter className="h-4 w-4" />
+                              {hasActiveFilters && !sidebarOpen && (
+                                <Badge 
+                                  variant="secondary"
+                                  className="absolute -top-2 -right-2 h-5 min-w-5 flex items-center justify-center p-0 text-xs"
+                                >
+                                  {filters.disciplines.length + filters.districts.length + typesArray.length + branchesArray.length + (filters.dateRange ? 1 : 0)}
+                                </Badge>
+                              )}
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom">
+                            {sidebarOpen ? "Dölj filter" : "Visa filter"}
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    )}
+                    
                     <TooltipProvider>
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <Button
-                            variant={sidebarOpen ? "default" : "outline"}
+                            variant={filters.showMap ? "default" : "outline"}
                             size="icon"
-                            onClick={toggleSidebar}
+                            onClick={toggleMapVisibility}
                             className="h-9 w-9 relative"
                           >
-                            <Filter className="h-4 w-4" />
-                            {hasActiveFilters && !sidebarOpen && (
-                              <Badge 
-                                variant="secondary"
-                                className="absolute -top-2 -right-2 h-5 min-w-5 flex items-center justify-center p-0 text-xs"
-                              >
-                                {filters.disciplines.length + filters.districts.length + typesArray.length + branchesArray.length + (filters.dateRange ? 1 : 0)}
-                              </Badge>
-                            )}
+                            {filters.showMap ? <MapPinOff className="h-4 w-4" /> : <MapPin className="h-4 w-4" />}
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent side="bottom">
-                          {sidebarOpen ? "Dölj filter" : "Visa filter"}
+                          {filters.showMap ? "Dölj karta" : "Visa karta"}
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
-                  )}
+                  </div>
                   
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant={filters.showMap ? "default" : "outline"}
-                          size="icon"
-                          onClick={toggleMapVisibility}
-                          className="h-9 w-9 relative"
-                        >
-                          {filters.showMap ? <MapPinOff className="h-4 w-4" /> : <MapPin className="h-4 w-4" />}
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent side="bottom">
-                        {filters.showMap ? "Dölj karta" : "Visa karta"}
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                  
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <ToggleGroup 
-                          type="single" 
-                          value={calendarView}
-                          onValueChange={handleViewChange}
-                          className="flex"
-                        >
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <ToggleGroupItem value="list" aria-label="Visa lista">
-                                  <List className="h-4 w-4" />
-                                </ToggleGroupItem>
-                              </TooltipTrigger>
-                              <TooltipContent side="bottom">
-                                Visa lista
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                          
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <ToggleGroupItem value="wall" aria-label="Visa kalender">
-                                  <CalendarDays className="h-4 w-4" />
-                                </ToggleGroupItem>
-                              </TooltipTrigger>
-                              <TooltipContent side="bottom">
-                                Visa kalender
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        </ToggleGroup>
-                      </TooltipTrigger>
-                      <TooltipContent side="bottom">
-                        Visa {calendarView === 'wall' ? "lista" : "kalender"}
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                  <div className="flex items-center">
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <ToggleGroup 
+                            type="single" 
+                            value={calendarView}
+                            onValueChange={handleViewChange}
+                          >
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <ToggleGroupItem value="list" aria-label="Visa lista">
+                                    <List className="h-4 w-4" />
+                                  </ToggleGroupItem>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom">
+                                  Visa lista
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                            
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <ToggleGroupItem value="wall" aria-label="Visa kalender">
+                                    <CalendarDays className="h-4 w-4" />
+                                  </ToggleGroupItem>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom">
+                                  Visa kalender
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </ToggleGroup>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom">
+                          Visa {calendarView === 'wall' ? "lista" : "kalender"}
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
                 </div>
               </div>
             </div>
