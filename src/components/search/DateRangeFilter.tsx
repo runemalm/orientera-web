@@ -40,8 +40,8 @@ const DateRangeFilter = ({
     { id: 'today', label: 'Idag' },
     { id: 'tomorrow', label: 'Imorgon' },
     { id: 'thisWeekend', label: 'Helgen' },
-    { id: 'next7days', label: isMobile ? 'Kommande 7 dgr' : 'Kommande 7 dagar' },
-    { id: 'next30days', label: isMobile ? 'Kommande 30 dgr' : 'Kommande 30 dagar' },
+    { id: 'next7days', label: 'Kommande 7 dgr' },
+    { id: 'next30days', label: 'Kommande 30 dgr' },
     { id: 'thisMonth', label: 'Denna månad' },
     { id: 'nextMonth', label: 'Nästa månad' },
   ];

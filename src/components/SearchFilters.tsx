@@ -30,10 +30,12 @@ const SearchFiltersComponent = ({
   hideSearchInput = false
 }: SearchFiltersProps) => {
   const { toast } = useToast();
-  const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [searchValue, setSearchValue] = useState("");
   const isMobile = useIsMobile();
   const breakpoint = useBreakpoint();
+  
+  // Create always-expanded items array with all filter values
+  const expandedItems = ['dateRange', 'type', 'discipline', 'district', 'branch'];
 
   const typesArray = Array.isArray(filters.types) ? filters.types : [];
   const branchesArray = Array.isArray(filters.branches) ? filters.branches : [];
@@ -165,16 +167,6 @@ const SearchFiltersComponent = ({
                            hasActiveDateFilter ||
                            hasSearchQuery;
   
-  const handleAccordionValueChange = (value: string | string[]) => {
-    if (Array.isArray(value)) {
-      setExpandedItems(value);
-    } else if (value) {
-      setExpandedItems([value]);
-    } else {
-      setExpandedItems([]);
-    }
-  };
-
   const filterContent = (
     <>
       {!hideSearchInput && (
@@ -209,172 +201,218 @@ const SearchFiltersComponent = ({
         </form>
       )}
 
-      {isMobile ? (
-        <Accordion 
-          type="single" 
-          value={expandedItems[0]} 
-          onValueChange={(value) => handleAccordionValueChange(value)}
-          className="space-y-2"
-          collapsible
-        >
-          <AccordionItem value="dateRange" className="border rounded-md overflow-hidden">
-            <AccordionTrigger className="px-3 py-2 hover:no-underline min-h-10">
-              <div className="flex items-center justify-between w-full">
-                <div className="flex items-center">
-                  <span className="text-sm font-medium">Tävlingsperiod</span>
-                </div>
-                <div className="flex items-center">
-                  {hasActiveDateFilter && (
-                    <Badge variant="secondary" className="ml-1 text-xs mr-2">
-                      1
-                    </Badge>
-                  )}
-                  {hasActiveDateFilter && (
-                    <div 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleClearFilter('date');
-                      }}
-                      className="h-7 w-7 p-0 mr-4 hover:bg-muted flex items-center justify-center rounded-sm cursor-pointer"
-                      title="Rensa datumfilter"
-                    >
-                      <XCircle className="h-4 w-4 text-muted-foreground hover:text-foreground" />
-                    </div>
-                  )}
-                </div>
+      <div className="space-y-2">
+        <div className="border rounded-md overflow-hidden">
+          <div className="px-3 py-2 min-h-10">
+            <div className="flex items-center justify-between w-full">
+              <div className="flex items-center">
+                <span className="text-sm font-medium">Tävlingsperiod</span>
               </div>
-            </AccordionTrigger>
-            <AccordionContent className="px-3 pb-3 pt-1">
-              <DateRangeFilter 
-                dateRange={filters.dateRange} 
-                onDateRangeChange={handleDateRangeChange}
-                hasActiveFilter={hasActiveDateFilter}
-                removeHeader={true}
-                onClearFilter={() => handleClearFilter('date')}
-              />
-            </AccordionContent>
-          </AccordionItem>
-
-          <CheckboxFilter
-            title="Tävlingstyp"
-            items={competitionTypes.map(t => ({ id: t, name: t }))}
-            selectedItems={typesArray}
-            onItemChange={handleTypeChange}
-            accordionValue="type"
-            onClearFilter={() => handleClearFilter('types')}
-          />
-
-          <CheckboxFilter
-            title="Disciplin"
-            items={disciplines.map(d => ({ id: d, name: d }))}
-            selectedItems={filters.disciplines}
-            onItemChange={handleDisciplineChange}
-            accordionValue="discipline"
-            onClearFilter={() => handleClearFilter('disciplines')}
-          />
-
-          <CheckboxFilter
-            title="Distrikt"
-            items={districts.map(d => ({ id: d.id, name: d.name }))}
-            selectedItems={filters.districts}
-            onItemChange={handleDistrictChange}
-            accordionValue="district"
-            hideSearch={true}
-            onClearFilter={() => handleClearFilter('districts')}
-          />
-
-          <CheckboxFilter
-            title="Orienteringsgren"
-            items={competitionBranches.map(b => ({ id: b, name: b }))}
-            selectedItems={branchesArray}
-            onItemChange={handleBranchChange}
-            accordionValue="branch"
-            onClearFilter={() => handleClearFilter('branches')}
-          />
-        </Accordion>
-      ) : (
-        <Accordion 
-          type="multiple" 
-          value={expandedItems} 
-          onValueChange={(value) => handleAccordionValueChange(value)}
-          className="space-y-2"
-        >
-          <AccordionItem value="dateRange" className="border rounded-md overflow-hidden">
-            <AccordionTrigger className="px-3 py-2 hover:no-underline min-h-10">
-              <div className="flex items-center justify-between w-full">
-                <div className="flex items-center">
-                  <span className="text-sm font-medium">Tävlingsperiod</span>
-                </div>
-                <div className="flex items-center">
-                  {hasActiveDateFilter && (
-                    <Badge variant="secondary" className="ml-1 text-xs mr-2">
-                      1
-                    </Badge>
-                  )}
-                  {hasActiveDateFilter && (
-                    <div 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleClearFilter('date');
-                      }}
-                      className="h-7 w-7 p-0 mr-4 hover:bg-muted flex items-center justify-center rounded-sm cursor-pointer"
-                      title="Rensa datumfilter"
-                    >
-                      <XCircle className="h-4 w-4 text-muted-foreground hover:text-foreground" />
-                    </div>
-                  )}
-                </div>
+              <div className="flex items-center">
+                {hasActiveDateFilter && (
+                  <Badge variant="secondary" className="ml-1 text-xs mr-2">
+                    1
+                  </Badge>
+                )}
+                {hasActiveDateFilter && (
+                  <div 
+                    onClick={() => handleClearFilter('date')}
+                    className="h-7 w-7 p-0 mr-4 hover:bg-muted flex items-center justify-center rounded-sm cursor-pointer"
+                    title="Rensa datumfilter"
+                  >
+                    <XCircle className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                  </div>
+                )}
               </div>
-            </AccordionTrigger>
-            <AccordionContent className="px-3 pb-3 pt-1">
-              <DateRangeFilter 
-                dateRange={filters.dateRange} 
-                onDateRangeChange={handleDateRangeChange}
-                hasActiveFilter={hasActiveDateFilter}
-                removeHeader={true}
-                onClearFilter={() => handleClearFilter('date')}
-              />
-            </AccordionContent>
-          </AccordionItem>
+            </div>
+          </div>
+          <div className="px-3 pb-3 pt-1">
+            <DateRangeFilter 
+              dateRange={filters.dateRange} 
+              onDateRangeChange={handleDateRangeChange}
+              hasActiveFilter={hasActiveDateFilter}
+              removeHeader={true}
+              onClearFilter={() => handleClearFilter('date')}
+            />
+          </div>
+        </div>
 
-          <CheckboxFilter
-            title="Tävlingstyp"
-            items={competitionTypes.map(t => ({ id: t, name: t }))}
-            selectedItems={typesArray}
-            onItemChange={handleTypeChange}
-            accordionValue="type"
-            onClearFilter={() => handleClearFilter('types')}
-          />
+        <div className="border rounded-md overflow-hidden">
+          <div className="px-3 py-2 min-h-10">
+            <div className="flex items-center justify-between w-full">
+              <div className="flex items-center">
+                <span className="text-sm font-medium">Tävlingstyp</span>
+              </div>
+              <div className="flex items-center">
+                {typesArray.length > 0 && (
+                  <Badge variant="secondary" className="ml-1 text-xs mr-2">
+                    {typesArray.length}
+                  </Badge>
+                )}
+                {typesArray.length > 0 && (
+                  <div 
+                    onClick={() => handleClearFilter('types')}
+                    className="h-7 w-7 p-0 mr-4 hover:bg-muted flex items-center justify-center rounded-sm cursor-pointer"
+                    title="Rensa tävlingstypsfilter"
+                  >
+                    <XCircle className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+          <div className="px-3 pb-3 pt-1">
+            <div className="space-y-3">
+              {competitionTypes.map(type => (
+                <div key={type} className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id={`type-${type}`}
+                    checked={typesArray.includes(type)}
+                    onChange={(e) => handleTypeChange(type, e.target.checked)}
+                    className="rounded border-gray-300 text-primary focus:ring-primary"
+                  />
+                  <label htmlFor={`type-${type}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                    {type}
+                  </label>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
 
-          <CheckboxFilter
-            title="Disciplin"
-            items={disciplines.map(d => ({ id: d, name: d }))}
-            selectedItems={filters.disciplines}
-            onItemChange={handleDisciplineChange}
-            accordionValue="discipline"
-            onClearFilter={() => handleClearFilter('disciplines')}
-          />
+        <div className="border rounded-md overflow-hidden">
+          <div className="px-3 py-2 min-h-10">
+            <div className="flex items-center justify-between w-full">
+              <div className="flex items-center">
+                <span className="text-sm font-medium">Disciplin</span>
+              </div>
+              <div className="flex items-center">
+                {filters.disciplines.length > 0 && (
+                  <Badge variant="secondary" className="ml-1 text-xs mr-2">
+                    {filters.disciplines.length}
+                  </Badge>
+                )}
+                {filters.disciplines.length > 0 && (
+                  <div 
+                    onClick={() => handleClearFilter('disciplines')}
+                    className="h-7 w-7 p-0 mr-4 hover:bg-muted flex items-center justify-center rounded-sm cursor-pointer"
+                    title="Rensa disciplinfilter"
+                  >
+                    <XCircle className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+          <div className="px-3 pb-3 pt-1">
+            <div className="space-y-3">
+              {disciplines.map(discipline => (
+                <div key={discipline} className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id={`discipline-${discipline}`}
+                    checked={filters.disciplines.includes(discipline)}
+                    onChange={(e) => handleDisciplineChange(discipline, e.target.checked)}
+                    className="rounded border-gray-300 text-primary focus:ring-primary"
+                  />
+                  <label htmlFor={`discipline-${discipline}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                    {discipline}
+                  </label>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
 
-          <CheckboxFilter
-            title="Distrikt"
-            items={districts.map(d => ({ id: d.id, name: d.name }))}
-            selectedItems={filters.districts}
-            onItemChange={handleDistrictChange}
-            accordionValue="district"
-            hideSearch={true}
-            onClearFilter={() => handleClearFilter('districts')}
-          />
+        <div className="border rounded-md overflow-hidden">
+          <div className="px-3 py-2 min-h-10">
+            <div className="flex items-center justify-between w-full">
+              <div className="flex items-center">
+                <span className="text-sm font-medium">Distrikt</span>
+              </div>
+              <div className="flex items-center">
+                {filters.districts.length > 0 && (
+                  <Badge variant="secondary" className="ml-1 text-xs mr-2">
+                    {filters.districts.length}
+                  </Badge>
+                )}
+                {filters.districts.length > 0 && (
+                  <div 
+                    onClick={() => handleClearFilter('districts')}
+                    className="h-7 w-7 p-0 mr-4 hover:bg-muted flex items-center justify-center rounded-sm cursor-pointer"
+                    title="Rensa distriktfilter"
+                  >
+                    <XCircle className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+          <div className="px-3 pb-3 pt-1">
+            <div className="space-y-3">
+              {districts.map(district => (
+                <div key={district.id} className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id={`district-${district.id}`}
+                    checked={filters.districts.includes(district.id)}
+                    onChange={(e) => handleDistrictChange(district.id, e.target.checked)}
+                    className="rounded border-gray-300 text-primary focus:ring-primary"
+                  />
+                  <label htmlFor={`district-${district.id}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                    {district.name}
+                  </label>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
 
-          <CheckboxFilter
-            title="Orienteringsgren"
-            items={competitionBranches.map(b => ({ id: b, name: b }))}
-            selectedItems={branchesArray}
-            onItemChange={handleBranchChange}
-            accordionValue="branch"
-            onClearFilter={() => handleClearFilter('branches')}
-          />
-        </Accordion>
-      )}
+        <div className="border rounded-md overflow-hidden">
+          <div className="px-3 py-2 min-h-10">
+            <div className="flex items-center justify-between w-full">
+              <div className="flex items-center">
+                <span className="text-sm font-medium">Orienteringsgren</span>
+              </div>
+              <div className="flex items-center">
+                {branchesArray.length > 0 && (
+                  <Badge variant="secondary" className="ml-1 text-xs mr-2">
+                    {branchesArray.length}
+                  </Badge>
+                )}
+                {branchesArray.length > 0 && (
+                  <div 
+                    onClick={() => handleClearFilter('branches')}
+                    className="h-7 w-7 p-0 mr-4 hover:bg-muted flex items-center justify-center rounded-sm cursor-pointer"
+                    title="Rensa grenfilter"
+                  >
+                    <XCircle className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+          <div className="px-3 pb-3 pt-1">
+            <div className="space-y-3">
+              {competitionBranches.map(branch => (
+                <div key={branch} className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id={`branch-${branch}`}
+                    checked={branchesArray.includes(branch)}
+                    onChange={(e) => handleBranchChange(branch, e.target.checked)}
+                    className="rounded border-gray-300 text-primary focus:ring-primary"
+                  />
+                  <label htmlFor={`branch-${branch}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                    {branch}
+                  </label>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
     </>
   );
 
