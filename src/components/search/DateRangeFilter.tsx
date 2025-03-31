@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { sv } from "date-fns/locale";
 import { format, isValid, isToday, isYesterday, isTomorrow, addDays, startOfMonth, endOfMonth, isSameDay, nextFriday, nextSunday, getDay, subDays } from "date-fns";
@@ -36,13 +37,13 @@ const DateRangeFilter = ({
   const [selectedPreset, setSelectedPreset] = useState<string | undefined>(undefined);
   
   const PRESET_OPTIONS = [
-    { id: 'today', label: 'Idag' },
-    { id: 'tomorrow', label: 'Imorgon' },
-    { id: 'thisWeekend', label: 'Helgen' },
-    { id: 'next7days', label: 'Kommande 7 dgr' },
-    { id: 'next30days', label: 'Kommande 30 dgr' },
-    { id: 'thisMonth', label: 'Denna månad' },
-    { id: 'nextMonth', label: 'Nästa månad' },
+    { id: 'today', label: 'Idag', priority: 1 },
+    { id: 'tomorrow', label: 'Imorgon', priority: 2 },
+    { id: 'thisWeekend', label: 'Helgen', priority: 3 },
+    { id: 'next7days', label: 'Kommande 7 dgr', priority: 4 },
+    { id: 'next30days', label: 'Kommande 30 dgr', priority: 5 },
+    { id: 'thisMonth', label: 'Denna månad', priority: 6 },
+    { id: 'nextMonth', label: 'Nästa månad', priority: 7 },
   ];
   
   useEffect(() => {
@@ -70,14 +71,36 @@ const DateRangeFilter = ({
       return isSameDay(date1, date2);
     };
     
+    const matchingPresets: string[] = [];
+    
     for (const preset of PRESET_OPTIONS) {
       const presetRange = getPresetDateRange(preset.id);
       if (datesMatch(from, presetRange.from) && datesMatch(to, presetRange.to)) {
-        return preset.id;
+        matchingPresets.push(preset.id);
       }
     }
     
-    return undefined;
+    if (matchingPresets.length === 0) {
+      return undefined;
+    }
+    
+    // If multiple presets match, select the one with highest priority (lowest priority number)
+    if (matchingPresets.length > 1) {
+      let highestPriorityPreset = matchingPresets[0];
+      let highestPriority = PRESET_OPTIONS.find(p => p.id === highestPriorityPreset)?.priority || 999;
+      
+      for (const presetId of matchingPresets) {
+        const currentPriority = PRESET_OPTIONS.find(p => p.id === presetId)?.priority || 999;
+        if (currentPriority < highestPriority) {
+          highestPriority = currentPriority;
+          highestPriorityPreset = presetId;
+        }
+      }
+      
+      return highestPriorityPreset;
+    }
+    
+    return matchingPresets[0];
   };
   
   const getPresetDateRange = (presetId: string): DateRangeValue => {
