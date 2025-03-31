@@ -163,7 +163,7 @@ const CompetitionListView: React.FC<CompetitionListViewProps> = ({
                         </div>
                       </div>
                       
-                      <div className="flex items-center gap-2 sm:ml-4">
+                      <div className="flex items-center gap-2 sm:ml-4 ml-auto">
                         <Button 
                           variant="ghost" 
                           size="icon" 
