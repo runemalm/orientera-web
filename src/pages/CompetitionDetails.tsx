@@ -1,19 +1,24 @@
+
 import { useParams, Link } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { Calendar, MapPin, Flag, Star, Users, Globe, ArrowUp } from "lucide-react";
 import { competitions } from "@/data/competitions";
-import { formatDate, formatDistance } from "@/lib/utils";
+import { formatDate, formatDistance, cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import WaitlistDialog from "@/components/WaitlistDialog";
 import CompetitionResources from "@/components/CompetitionResources";
+import { useToast } from "@/hooks/use-toast";
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
 // Fix for Leaflet marker icons
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+// Key for storing favorites in localStorage
+const FAVORITES_KEY = "competition-favorites";
 
 let DefaultIcon = L.icon({
   iconUrl: icon,
@@ -28,9 +33,60 @@ const CompetitionDetails = () => {
   const { id } = useParams<{ id: string }>();
   const competition = competitions.find(comp => comp.id === id);
   const [waitlistOpen, setWaitlistOpen] = useState(false);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const { toast } = useToast();
   const mapRef = useRef<HTMLDivElement>(null);
   const leafletMap = useRef<L.Map | null>(null);
   const userInteractingRef = useRef(false);
+  
+  // Load favorites from localStorage
+  useEffect(() => {
+    if (!id) return;
+    
+    const storedFavorites = localStorage.getItem(FAVORITES_KEY);
+    if (storedFavorites) {
+      try {
+        const favorites = JSON.parse(storedFavorites);
+        setIsFavorite(favorites.includes(id));
+      } catch (error) {
+        console.error("Failed to parse favorites", error);
+      }
+    }
+  }, [id]);
+  
+  // Toggle favorite status
+  const toggleFavorite = () => {
+    if (!id) return;
+    
+    const storedFavorites = localStorage.getItem(FAVORITES_KEY);
+    let favorites: string[] = [];
+    
+    if (storedFavorites) {
+      try {
+        favorites = JSON.parse(storedFavorites);
+      } catch (error) {
+        console.error("Failed to parse favorites", error);
+      }
+    }
+    
+    let newFavorites: string[];
+    if (isFavorite) {
+      newFavorites = favorites.filter(fav => fav !== id);
+      toast({
+        title: "Borttagen från favoriter",
+        description: "Tävlingen har tagits bort från dina favoriter"
+      });
+    } else {
+      newFavorites = [...favorites, id];
+      toast({
+        title: "Tillagd som favorit",
+        description: "Tävlingen har lagts till i dina favoriter"
+      });
+    }
+    
+    setIsFavorite(!isFavorite);
+    localStorage.setItem(FAVORITES_KEY, JSON.stringify(newFavorites));
+  };
   
   const showWaitlist = () => {
     setWaitlistOpen(true);
@@ -122,7 +178,10 @@ const CompetitionDetails = () => {
       <Header />
       
       <main className="flex-1">
-        <div className="bg-orienteering-green/5 py-12">
+        <div className={cn(
+          "bg-orienteering-green/5 py-12",
+          isFavorite ? "border-l-4 border-l-amber-400" : ""
+        )}>
           <div className="container">
             <a 
               href="#" 
@@ -168,7 +227,21 @@ const CompetitionDetails = () => {
               </div>
               
               <div className="flex flex-col gap-3 md:min-w-[200px]">
-                <Button size="lg" className="w-full" onClick={showWaitlist}>Anmäl dig</Button>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className={cn(
+                      "hover:bg-amber-50 h-12 w-12",
+                      isFavorite ? "text-amber-500 hover:text-amber-600" : "text-muted-foreground hover:text-amber-500"
+                    )}
+                    onClick={toggleFavorite}
+                    aria-label={isFavorite ? "Ta bort från favoriter" : "Lägg till i favoriter"}
+                  >
+                    <Star className={cn("h-6 w-6", isFavorite ? "fill-current" : "")} />
+                  </Button>
+                  <Button size="lg" className="w-full" onClick={showWaitlist}>Anmäl dig</Button>
+                </div>
                 {competition.website && (
                   <Button variant="outline" size="lg" asChild className="w-full">
                     <a href={competition.website} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center">
