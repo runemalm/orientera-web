@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { sv } from "date-fns/locale";
 import { format, isValid, isToday, isYesterday, isTomorrow, addDays, startOfMonth, endOfMonth, isSameDay, nextFriday, nextSunday, getDay, subDays } from "date-fns";
@@ -193,6 +194,11 @@ const DateRangeFilter = ({
     onDateRangeChange(undefined);
     setCalendarOpen(false);
     setSelectedPreset(undefined);
+    
+    // Call the onClearFilter if it exists to properly clear the filter at the parent level
+    if (onClearFilter) {
+      onClearFilter();
+    }
   };
   
   const handlePresetChange = (value: string) => {
