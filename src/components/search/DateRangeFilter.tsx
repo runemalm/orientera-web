@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { sv } from "date-fns/locale";
 import { format, isValid, isToday, isYesterday, isTomorrow, addDays, startOfMonth, endOfMonth, isSameDay, nextFriday, nextSunday, getDay, subDays } from "date-fns";
@@ -9,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Toggle } from "@/components/ui/toggle";
 
 type DateRangeValue = {
   from?: Date;
@@ -53,7 +53,8 @@ const DateRangeFilter = ({
     // Only try to match a preset if we don't already have one selected
     // or if the dates have changed from outside this component
     if (dateRange?.from && !selectedPreset) {
-      checkAndSetPreset(dateRange.from, dateRange.to);
+      const detectedPreset = checkAndSetPreset(dateRange.from, dateRange.to);
+      setSelectedPreset(detectedPreset);
     }
   }, [dateRange]);
   
@@ -191,6 +192,12 @@ const DateRangeFilter = ({
   };
   
   const handlePresetChange = (value: string) => {
+    if (selectedPreset === value) {
+      setSelectedPreset(undefined);
+      clearDateRange();
+      return;
+    }
+    
     setSelectedPreset(value);
     const dateRange = getPresetDateRange(value);
     
@@ -220,55 +227,49 @@ const DateRangeFilter = ({
       <div className="space-y-3">
         <div className="grid grid-cols-3 gap-1.5">
           {PRESET_OPTIONS.slice(0, 3).map(option => (
-            <Button
+            <Toggle
               key={option.id}
-              type="button"
-              variant={selectedPreset === option.id ? "default" : "outline"}
-              size="sm"
+              pressed={selectedPreset === option.id}
+              onPressedChange={() => handlePresetChange(option.id)}
               className={cn(
                 "text-xs h-7 w-full px-2 truncate",
-                selectedPreset === option.id && "bg-orienteering-green hover:bg-orienteering-green/90 text-white"
+                selectedPreset === option.id && "bg-orienteering-green hover:bg-orienteering-green/90 text-white data-[state=on]:bg-orienteering-green data-[state=on]:text-white"
               )}
-              onClick={() => handlePresetChange(option.id)}
             >
               {option.label}
-            </Button>
+            </Toggle>
           ))}
         </div>
         
         <div className="grid grid-cols-2 gap-1.5">
           {PRESET_OPTIONS.slice(3, 5).map(option => (
-            <Button
+            <Toggle
               key={option.id}
-              type="button"
-              variant={selectedPreset === option.id ? "default" : "outline"}
-              size="sm"
+              pressed={selectedPreset === option.id}
+              onPressedChange={() => handlePresetChange(option.id)}
               className={cn(
                 "text-xs h-7 w-full px-2 truncate",
-                selectedPreset === option.id && "bg-orienteering-green hover:bg-orienteering-green/90 text-white"
+                selectedPreset === option.id && "bg-orienteering-green hover:bg-orienteering-green/90 text-white data-[state=on]:bg-orienteering-green data-[state=on]:text-white"
               )}
-              onClick={() => handlePresetChange(option.id)}
             >
               {option.label}
-            </Button>
+            </Toggle>
           ))}
         </div>
         
         <div className="grid grid-cols-2 gap-1.5">
           {PRESET_OPTIONS.slice(5, 7).map(option => (
-            <Button
+            <Toggle
               key={option.id}
-              type="button"
-              variant={selectedPreset === option.id ? "default" : "outline"}
-              size="sm"
+              pressed={selectedPreset === option.id}
+              onPressedChange={() => handlePresetChange(option.id)}
               className={cn(
                 "text-xs h-7 w-full px-2 truncate",
-                selectedPreset === option.id && "bg-orienteering-green hover:bg-orienteering-green/90 text-white"
+                selectedPreset === option.id && "bg-orienteering-green hover:bg-orienteering-green/90 text-white data-[state=on]:bg-orienteering-green data-[state=on]:text-white"
               )}
-              onClick={() => handlePresetChange(option.id)}
             >
               {option.label}
-            </Button>
+            </Toggle>
           ))}
         </div>
         
