@@ -49,25 +49,6 @@ const CheckboxFilter = ({
           <span className="text-sm font-medium">
             {title}
           </span>
-          <div className="flex items-center">
-            {selectedCount > 0 && (
-              <Badge variant="secondary" className="ml-1 text-xs mr-2">
-                {selectedCount}
-              </Badge>
-            )}
-            {selectedCount > 0 && onClearFilter && (
-              <div
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onClearFilter();
-                }}
-                className="h-7 w-7 p-0 mr-4 hover:bg-muted flex items-center justify-center rounded-sm cursor-pointer"
-                title={`Rensa ${title.toLowerCase()}`}
-              >
-                <XCircle className="h-4 w-4 text-muted-foreground hover:text-foreground" />
-              </div>
-            )}
-          </div>
         </div>
       </AccordionTrigger>
       <AccordionContent className="px-3 pb-3 border-t pt-3 bg-background">

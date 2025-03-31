@@ -97,20 +97,12 @@ const DateRangeFilter = ({
           
         case 'next7days':
           presetFrom = addDays(today, 1);
-          const dayOfWeek7 = getDay(today);
-          
-          if (dayOfWeek7 === 5) { // Friday
-            presetTo = addDays(today, 8);
-          } else if (dayOfWeek7 === 6) { // Saturday
-            presetTo = addDays(today, 7);
-          } else {
-            presetTo = addDays(today, 6);
-          }
+          presetTo = addDays(today, 7);
           break;
           
         case 'next30days':
           presetFrom = addDays(today, 1);
-          presetTo = addDays(today, 29);
+          presetTo = addDays(today, 30);
           break;
           
         case 'thisMonth':
@@ -234,12 +226,12 @@ const DateRangeFilter = ({
         
       case 'next7days':
         from = addDays(today, 1);
-        to = addDays(from, 6); // Fix: Use from date + 6 days to get 7 days total
+        to = addDays(today, 7);
         break;
         
       case 'next30days':
         from = addDays(today, 1);
-        to = addDays(from, 29); // Fix: Use from date + 29 days to get 30 days total
+        to = addDays(today, 30);
         break;
         
       case 'thisMonth':
