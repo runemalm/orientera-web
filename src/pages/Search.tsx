@@ -272,7 +272,7 @@ const Search = () => {
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button
-                              variant={sidebarOpen ? "outline" : "outline"}
+                              variant={sidebarOpen ? "default" : "outline"}
                               size="icon"
                               onClick={toggleSidebar}
                               className="h-9 w-9 relative"
