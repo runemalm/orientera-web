@@ -42,13 +42,13 @@ function Calendar({
         ),
         day_range_end: "day-range-end",
         day_selected:
-          "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-        day_today: "bg-accent text-accent-foreground",
+          "bg-orienteering-green text-white hover:bg-orienteering-green hover:text-white focus:bg-orienteering-green focus:text-white",
+        day_today: "bg-muted text-orienteering-dark font-semibold",
         day_outside:
-          "day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-30",
+          "day-outside text-muted-foreground opacity-50 aria-selected:bg-orienteering-green/20 aria-selected:text-primary-foreground aria-selected:opacity-70",
         day_disabled: "text-muted-foreground opacity-50",
         day_range_middle:
-          "aria-selected:bg-accent aria-selected:text-accent-foreground",
+          "aria-selected:bg-orienteering-green/20 aria-selected:text-foreground",
         day_hidden: "invisible",
         ...classNames,
       }}

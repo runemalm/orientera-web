@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { sv } from "date-fns/locale";
 import { format, isValid, isToday, isYesterday, isTomorrow, addDays, startOfMonth, endOfMonth, isSameDay, nextFriday, nextSunday, getDay, subDays } from "date-fns";
@@ -291,7 +292,10 @@ const DateRangeFilter = ({
               type="button"
               variant={selectedPreset === option.id ? "default" : "outline"}
               size="sm"
-              className="text-xs h-7 w-full px-2 truncate"
+              className={cn(
+                "text-xs h-7 w-full px-2 truncate",
+                selectedPreset === option.id && "bg-orienteering-green hover:bg-orienteering-green/90 text-white"
+              )}
               onClick={() => handlePresetChange(option.id)}
             >
               {option.label}
@@ -306,7 +310,10 @@ const DateRangeFilter = ({
               type="button"
               variant={selectedPreset === option.id ? "default" : "outline"}
               size="sm"
-              className="text-xs h-7 w-full px-2 truncate"
+              className={cn(
+                "text-xs h-7 w-full px-2 truncate",
+                selectedPreset === option.id && "bg-orienteering-green hover:bg-orienteering-green/90 text-white"
+              )}
               onClick={() => handlePresetChange(option.id)}
             >
               {option.label}
@@ -321,7 +328,10 @@ const DateRangeFilter = ({
               type="button"
               variant={selectedPreset === option.id ? "default" : "outline"}
               size="sm"
-              className="text-xs h-7 w-full px-2 truncate"
+              className={cn(
+                "text-xs h-7 w-full px-2 truncate",
+                selectedPreset === option.id && "bg-orienteering-green hover:bg-orienteering-green/90 text-white"
+              )}
               onClick={() => handlePresetChange(option.id)}
             >
               {option.label}
@@ -342,14 +352,15 @@ const DateRangeFilter = ({
                 variant="outline"
                 className={cn(
                   "w-full justify-start text-left font-normal text-sm h-9",
-                  !fromDate && !toDate && "text-muted-foreground"
+                  !fromDate && !toDate && "text-muted-foreground",
+                  (fromDate || toDate) && "border-orienteering-green focus:ring-orienteering-green"
                 )}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
                 {formatDateRange()}
                 {(fromDate || toDate) && (
                   <X 
-                    className="ml-auto h-3 w-3 cursor-pointer" 
+                    className="ml-auto h-3 w-3 cursor-pointer text-muted-foreground hover:text-foreground" 
                     onClick={(e) => {
                       e.stopPropagation();
                       clearDateRange();
