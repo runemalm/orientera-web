@@ -51,9 +51,15 @@ const DateRangeFilter = ({
     setFromDate(dateRange?.from);
     setToDate(dateRange?.to);
     
+    // Reset selectedPreset if dateRange is undefined or empty
+    if (!dateRange || (!dateRange.from && !dateRange.to)) {
+      setSelectedPreset(undefined);
+      return;
+    }
+    
     // Only try to match a preset if we don't already have one selected
     // or if the dates have changed from outside this component
-    if (dateRange?.from && !selectedPreset) {
+    if (dateRange?.from) {
       const detectedPreset = checkAndSetPreset(dateRange.from, dateRange.to);
       setSelectedPreset(detectedPreset);
     }

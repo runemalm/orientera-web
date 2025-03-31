@@ -153,7 +153,7 @@ const Search = () => {
       showMap: filters.showMap
     };
     
-    setFilters(resetFilters);
+    setFilters({...resetFilters});
     
     toast({
       title: "Filtren har återställts",

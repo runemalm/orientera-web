@@ -115,7 +115,7 @@ const SearchFiltersComponent = ({
       showMap: filters.showMap
     };
     
-    onFilterChange(resetFilters);
+    onFilterChange({...resetFilters});
     setSearchValue("");
     
     toast({
