@@ -10,7 +10,7 @@ import { Filter, Trash2, MapPin, CalendarDays, List, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import CompetitionMapView from "@/components/CompetitionMapView";
-import CompetitionCalendarView from "@/components/CompetitionCalendarView";
+import CompetitionListView from "@/components/CompetitionListView";
 import CompetitionWallCalendarView from "@/components/CompetitionWallCalendarView";
 import CompetitionFavoritesView from "@/components/CompetitionFavoritesView";
 import { useIsMobile, useBreakpoint } from "@/hooks/use-mobile";
@@ -348,7 +348,7 @@ const Search = () => {
                   </div>
                 )}
                 
-                {viewType === 'list' && <CompetitionCalendarView competitions={filteredCompetitions} />}
+                {viewType === 'list' && <CompetitionListView competitions={filteredCompetitions} />}
                 {viewType === 'wall' && <CompetitionWallCalendarView competitions={filteredCompetitions} />}
                 {viewType === 'favorites' && <CompetitionFavoritesView competitions={filteredCompetitions} />}
               </div>

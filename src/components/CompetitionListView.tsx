@@ -13,11 +13,11 @@ import { useNavigate } from "react-router-dom";
 import { Calendar, MapPin, Flag, Star, Navigation } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface CompetitionCalendarViewProps {
+interface CompetitionListViewProps {
   competitions: Competition[];
 }
 
-const CompetitionCalendarView: React.FC<CompetitionCalendarViewProps> = ({ 
+const CompetitionListView: React.FC<CompetitionListViewProps> = ({ 
   competitions 
 }) => {
   const navigate = useNavigate();
@@ -135,4 +135,4 @@ const CompetitionCalendarView: React.FC<CompetitionCalendarViewProps> = ({
   );
 };
 
-export default CompetitionCalendarView;
+export default CompetitionListView;
