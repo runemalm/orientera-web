@@ -6,19 +6,19 @@ import {
   CardContent
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { formatDate, formatDistance } from "@/lib/utils";
+import { formatDate } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
-import { Calendar, MapPin, Flag, Star, Navigation, Heart } from "lucide-react";
+import { Calendar, MapPin, Flag, Star, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 // Key for storing favorites in localStorage
 const FAVORITES_KEY = "competition-favorites";
 
-interface CompetitionListViewProps {
+interface CompetitionFavoritesViewProps {
   competitions: Competition[];
 }
 
-const CompetitionListView: React.FC<CompetitionListViewProps> = ({ 
+const CompetitionFavoritesView: React.FC<CompetitionFavoritesViewProps> = ({ 
   competitions 
 }) => {
   const navigate = useNavigate();
@@ -37,6 +37,16 @@ const CompetitionListView: React.FC<CompetitionListViewProps> = ({
     }
   }, []);
   
+  // Filter competitions to only show favorites
+  const favoriteCompetitions = competitions.filter(comp => 
+    favorites.includes(comp.id)
+  );
+  
+  // Sort favorite competitions by date
+  const sortedFavorites = [...favoriteCompetitions].sort((a, b) => 
+    new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
+
   // Toggle favorite status
   const toggleFavorite = (event: React.MouseEvent, id: string) => {
     event.stopPropagation();
@@ -51,20 +61,35 @@ const CompetitionListView: React.FC<CompetitionListViewProps> = ({
     setFavorites(newFavorites);
     localStorage.setItem(FAVORITES_KEY, JSON.stringify(newFavorites));
   };
-  
-  // Sort competitions by date in ascending order
-  const sortedCompetitions = [...competitions].sort((a, b) => 
-    new Date(a.date).getTime() - new Date(b.date).getTime()
-  );
+
+  if (sortedFavorites.length === 0) {
+    return (
+      <Card>
+        <CardContent className="p-8 text-center">
+          <Heart className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+          <h3 className="text-lg font-medium mb-2">Inga favorittävlingar</h3>
+          <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+            Du har inte markerat några tävlingar som favoriter än. 
+            Klicka på hjärtikonen på en tävling för att lägga till den i dina favoriter.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-4">
-      {sortedCompetitions.map((competition) => (
+      <div className="flex justify-between items-center mb-2">
+        <h3 className="text-lg font-semibold">Dina favoriter</h3>
+        <Badge variant="outline" className="font-normal">
+          {sortedFavorites.length} {sortedFavorites.length === 1 ? "tävling" : "tävlingar"}
+        </Badge>
+      </div>
+      
+      {sortedFavorites.map((competition) => (
         <Card 
           key={competition.id}
-          className={`overflow-hidden transition-all hover:shadow-md cursor-pointer ${
-            competition.featured ? 'border-accent border-l-4' : ''
-          }`}
+          className="overflow-hidden transition-all hover:shadow-md cursor-pointer"
           onClick={() => navigate(`/competition/${competition.id}`)}
         >
           <CardContent className="p-4">
@@ -87,12 +112,6 @@ const CompetitionListView: React.FC<CompetitionListViewProps> = ({
                   <div className="flex items-center text-muted-foreground">
                     <MapPin className="h-4 w-4 mr-1.5" />
                     <span>{competition.location}</span>
-                    {competition.distance !== undefined && (
-                      <Badge variant="outline" className="ml-1.5 text-xs">
-                        <Navigation className="h-3 w-3 mr-1" />
-                        {formatDistance(competition.distance)}
-                      </Badge>
-                    )}
                   </div>
                   <div className="flex items-center text-muted-foreground">
                     <Flag className="h-4 w-4 mr-1.5" />
@@ -113,13 +132,11 @@ const CompetitionListView: React.FC<CompetitionListViewProps> = ({
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className={favorites.includes(competition.id) 
-                    ? "text-rose-500 hover:text-rose-600 hover:bg-rose-50" 
-                    : "text-muted-foreground hover:text-rose-500"}
+                  className="text-rose-500 hover:text-rose-600 hover:bg-rose-50"
                   onClick={(e) => toggleFavorite(e, competition.id)}
-                  aria-label={favorites.includes(competition.id) ? "Ta bort från favoriter" : "Lägg till som favorit"}
+                  aria-label="Ta bort från favoriter"
                 >
-                  <Heart className={`h-5 w-5 ${favorites.includes(competition.id) ? "fill-current" : ""}`} />
+                  <Heart className="h-5 w-5 fill-current" />
                 </Button>
                 
                 <Button size="sm" className="self-end md:self-center shrink-0">
@@ -134,4 +151,4 @@ const CompetitionListView: React.FC<CompetitionListViewProps> = ({
   );
 };
 
-export default CompetitionListView;
+export default CompetitionFavoritesView;

@@ -6,22 +6,27 @@ import SearchFilters from "@/components/SearchFilters";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
-import { Filter, Trash2, MapPin, CalendarDays, List } from "lucide-react";
+import { Filter, Trash2, MapPin, CalendarDays, List, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import CompetitionMapView from "@/components/CompetitionMapView";
 import CompetitionCalendarView from "@/components/CompetitionCalendarView";
 import CompetitionWallCalendarView from "@/components/CompetitionWallCalendarView";
+import CompetitionFavoritesView from "@/components/CompetitionFavoritesView";
 import { useIsMobile, useBreakpoint } from "@/hooks/use-mobile";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const SEARCH_SIDEBAR_OPEN_KEY = "search-sidebar-open";
 const SEARCH_FILTERS_KEY = "search-filters";
 const SEARCH_MAP_VISIBLE_KEY = "search-map-visible";
+const SEARCH_VIEW_KEY = "search-view";
 const SEARCH_CALENDAR_VIEW_KEY = "search-calendar-view";
 const HEADER_HEIGHT = 64;
+
+type ViewType = 'list' | 'wall' | 'favorites';
 
 const Search = () => {
   const location = useLocation();
@@ -32,6 +37,7 @@ const Search = () => {
   const filterRef = useRef<HTMLDivElement>(null);
   const filterContentRef = useRef<HTMLDivElement>(null);
   const [calendarView, setCalendarView] = useState<'list' | 'wall'>('list');
+  const [viewType, setViewType] = useState<ViewType>('list');
   
   const [filters, setFilters] = useState<SearchFiltersType>({
     regions: [],
@@ -114,6 +120,17 @@ const Search = () => {
   }, [calendarView]);
 
   useEffect(() => {
+    const savedView = localStorage.getItem(SEARCH_VIEW_KEY);
+    if (savedView === 'list' || savedView === 'wall' || savedView === 'favorites') {
+      setViewType(savedView as ViewType);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(SEARCH_VIEW_KEY, viewType);
+  }, [viewType]);
+
+  useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     
     const disciplinesParam = searchParams.get('disciplines');
@@ -191,8 +208,8 @@ const Search = () => {
   };
 
   const handleViewChange = (value: string) => {
-    if (value === 'list' || value === 'wall') {
-      setCalendarView(value);
+    if (value === 'list' || value === 'wall' || value === 'favorites') {
+      setViewType(value as ViewType);
     }
   };
 
@@ -298,19 +315,26 @@ const Search = () => {
                   </div>
                   
                   <div className="flex items-center">
-                    <ToggleGroup 
-                      type="single" 
-                      value={calendarView}
-                      onValueChange={handleViewChange}
-                      className="shadow-sm"
+                    <Tabs 
+                      value={viewType} 
+                      onValueChange={handleViewChange} 
+                      className="w-full"
                     >
-                      <ToggleGroupItem value="list" aria-label="Visa lista">
-                        <List className="h-4 w-4" />
-                      </ToggleGroupItem>
-                      <ToggleGroupItem value="wall" aria-label="Visa kalender">
-                        <CalendarDays className="h-4 w-4" />
-                      </ToggleGroupItem>
-                    </ToggleGroup>
+                      <TabsList className="grid grid-cols-3 w-auto">
+                        <TabsTrigger value="list" className="px-3 py-1.5">
+                          <List className="h-4 w-4 mr-1" />
+                          <span className="hidden sm:inline">Lista</span>
+                        </TabsTrigger>
+                        <TabsTrigger value="wall" className="px-3 py-1.5">
+                          <CalendarDays className="h-4 w-4 mr-1" />
+                          <span className="hidden sm:inline">Kalender</span>
+                        </TabsTrigger>
+                        <TabsTrigger value="favorites" className="px-3 py-1.5">
+                          <Heart className="h-4 w-4 mr-1" />
+                          <span className="hidden sm:inline">Favoriter</span>
+                        </TabsTrigger>
+                      </TabsList>
+                    </Tabs>
                   </div>
                 </div>
               </div>
@@ -324,11 +348,9 @@ const Search = () => {
                   </div>
                 )}
                 
-                {calendarView === 'list' ? (
-                  <CompetitionCalendarView competitions={filteredCompetitions} />
-                ) : (
-                  <CompetitionWallCalendarView competitions={filteredCompetitions} />
-                )}
+                {viewType === 'list' && <CompetitionCalendarView competitions={filteredCompetitions} />}
+                {viewType === 'wall' && <CompetitionWallCalendarView competitions={filteredCompetitions} />}
+                {viewType === 'favorites' && <CompetitionFavoritesView competitions={filteredCompetitions} />}
               </div>
             ) : (
               <div className="bg-card rounded-lg border p-8 text-center">
