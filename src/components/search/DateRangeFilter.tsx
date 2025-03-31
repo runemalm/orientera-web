@@ -234,20 +234,12 @@ const DateRangeFilter = ({
         
       case 'next7days':
         from = addDays(today, 1);
-        const dayOfWeek7 = getDay(today);
-        
-        if (dayOfWeek7 === 5) { // Friday
-          to = addDays(today, 8);
-        } else if (dayOfWeek7 === 6) { // Saturday
-          to = addDays(today, 7);
-        } else {
-          to = addDays(from, 6);
-        }
+        to = addDays(from, 6); // Fix: Use from date + 6 days to get 7 days total
         break;
         
       case 'next30days':
         from = addDays(today, 1);
-        to = addDays(from, 29);
+        to = addDays(from, 29); // Fix: Use from date + 29 days to get 30 days total
         break;
         
       case 'thisMonth':
