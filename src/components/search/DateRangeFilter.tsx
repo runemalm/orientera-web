@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { sv } from "date-fns/locale";
 import { format, isValid, isToday, isYesterday, isTomorrow, addDays, startOfMonth, endOfMonth, isSameDay, nextFriday, nextSunday, getDay, subDays } from "date-fns";
-import { Calendar as CalendarIcon, XCircle } from "lucide-react";
+import { Calendar as CalendarIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
@@ -35,6 +35,7 @@ const DateRangeFilter = ({
   const [toDate, setToDate] = useState<Date | undefined>(dateRange?.to);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [selectedPreset, setSelectedPreset] = useState<string | undefined>(undefined);
+  const [lastClickedPreset, setLastClickedPreset] = useState<string | undefined>(undefined);
   
   const PRESET_OPTIONS = [
     { id: 'today', label: 'Idag', priority: 1 },
@@ -52,14 +53,18 @@ const DateRangeFilter = ({
     
     if (!dateRange || (!dateRange.from && !dateRange.to)) {
       setSelectedPreset(undefined);
+      setLastClickedPreset(undefined);
       return;
     }
     
     if (dateRange?.from) {
-      const detectedPreset = checkAndSetPreset(dateRange.from, dateRange.to);
-      setSelectedPreset(detectedPreset);
+      // Only check for matching presets if no preset was clicked directly
+      if (!lastClickedPreset) {
+        const detectedPreset = checkAndSetPreset(dateRange.from, dateRange.to);
+        setSelectedPreset(detectedPreset);
+      }
     }
-  }, [dateRange]);
+  }, [dateRange, lastClickedPreset]);
   
   const checkAndSetPreset = (from: Date, to?: Date) => {
     const today = new Date();
@@ -168,12 +173,14 @@ const DateRangeFilter = ({
     setFromDate(date);
     updateDateRange(date, toDate);
     setSelectedPreset(undefined);
+    setLastClickedPreset(undefined);
   };
 
   const handleToDateSelect = (date: Date | undefined) => {
     setToDate(date);
     updateDateRange(fromDate, date);
     setSelectedPreset(undefined);
+    setLastClickedPreset(undefined);
   };
   
   const updateDateRange = (from: Date | undefined, to: Date | undefined) => {
@@ -211,6 +218,7 @@ const DateRangeFilter = ({
     onDateRangeChange(undefined);
     setCalendarOpen(false);
     setSelectedPreset(undefined);
+    setLastClickedPreset(undefined);
     
     if (onClearFilter) {
       onClearFilter();
@@ -220,11 +228,13 @@ const DateRangeFilter = ({
   const handlePresetChange = (value: string) => {
     if (selectedPreset === value) {
       setSelectedPreset(undefined);
+      setLastClickedPreset(undefined);
       clearDateRange();
       return;
     }
     
     setSelectedPreset(value);
+    setLastClickedPreset(value); // Track which preset was clicked directly
     const dateRange = getPresetDateRange(value);
     
     setFromDate(dateRange.from);
@@ -349,3 +359,4 @@ const DateRangeFilter = ({
 };
 
 export default DateRangeFilter;
+
