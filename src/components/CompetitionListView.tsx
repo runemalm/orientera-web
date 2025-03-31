@@ -129,7 +129,7 @@ const CompetitionListView: React.FC<CompetitionListViewProps> = ({
                   onClick={() => navigate(`/competition/${competition.id}`)}
                 >
                   <CardContent className="p-4">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div className="flex flex-col sm:flex-row items-start justify-between gap-2">
                       <div className="flex-1">
                         <div className="flex items-center mb-1.5">
                           <div className={cn(
@@ -163,7 +163,7 @@ const CompetitionListView: React.FC<CompetitionListViewProps> = ({
                         </div>
                       </div>
                       
-                      <div className="flex items-center gap-2 sm:ml-4 ml-auto">
+                      <div className="flex items-center justify-end gap-2 ml-auto w-full sm:w-auto">
                         <Button 
                           variant="ghost" 
                           size="icon" 
