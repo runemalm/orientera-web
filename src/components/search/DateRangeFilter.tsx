@@ -1,8 +1,7 @@
-
 import { useState, useEffect } from "react";
 import { sv } from "date-fns/locale";
 import { format, isValid, isToday, isYesterday, isTomorrow, addDays, startOfMonth, endOfMonth, isSameDay, nextFriday, nextSunday, getDay, subDays } from "date-fns";
-import { X, Calendar as CalendarIcon, XCircle } from "lucide-react";
+import { Calendar as CalendarIcon, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Calendar } from "@/components/ui/calendar";
@@ -50,14 +49,11 @@ const DateRangeFilter = ({
     setFromDate(dateRange?.from);
     setToDate(dateRange?.to);
     
-    // Reset selectedPreset if dateRange is undefined or empty
     if (!dateRange || (!dateRange.from && !dateRange.to)) {
       setSelectedPreset(undefined);
       return;
     }
     
-    // Only try to match a preset if we don't already have one selected
-    // or if the dates have changed from outside this component
     if (dateRange?.from) {
       const detectedPreset = checkAndSetPreset(dateRange.from, dateRange.to);
       setSelectedPreset(detectedPreset);
@@ -68,14 +64,12 @@ const DateRangeFilter = ({
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
-    // Helper function to compare dates for preset matching
     const datesMatch = (date1: Date | undefined, date2: Date | undefined): boolean => {
       if (!date1 && !date2) return true;
       if (!date1 || !date2) return false;
       return isSameDay(date1, date2);
     };
     
-    // We'll match but not set a preset here - this is just for detection
     for (const preset of PRESET_OPTIONS) {
       const presetRange = getPresetDateRange(preset.id);
       if (datesMatch(from, presetRange.from) && datesMatch(to, presetRange.to)) {
@@ -195,7 +189,6 @@ const DateRangeFilter = ({
     setCalendarOpen(false);
     setSelectedPreset(undefined);
     
-    // Call the onClearFilter if it exists to properly clear the filter at the parent level
     if (onClearFilter) {
       onClearFilter();
     }
@@ -302,15 +295,6 @@ const DateRangeFilter = ({
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
               {formatDateRange()}
-              {(fromDate || toDate) && (
-                <X 
-                  className="ml-auto h-3 w-3 cursor-pointer text-muted-foreground hover:text-foreground" 
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    clearDateRange();
-                  }}
-                />
-              )}
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto p-0" align="start">
