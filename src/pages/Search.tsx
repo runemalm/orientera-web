@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -7,7 +6,7 @@ import SearchFilters from "@/components/SearchFilters";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
-import { Filter, Trash2, MapPin, MapPinOff, CalendarDays, List, SlidersHorizontal } from "lucide-react";
+import { Filter, Trash2, MapPin, MapPinOff, CalendarDays, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import CompetitionMapView from "@/components/CompetitionMapView";
@@ -16,6 +15,7 @@ import CompetitionWallCalendarView from "@/components/CompetitionWallCalendarVie
 import { useIsMobile, useBreakpoint } from "@/hooks/use-mobile";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 const SEARCH_SIDEBAR_OPEN_KEY = "search-sidebar-open";
 const SEARCH_FILTERS_KEY = "search-filters";
@@ -190,8 +190,10 @@ const Search = () => {
     }));
   };
 
-  const toggleCalendarView = () => {
-    setCalendarView(prev => prev === 'list' ? 'wall' : 'list');
+  const handleViewChange = (value: string) => {
+    if (value === 'list' || value === 'wall') {
+      setCalendarView(value);
+    }
   };
 
   const typesArray = Array.isArray(filters.types) ? filters.types : [];
@@ -296,19 +298,41 @@ const Search = () => {
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={toggleCalendarView}
-                          className="h-9 w-9 relative"
-                          aria-pressed={calendarView === 'wall'}
-                          aria-label={calendarView === 'wall' ? "Visa lista" : "Visa kalender"}
+                        <ToggleGroup 
+                          type="single" 
+                          value={calendarView}
+                          onValueChange={handleViewChange}
+                          className="flex"
                         >
-                          {calendarView === 'wall' ? <List className="h-4 w-4" /> : <CalendarDays className="h-4 w-4" />}
-                        </Button>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <ToggleGroupItem value="list" aria-label="Visa lista">
+                                  <List className="h-4 w-4" />
+                                </ToggleGroupItem>
+                              </TooltipTrigger>
+                              <TooltipContent side="bottom">
+                                Visa lista
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                          
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <ToggleGroupItem value="wall" aria-label="Visa kalender">
+                                  <CalendarDays className="h-4 w-4" />
+                                </ToggleGroupItem>
+                              </TooltipTrigger>
+                              <TooltipContent side="bottom">
+                                Visa kalender
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </ToggleGroup>
                       </TooltipTrigger>
                       <TooltipContent side="bottom">
-                        {calendarView === 'wall' ? "Visa lista" : "Visa kalender"}
+                        Visa {calendarView === 'wall' ? "lista" : "kalender"}
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
