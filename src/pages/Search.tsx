@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -6,7 +7,7 @@ import SearchFilters from "@/components/SearchFilters";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
-import { Filter, Trash2, MapPin, CalendarDays, List, ViewGrid, LayoutGrid, PanelLeftClose, PanelLeft, MapPinOff } from "lucide-react";
+import { Filter, Trash2, MapPin, CalendarDays, List, LayoutGrid, PanelLeftClose, PanelLeft, MapPinOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ToggleButton } from "@/components/ui/toggle-button";
 import { ButtonGroup } from "@/components/ui/button-group";
