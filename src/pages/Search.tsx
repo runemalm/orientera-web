@@ -6,7 +6,7 @@ import SearchFilters from "@/components/SearchFilters";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
-import { Filter, Trash2, MapPin, CalendarDays, List, Star, PanelLeftClose, PanelLeft } from "lucide-react";
+import { Filter, Trash2, MapPin, CalendarDays, List, Star, PanelLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import CompetitionMapView from "@/components/CompetitionMapView";
@@ -277,11 +277,7 @@ const Search = () => {
                               onClick={toggleSidebar}
                               className="h-9 w-9 relative"
                             >
-                              {sidebarOpen ? (
-                                <PanelLeftClose className="h-4 w-4" />
-                              ) : (
-                                <PanelLeft className="h-4 w-4" />
-                              )}
+                              <PanelLeft className="h-4 w-4" />
                               {hasActiveFilters && !sidebarOpen && (
                                 <Badge 
                                   variant="secondary"
