@@ -209,22 +209,6 @@ const SearchFiltersComponent = ({
               <div className="flex items-center">
                 <span className="text-sm font-medium">Tävlingsperiod</span>
               </div>
-              <div className="flex items-center">
-                {hasActiveDateFilter && (
-                  <Badge variant="secondary" className="ml-1 text-xs mr-2">
-                    1
-                  </Badge>
-                )}
-                {hasActiveDateFilter && (
-                  <div 
-                    onClick={() => handleClearFilter('date')}
-                    className="h-7 w-7 p-0 mr-4 hover:bg-muted flex items-center justify-center rounded-sm cursor-pointer"
-                    title="Rensa datumfilter"
-                  >
-                    <XCircle className="h-4 w-4 text-muted-foreground hover:text-foreground" />
-                  </div>
-                )}
-              </div>
             </div>
           </div>
           <div className="px-3 pb-3 pt-1">
@@ -243,22 +227,6 @@ const SearchFiltersComponent = ({
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center">
                 <span className="text-sm font-medium">Tävlingstyp</span>
-              </div>
-              <div className="flex items-center">
-                {typesArray.length > 0 && (
-                  <Badge variant="secondary" className="ml-1 text-xs mr-2">
-                    {typesArray.length}
-                  </Badge>
-                )}
-                {typesArray.length > 0 && (
-                  <div 
-                    onClick={() => handleClearFilter('types')}
-                    className="h-7 w-7 p-0 mr-4 hover:bg-muted flex items-center justify-center rounded-sm cursor-pointer"
-                    title="Rensa tävlingstypsfilter"
-                  >
-                    <XCircle className="h-4 w-4 text-muted-foreground hover:text-foreground" />
-                  </div>
-                )}
               </div>
             </div>
           </div>
@@ -288,22 +256,6 @@ const SearchFiltersComponent = ({
               <div className="flex items-center">
                 <span className="text-sm font-medium">Disciplin</span>
               </div>
-              <div className="flex items-center">
-                {filters.disciplines.length > 0 && (
-                  <Badge variant="secondary" className="ml-1 text-xs mr-2">
-                    {filters.disciplines.length}
-                  </Badge>
-                )}
-                {filters.disciplines.length > 0 && (
-                  <div 
-                    onClick={() => handleClearFilter('disciplines')}
-                    className="h-7 w-7 p-0 mr-4 hover:bg-muted flex items-center justify-center rounded-sm cursor-pointer"
-                    title="Rensa disciplinfilter"
-                  >
-                    <XCircle className="h-4 w-4 text-muted-foreground hover:text-foreground" />
-                  </div>
-                )}
-              </div>
             </div>
           </div>
           <div className="px-3 pb-3 pt-1">
@@ -332,22 +284,6 @@ const SearchFiltersComponent = ({
               <div className="flex items-center">
                 <span className="text-sm font-medium">Distrikt</span>
               </div>
-              <div className="flex items-center">
-                {filters.districts.length > 0 && (
-                  <Badge variant="secondary" className="ml-1 text-xs mr-2">
-                    {filters.districts.length}
-                  </Badge>
-                )}
-                {filters.districts.length > 0 && (
-                  <div 
-                    onClick={() => handleClearFilter('districts')}
-                    className="h-7 w-7 p-0 mr-4 hover:bg-muted flex items-center justify-center rounded-sm cursor-pointer"
-                    title="Rensa distriktfilter"
-                  >
-                    <XCircle className="h-4 w-4 text-muted-foreground hover:text-foreground" />
-                  </div>
-                )}
-              </div>
             </div>
           </div>
           <div className="px-3 pb-3 pt-1">
@@ -375,22 +311,6 @@ const SearchFiltersComponent = ({
             <div className="flex items-center justify-between w-full">
               <div className="flex items-center">
                 <span className="text-sm font-medium">Orienteringsgren</span>
-              </div>
-              <div className="flex items-center">
-                {branchesArray.length > 0 && (
-                  <Badge variant="secondary" className="ml-1 text-xs mr-2">
-                    {branchesArray.length}
-                  </Badge>
-                )}
-                {branchesArray.length > 0 && (
-                  <div 
-                    onClick={() => handleClearFilter('branches')}
-                    className="h-7 w-7 p-0 mr-4 hover:bg-muted flex items-center justify-center rounded-sm cursor-pointer"
-                    title="Rensa grenfilter"
-                  >
-                    <XCircle className="h-4 w-4 text-muted-foreground hover:text-foreground" />
-                  </div>
-                )}
               </div>
             </div>
           </div>
