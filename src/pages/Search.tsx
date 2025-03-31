@@ -6,15 +6,16 @@ import SearchFilters from "@/components/SearchFilters";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
-import { Filter, Trash2, MapPin, PanelLeftClose, PanelLeft, Map, MapPinOff, CalendarDays, List } from "lucide-react";
+import { Filter, Trash2, MapPin, CalendarDays, List, ViewGrid, LayoutGrid, PanelLeftClose, PanelLeft, MapPinOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ToggleButton } from "@/components/ui/toggle-button";
+import { ButtonGroup } from "@/components/ui/button-group";
 import { useToast } from "@/hooks/use-toast";
 import CompetitionMapView from "@/components/CompetitionMapView";
 import CompetitionCalendarView from "@/components/CompetitionCalendarView";
 import CompetitionWallCalendarView from "@/components/CompetitionWallCalendarView";
 import { useIsMobile, useBreakpoint } from "@/hooks/use-mobile";
 import { Badge } from "@/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const SEARCH_SIDEBAR_OPEN_KEY = "search-sidebar-open";
 const SEARCH_FILTERS_KEY = "search-filters";
@@ -204,6 +205,15 @@ const Search = () => {
                           branchesArray.length > 0 ||
                           filters.dateRange?.from !== undefined;
 
+  const activeFilterCount = 
+    filters.regions.length + 
+    filters.districts.length + 
+    filters.disciplines.length + 
+    filters.levels.length + 
+    typesArray.length + 
+    branchesArray.length + 
+    (filters.dateRange ? 1 : 0);
+
   const filteredCompetitions = useMemo(() => {
     return filterCompetitions(competitions, filters);
   }, [competitions, filters, typesArray, branchesArray]);
@@ -245,70 +255,40 @@ const Search = () => {
                   )}
                 </div>
                 
-                <div className="flex items-center gap-2">
-                  {!isMobile && (
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant={sidebarOpen ? "default" : "outline"}
-                            size="icon"
-                            onClick={toggleSidebar}
-                            className="h-9 w-9 relative"
-                          >
-                            {sidebarOpen ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeft className="h-4 w-4" />}
-                            {hasActiveFilters && !sidebarOpen && (
-                              <Badge 
-                                variant="secondary"
-                                className="absolute -top-2 -right-2 h-5 min-w-5 flex items-center justify-center p-0 text-xs"
-                              >
-                                {filters.disciplines.length + filters.districts.length + typesArray.length + branchesArray.length + (filters.dateRange ? 1 : 0)}
-                              </Badge>
-                            )}
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent side="bottom">
-                          {sidebarOpen ? "Dölj filter" : "Visa filter"}
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  )}
-                  
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant={filters.showMap ? "default" : "outline"}
-                          size="icon"
-                          onClick={toggleMapVisibility}
-                          className="h-9 w-9 relative"
-                        >
-                          {filters.showMap ? <MapPinOff className="h-4 w-4" /> : <MapPin className="h-4 w-4" />}
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent side="bottom">
-                        {filters.showMap ? "Dölj karta" : "Visa karta"}
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                  
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant={calendarView === 'wall' ? "default" : "outline"}
-                          size="icon"
-                          onClick={toggleCalendarView}
-                          className="h-9 w-9 relative"
-                        >
-                          {calendarView === 'wall' ? <List className="h-4 w-4" /> : <CalendarDays className="h-4 w-4" />}
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent side="bottom">
-                        {calendarView === 'wall' ? "Visa lista" : "Visa kalender"}
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-3">
+                    {!isMobile && (
+                      <ToggleButton
+                        active={sidebarOpen}
+                        onClick={toggleSidebar}
+                        tooltip={sidebarOpen ? "Dölj filter" : "Visa filter"}
+                        badgeCount={!sidebarOpen && hasActiveFilters ? activeFilterCount : undefined}
+                        aria-label={sidebarOpen ? "Dölj filter" : "Visa filter"}
+                      >
+                        {sidebarOpen ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeft className="h-4 w-4" />}
+                      </ToggleButton>
+                    )}
+                    
+                    <ButtonGroup>
+                      <ToggleButton
+                        active={filters.showMap}
+                        onClick={toggleMapVisibility}
+                        tooltip={filters.showMap ? "Dölj karta" : "Visa karta"}
+                        aria-label={filters.showMap ? "Dölj karta" : "Visa karta"}
+                      >
+                        {filters.showMap ? <MapPinOff className="h-4 w-4" /> : <MapPin className="h-4 w-4" />}
+                      </ToggleButton>
+                      
+                      <ToggleButton
+                        active={calendarView === 'wall'}
+                        onClick={toggleCalendarView}
+                        tooltip={calendarView === 'wall' ? "Visa lista" : "Visa kalender"}
+                        aria-label={calendarView === 'wall' ? "Visa lista" : "Visa kalender"}
+                      >
+                        {calendarView === 'wall' ? <List className="h-4 w-4" /> : <LayoutGrid className="h-4 w-4" />}
+                      </ToggleButton>
+                    </ButtonGroup>
+                  </div>
                 </div>
               </div>
             </div>
