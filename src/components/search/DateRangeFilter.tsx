@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { sv } from "date-fns/locale";
 import { format, isValid, isToday, isYesterday, isTomorrow, addDays, startOfMonth, endOfMonth, isSameDay, nextFriday, nextSunday, getDay, subDays } from "date-fns";
@@ -32,8 +33,7 @@ const DateRangeFilter = ({
   const isMobile = useIsMobile();
   const [fromDate, setFromDate] = useState<Date | undefined>(dateRange?.from);
   const [toDate, setToDate] = useState<Date | undefined>(dateRange?.to);
-  const [fromDateOpen, setFromDateOpen] = useState(false);
-  const [toDateOpen, setToDateOpen] = useState(false);
+  const [calendarOpen, setCalendarOpen] = useState(false);
   const [selectedPreset, setSelectedPreset] = useState<string | undefined>(undefined);
   
   const PRESET_OPTIONS = [
@@ -175,13 +175,22 @@ const DateRangeFilter = ({
     
     return format(date, "d MMM yyyy", { locale: sv });
   };
+  
+  const formatDateRange = (): string => {
+    if (!fromDate && !toDate) return "Välj datumintervall";
+    
+    if (fromDate && toDate && isSameDay(fromDate, toDate)) {
+      return formatDate(fromDate);
+    }
+    
+    return `${formatDate(fromDate)} — ${formatDate(toDate) || '...'}`;
+  };
 
   const clearDateRange = () => {
     setFromDate(undefined);
     setToDate(undefined);
     onDateRangeChange(undefined);
-    setFromDateOpen(false);
-    setToDateOpen(false);
+    setCalendarOpen(false);
     setSelectedPreset(undefined);
   };
   
@@ -325,72 +334,73 @@ const DateRangeFilter = ({
           eller
         </div>
         
-        <div className="grid grid-cols-2 gap-2">
-          <div className="space-y-1.5">
-            <Label htmlFor="from-date" className="text-xs">Från</Label>
-            <Popover open={fromDateOpen} onOpenChange={setFromDateOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  id="from-date"
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal text-sm h-9",
-                    !fromDate && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {fromDate ? formatDate(fromDate) : "Välj datum"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={fromDate}
-                  onSelect={(date) => {
-                    handleFromDateSelect(date);
-                    setFromDateOpen(false);
-                  }}
-                  locale={sv}
-                  initialFocus
-                  className="pointer-events-auto"
-                  disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="to-date" className="text-xs">Till</Label>
-            <Popover open={toDateOpen} onOpenChange={setToDateOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  id="to-date"
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal text-sm h-9",
-                    !toDate && "text-muted-foreground"
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {toDate ? formatDate(toDate) : "Välj datum"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={toDate}
-                  onSelect={(date) => {
-                    handleToDateSelect(date);
-                    setToDateOpen(false);
-                  }}
-                  locale={sv}
-                  initialFocus
-                  className="pointer-events-auto"
-                  disabled={(date) => fromDate ? date < fromDate : date < new Date(new Date().setHours(0, 0, 0, 0))}
-                />
-              </PopoverContent>
-            </Popover>
-          </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="date-range" className="text-xs">Välj intervall</Label>
+          <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                id="date-range"
+                variant="outline"
+                className={cn(
+                  "w-full justify-start text-left font-normal text-sm h-9",
+                  !fromDate && !toDate && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {formatDateRange()}
+                {(fromDate || toDate) && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      clearDateRange();
+                    }}
+                    className="ml-auto h-6 w-6 p-0 hover:bg-muted"
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <div className="p-3 border-b">
+                <div className="space-y-1">
+                  <div className="font-medium text-sm">Från</div>
+                  <div className="text-sm">{fromDate ? formatDate(fromDate) : "Välj datum"}</div>
+                </div>
+                {fromDate && (
+                  <div className="space-y-1 mt-3">
+                    <div className="font-medium text-sm">Till</div>
+                    <div className="text-sm">{toDate ? formatDate(toDate) : "Välj datum"}</div>
+                  </div>
+                )}
+              </div>
+              <Calendar
+                mode="range"
+                selected={{ 
+                  from: fromDate, 
+                  to: toDate 
+                }}
+                onSelect={(range) => {
+                  if (!range) {
+                    setFromDate(undefined);
+                    setToDate(undefined);
+                    updateDateRange(undefined, undefined);
+                  } else {
+                    setFromDate(range.from);
+                    setToDate(range.to);
+                    updateDateRange(range.from, range.to);
+                  }
+                  setSelectedPreset(undefined);
+                }}
+                locale={sv}
+                initialFocus
+                className="pointer-events-auto"
+                disabled={(date) => date < new Date(new Date().setHours(0, 0, 0, 0))}
+              />
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
     </div>
