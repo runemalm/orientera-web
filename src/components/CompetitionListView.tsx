@@ -1,5 +1,5 @@
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { Competition } from "@/types";
 import { 
   Card, 
@@ -8,10 +8,14 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { format, isWeekend, parseISO, isSameMonth } from "date-fns";
 import { sv } from "date-fns/locale";
-import { formatDate } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Calendar, MapPin, Flag, Star, Navigation } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
+
+// Key for storing favorites in localStorage
+const FAVORITES_KEY = "competition-favorites";
 
 interface CompetitionListViewProps {
   competitions: Competition[];
@@ -21,6 +25,21 @@ const CompetitionListView: React.FC<CompetitionListViewProps> = ({
   competitions 
 }) => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [favorites, setFavorites] = useState<string[]>([]);
+  
+  // Load favorites from localStorage
+  useEffect(() => {
+    const storedFavorites = localStorage.getItem(FAVORITES_KEY);
+    if (storedFavorites) {
+      try {
+        setFavorites(JSON.parse(storedFavorites));
+      } catch (error) {
+        console.error("Failed to parse favorites", error);
+        setFavorites([]);
+      }
+    }
+  }, []);
   
   // Sort competitions by date in ascending order
   const sortedCompetitions = useMemo(() => 
@@ -51,6 +70,29 @@ const CompetitionListView: React.FC<CompetitionListViewProps> = ({
     }));
   }, [sortedCompetitions]);
 
+  // Toggle favorite status
+  const toggleFavorite = (event: React.MouseEvent, id: string) => {
+    event.stopPropagation();
+    
+    let newFavorites: string[];
+    if (favorites.includes(id)) {
+      newFavorites = favorites.filter(fav => fav !== id);
+      toast({
+        title: "Borttagen från favoriter",
+        description: "Tävlingen har tagits bort från dina favoriter"
+      });
+    } else {
+      newFavorites = [...favorites, id];
+      toast({
+        title: "Tillagd som favorit",
+        description: "Tävlingen har lagts till i dina favoriter"
+      });
+    }
+    
+    setFavorites(newFavorites);
+    localStorage.setItem(FAVORITES_KEY, JSON.stringify(newFavorites));
+  };
+
   if (competitions.length === 0) {
     return (
       <Card>
@@ -73,6 +115,7 @@ const CompetitionListView: React.FC<CompetitionListViewProps> = ({
             {competitions.map((competition) => {
               const date = parseISO(competition.date);
               const isWeekendDay = isWeekend(date);
+              const isFavorite = favorites.includes(competition.id);
               
               return (
                 <Card 
@@ -80,7 +123,8 @@ const CompetitionListView: React.FC<CompetitionListViewProps> = ({
                   className={cn(
                     "overflow-hidden transition-all hover:shadow-md cursor-pointer",
                     isWeekendDay ? "border-l-4 border-l-amber-400" : "",
-                    competition.featured ? "border-accent border-l-4" : ""
+                    competition.featured ? "border-accent border-l-4" : "",
+                    isFavorite ? "border-amber-400 border-l-4" : ""
                   )}
                   onClick={() => navigate(`/competition/${competition.id}`)}
                 >
@@ -120,6 +164,18 @@ const CompetitionListView: React.FC<CompetitionListViewProps> = ({
                       </div>
                       
                       <div className="flex items-center gap-2 sm:ml-4">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className={cn(
+                            "hover:bg-amber-50",
+                            isFavorite ? "text-amber-500 hover:text-amber-600" : "text-muted-foreground hover:text-amber-500"
+                          )}
+                          onClick={(e) => toggleFavorite(e, competition.id)}
+                          aria-label={isFavorite ? "Ta bort från favoriter" : "Lägg till i favoriter"}
+                        >
+                          <Star className={cn("h-5 w-5", isFavorite ? "fill-current" : "")} />
+                        </Button>
                         <Badge variant="secondary">{competition.discipline}</Badge>
                         <Badge variant="muted">{competition.level}</Badge>
                       </div>
