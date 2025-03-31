@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Competition } from "@/types";
 import { 
@@ -109,6 +108,7 @@ const CompetitionListView: React.FC<CompetitionListViewProps> = ({
                 </p>
               </div>
               
+              {/* Action buttons section - Ensure this is visible */}
               <div className="flex items-center gap-2">
                 <Button 
                   variant="ghost" 
