@@ -6,7 +6,7 @@ import SearchFilters from "@/components/SearchFilters";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
-import { Filter, Trash2, MapPin, PanelLeftClose, PanelLeft } from "lucide-react";
+import { Filter, Trash2, MapPin, PanelLeftClose, PanelLeft, Map, MapPinOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import CompetitionMapView from "@/components/CompetitionMapView";
@@ -236,7 +236,7 @@ const Search = () => {
                             variant={sidebarOpen ? "default" : "outline"}
                             size="icon"
                             onClick={toggleSidebar}
-                            className="h-9 w-9 active:bg-primary focus:bg-primary active:text-primary-foreground focus:text-primary-foreground relative"
+                            className="h-9 w-9 relative"
                           >
                             {sidebarOpen ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeft className="h-4 w-4" />}
                             {hasActiveFilters && !sidebarOpen && (
@@ -256,18 +256,23 @@ const Search = () => {
                     </TooltipProvider>
                   )}
                   
-                  <Button
-                    variant={filters.showMap ? "default" : "outline"}
-                    size="sm"
-                    onClick={toggleMapVisibility}
-                    className="h-9 active:bg-primary focus:bg-primary active:text-primary-foreground focus:text-primary-foreground"
-                    onTouchEnd={(e) => {
-                      e.currentTarget.blur();
-                    }}
-                  >
-                    <MapPin className="h-4 w-4 mr-2" />
-                    <span>{filters.showMap ? "Dölj karta" : "Visa karta"}</span>
-                  </Button>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant={filters.showMap ? "default" : "outline"}
+                          size="icon"
+                          onClick={toggleMapVisibility}
+                          className="h-9 w-9 relative"
+                        >
+                          {filters.showMap ? <MapPinOff className="h-4 w-4" /> : <MapPin className="h-4 w-4" />}
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">
+                        {filters.showMap ? "Dölj karta" : "Visa karta"}
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
               </div>
             </div>
