@@ -6,7 +6,7 @@ import SearchFilters from "@/components/SearchFilters";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
-import { Filter, Trash2, MapPin, CalendarDays, List, Star } from "lucide-react";
+import { Filter, Trash2, MapPin, CalendarDays, List, Star, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import CompetitionMapView from "@/components/CompetitionMapView";
@@ -239,9 +239,9 @@ const Search = () => {
         </div>
         
         <div className="flex flex-col md:flex-row gap-6 w-full max-w-full">
-          {(sidebarOpen || isMobile) && (
-            <div className="w-full md:w-80 flex-shrink-0" ref={filterRef}>
-              <div ref={filterContentRef} className="mb-4">
+          <div className={`relative ${sidebarOpen || isMobile ? 'w-full md:w-80 flex-shrink-0' : 'w-0'}`} ref={filterRef}>
+            {sidebarOpen && (
+              <div ref={filterContentRef} className="mb-4 relative">
                 <SearchFilters 
                   filters={filters} 
                   onFilterChange={handleFilterChange} 
@@ -249,8 +249,40 @@ const Search = () => {
                   hideSearchInput={true}
                   showMapToggle={true}
                 />
+                
+                {!isMobile && (
+                  <Button 
+                    size="icon" 
+                    variant="outline"
+                    onClick={toggleSidebar}
+                    className="absolute -right-4 top-1/2 transform -translate-y-1/2 h-8 w-8 rounded-full border shadow-md z-10 bg-background"
+                    aria-label="Dölj filterpanel"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                )}
               </div>
-            </div>
+            )}
+          </div>
+          
+          {!sidebarOpen && !isMobile && (
+            <Button 
+              size="icon" 
+              variant="outline"
+              onClick={toggleSidebar}
+              className="w-8 h-16 flex items-center justify-center rounded-r-lg rounded-l-none border-l-0 shadow-md bg-background"
+              aria-label="Visa filterpanel"
+            >
+              <Filter className="h-4 w-4" />
+              {hasActiveFilters && (
+                <Badge 
+                  variant="secondary"
+                  className="absolute -top-2 -right-2 h-5 min-w-5 flex items-center justify-center p-0 text-xs"
+                >
+                  {filters.disciplines.length + filters.districts.length + typesArray.length + branchesArray.length + (filters.dateRange ? 1 : 0)}
+                </Badge>
+              )}
+            </Button>
           )}
           
           <div className="flex-1">
@@ -267,36 +299,6 @@ const Search = () => {
                 </div>
                 
                 <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    {!isMobile && (
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant={sidebarOpen ? "default" : "outline"}
-                              size="icon"
-                              onClick={toggleSidebar}
-                              className="h-9 w-9 relative"
-                            >
-                              <Filter className="h-4 w-4" />
-                              {hasActiveFilters && !sidebarOpen && (
-                                <Badge 
-                                  variant="secondary"
-                                  className="absolute -top-2 -right-2 h-5 min-w-5 flex items-center justify-center p-0 text-xs"
-                                >
-                                  {filters.disciplines.length + filters.districts.length + typesArray.length + branchesArray.length + (filters.dateRange ? 1 : 0)}
-                                </Badge>
-                              )}
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent side="bottom">
-                            {sidebarOpen ? "Dölj filterpanel" : "Visa filterpanel"}
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    )}
-                  </div>
-                  
                   <div className="flex items-center">
                     <Tabs 
                       value={viewType} 
