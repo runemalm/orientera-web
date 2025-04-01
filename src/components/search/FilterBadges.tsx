@@ -42,6 +42,23 @@ const FilterBadges = ({ filters, onRemoveFilter, onClearAllFilters }: FilterBadg
     }).format(date);
   };
 
+  // Get preset name for display
+  const getPresetName = (presetId?: string) => {
+    if (!presetId) return "";
+    
+    const presetLabels: {[key: string]: string} = {
+      'today': 'Idag',
+      'tomorrow': 'Imorgon',
+      'thisWeekend': 'Helgen',
+      'next7days': 'Kommande 7 dgr',
+      'next30days': 'Kommande 30 dgr',
+      'thisMonth': 'Denna månad',
+      'nextMonth': 'Nästa månad'
+    };
+    
+    return presetLabels[presetId] || "";
+  };
+
   return (
     <div className="mb-4">
       <div className="flex flex-wrap gap-2 items-center">
@@ -107,7 +124,8 @@ const FilterBadges = ({ filters, onRemoveFilter, onClearAllFilters }: FilterBadg
         
         {filters.dateRange?.from && (
           <Badge variant="secondary" className="px-2 py-1">
-            {`${formatDate(filters.dateRange.from)}${filters.dateRange.to ? ` - ${formatDate(filters.dateRange.to)}` : ""}`}
+            {filters.datePreset ? getPresetName(filters.datePreset) : 
+              `${formatDate(filters.dateRange.from)}${filters.dateRange.to ? ` - ${formatDate(filters.dateRange.to)}` : ""}`}
             <Button
               variant="ghost"
               size="sm"

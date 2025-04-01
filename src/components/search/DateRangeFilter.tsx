@@ -12,6 +12,7 @@ import { Toggle } from "@/components/ui/toggle";
 type DateRangeValue = {
   from?: Date;
   to?: Date;
+  presetId?: string;
 };
 
 interface DateRangeFilterProps {
@@ -33,8 +34,8 @@ const DateRangeFilter = ({
   const [fromDate, setFromDate] = useState<Date | undefined>(dateRange?.from);
   const [toDate, setToDate] = useState<Date | undefined>(dateRange?.to);
   const [calendarOpen, setCalendarOpen] = useState(false);
-  const [selectedPreset, setSelectedPreset] = useState<string | undefined>(undefined);
-  const [lastClickedPreset, setLastClickedPreset] = useState<string | undefined>(undefined);
+  const [selectedPreset, setSelectedPreset] = useState<string | undefined>(dateRange?.presetId);
+  const [lastClickedPreset, setLastClickedPreset] = useState<string | undefined>(dateRange?.presetId);
   
   const PRESET_OPTIONS = [
     { id: 'today', label: 'Idag', priority: 1 },
@@ -49,6 +50,7 @@ const DateRangeFilter = ({
   useEffect(() => {
     setFromDate(dateRange?.from);
     setToDate(dateRange?.to);
+    setSelectedPreset(dateRange?.presetId);
     
     if (!dateRange || (!dateRange.from && !dateRange.to)) {
       setSelectedPreset(undefined);
@@ -56,7 +58,7 @@ const DateRangeFilter = ({
       return;
     }
     
-    if (dateRange?.from) {
+    if (dateRange?.from && !dateRange.presetId) {
       // Only check for matching presets if no preset was clicked directly
       if (!lastClickedPreset) {
         const detectedPreset = checkAndSetPreset(dateRange.from, dateRange.to);
@@ -88,7 +90,6 @@ const DateRangeFilter = ({
       return undefined;
     }
     
-    // If multiple presets match, select the one with highest priority (lowest priority number)
     if (matchingPresets.length > 1) {
       let highestPriorityPreset = matchingPresets[0];
       let highestPriority = PRESET_OPTIONS.find(p => p.id === highestPriorityPreset)?.priority || 999;
@@ -165,7 +166,7 @@ const DateRangeFilter = ({
         break;
     }
     
-    return { from, to };
+    return { from, to, presetId };
   };
   
   const handleFromDateSelect = (date: Date | undefined) => {
@@ -182,13 +183,13 @@ const DateRangeFilter = ({
     setLastClickedPreset(undefined);
   };
   
-  const updateDateRange = (from: Date | undefined, to: Date | undefined) => {
+  const updateDateRange = (from: Date | undefined, to: Date | undefined, presetId?: string) => {
     if (!from && !to) {
       onDateRangeChange(undefined);
       return;
     }
     
-    onDateRangeChange({ from, to });
+    onDateRangeChange({ from, to, presetId });
   };
 
   const formatDate = (date?: Date): string => {
@@ -238,7 +239,7 @@ const DateRangeFilter = ({
     
     setFromDate(dateRange.from);
     setToDate(dateRange.to);
-    updateDateRange(dateRange.from, dateRange.to);
+    updateDateRange(dateRange.from, dateRange.to, value);
   };
 
   return (

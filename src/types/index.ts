@@ -68,6 +68,6 @@ export type SearchFilters = {
     to?: Date;
   }; // Date range for filtering, both from and to are now optional
   distance?: number; // Optional distance filter
-  datePreset?: string; // New field to track the date preset selection
-  showMap?: boolean; // New field to track map visibility
+  datePreset?: string; // Field to track the date preset selection
+  showMap?: boolean; // Field to track map visibility
 };
