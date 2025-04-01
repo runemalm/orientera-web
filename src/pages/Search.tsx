@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -268,20 +269,19 @@ const Search = () => {
         </div>
         
         <div className="flex flex-col md:flex-row gap-6 w-full max-w-full">
-          <div className="relative flex">
-            <div className={`relative ${sidebarOpen || isMobile ? 'w-full md:w-80 flex-shrink-0' : 'w-0 overflow-hidden'}`} ref={filterRef}>
-              {sidebarOpen && (
-                <div ref={filterContentRef} className="mb-4 relative">
-                  <SearchFilters 
-                    filters={filters} 
-                    onFilterChange={handleFilterChange} 
-                    hasLocation={false}
-                    hideSearchInput={true}
-                    showMapToggle={true}
-                  />
-                </div>
-              )}
-            </div>
+          {/* Filter sidebar */}
+          <div className={`${sidebarOpen || isMobile ? 'w-full md:w-80 flex-shrink-0' : 'w-0 md:hidden'}`} ref={filterRef}>
+            {sidebarOpen && (
+              <div ref={filterContentRef} className="mb-4">
+                <SearchFilters 
+                  filters={filters} 
+                  onFilterChange={handleFilterChange} 
+                  hasLocation={false}
+                  hideSearchInput={true}
+                  showMapToggle={true}
+                />
+              </div>
+            )}
           </div>
           
           <div className="flex-1">
