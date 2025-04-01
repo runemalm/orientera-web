@@ -307,23 +307,17 @@ const Search = () => {
                   <div className="flex items-center gap-2">
                     {!isMobile && (
                       <Button 
-                        size="sm" 
+                        size="icon" 
                         variant="outline"
                         onClick={toggleSidebar}
-                        className="h-9 px-3 flex items-center"
+                        className="h-9 w-9"
                         aria-label={sidebarOpen ? "Dölj filterpanel" : "Visa filterpanel"}
                       >
-                        <Filter className="h-4 w-4 mr-1.5" />
-                        <span>Filter</span>
-                        {sidebarOpen ? (
-                          <ChevronLeft className="h-4 w-4 ml-1.5" />
-                        ) : (
-                          <ChevronRight className="h-4 w-4 ml-1.5" />
-                        )}
+                        <Filter className="h-4 w-4" />
                         {!sidebarOpen && hasActiveFilters && (
                           <Badge 
                             variant="secondary"
-                            className="ml-1.5 h-5 min-w-5 flex items-center justify-center p-0 text-xs"
+                            className="absolute -top-2 -right-2 h-5 min-w-5 flex items-center justify-center p-0 text-xs"
                           >
                             {filters.disciplines.length + filters.districts.length + typesArray.length + branchesArray.length + (filters.dateRange ? 1 : 0)}
                           </Badge>
