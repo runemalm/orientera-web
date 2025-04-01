@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -277,30 +276,6 @@ const Search = () => {
         
         <div className="flex flex-col md:flex-row gap-6 w-full max-w-full">
           <div className="relative flex">
-            {!isMobile && (
-              <Button 
-                size="icon" 
-                variant="outline"
-                onClick={toggleSidebar}
-                className="h-12 w-10 rounded-r-lg border shadow-md z-10 bg-background absolute -right-10 top-0"
-                aria-label={sidebarOpen ? "Dölj filterpanel" : "Visa filterpanel"}
-              >
-                {sidebarOpen ? (
-                  <ChevronLeft className="h-4 w-4" />
-                ) : (
-                  <ChevronRight className="h-4 w-4" />
-                )}
-                {!sidebarOpen && hasActiveFilters && (
-                  <Badge 
-                    variant="secondary"
-                    className="absolute -top-2 -right-2 h-5 min-w-5 flex items-center justify-center p-0 text-xs"
-                  >
-                    {filters.disciplines.length + filters.districts.length + typesArray.length + branchesArray.length + (filters.dateRange ? 1 : 0)}
-                  </Badge>
-                )}
-              </Button>
-            )}
-            
             <div className={`relative ${sidebarOpen || isMobile ? 'w-full md:w-80 flex-shrink-0' : 'w-0 overflow-hidden'}`} ref={filterRef}>
               {sidebarOpen && (
                 <div ref={filterContentRef} className="mb-4 relative">
@@ -330,6 +305,32 @@ const Search = () => {
                 
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2">
+                    {!isMobile && (
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={toggleSidebar}
+                        className="h-9 px-3 flex items-center"
+                        aria-label={sidebarOpen ? "Dölj filterpanel" : "Visa filterpanel"}
+                      >
+                        <Filter className="h-4 w-4 mr-1.5" />
+                        <span>Filter</span>
+                        {sidebarOpen ? (
+                          <ChevronLeft className="h-4 w-4 ml-1.5" />
+                        ) : (
+                          <ChevronRight className="h-4 w-4 ml-1.5" />
+                        )}
+                        {!sidebarOpen && hasActiveFilters && (
+                          <Badge 
+                            variant="secondary"
+                            className="ml-1.5 h-5 min-w-5 flex items-center justify-center p-0 text-xs"
+                          >
+                            {filters.disciplines.length + filters.districts.length + typesArray.length + branchesArray.length + (filters.dateRange ? 1 : 0)}
+                          </Badge>
+                        )}
+                      </Button>
+                    )}
+                    
                     <div className="flex items-center space-x-2">
                       <Switch
                         id="map-toggle"
