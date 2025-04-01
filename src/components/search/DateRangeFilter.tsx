@@ -59,7 +59,6 @@ const DateRangeFilter = ({
     }
     
     if (dateRange?.from && !dateRange.presetId) {
-      // Only check for matching presets if no preset was clicked directly
       if (!lastClickedPreset) {
         const detectedPreset = checkAndSetPreset(dateRange.from, dateRange.to);
         setSelectedPreset(detectedPreset);

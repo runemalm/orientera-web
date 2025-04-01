@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -172,6 +171,10 @@ const Search = () => {
     newFilters.types = Array.isArray(newFilters.types) ? newFilters.types : [];
     newFilters.branches = Array.isArray(newFilters.branches) ? newFilters.branches : [];
     
+    if (newFilters.dateRange?.presetId) {
+      newFilters.datePreset = newFilters.dateRange.presetId;
+    }
+    
     setFilters(newFilters);
   };
 
@@ -185,6 +188,7 @@ const Search = () => {
       branches: [],
       searchQuery: "", 
       dateRange: undefined,
+      datePreset: undefined,
       showMap: filters.showMap
     };
     
@@ -201,6 +205,7 @@ const Search = () => {
     
     if (filterType === "dateRange") {
       updatedFilters.dateRange = undefined;
+      updatedFilters.datePreset = undefined;
     } else if (value) {
       const filterKey = filterType as keyof SearchFiltersType;
       

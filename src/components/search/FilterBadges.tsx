@@ -1,4 +1,3 @@
-
 import React from "react";
 import { X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -73,6 +72,21 @@ const FilterBadges = ({ filters, onRemoveFilter, onClearAllFilters }: FilterBadg
             >
               <X className="h-3 w-3" />
               <span className="sr-only">Ta bort {discipline}</span>
+            </Button>
+          </Badge>
+        ))}
+        
+        {filters.regions.map((region) => (
+          <Badge key={`region-${region}`} variant="secondary" className="px-2 py-1">
+            {region}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-4 w-4 p-0 ml-1 hover:bg-transparent"
+              onClick={() => onRemoveFilter("regions", region)}
+            >
+              <X className="h-3 w-3" />
+              <span className="sr-only">Ta bort {region}</span>
             </Button>
           </Badge>
         ))}
