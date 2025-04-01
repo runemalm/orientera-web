@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
@@ -6,8 +7,8 @@ import SearchFilters from "@/components/SearchFilters";
 import FilterBadges from "@/components/search/FilterBadges";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
-import { SearchFilters as SearchFiltersType, Discipline, CompetitionType, CompetitionBranch, CompetitionLevel } from "@/types";
-import { Filter, Trash2, MapPin, CalendarDays, List, Star, ChevronLeft, ChevronRight } from "lucide-react";
+import { SearchFilters as SearchFiltersType } from "@/types";
+import { Filter, Trash2, MapPin, CalendarDays, List, Star, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import CompetitionMapView from "@/components/CompetitionMapView";
@@ -201,24 +202,12 @@ const Search = () => {
     if (filterType === "dateRange") {
       updatedFilters.dateRange = undefined;
     } else if (value) {
+      // TypeScript type assertion to handle the array properties
       const filterKey = filterType as keyof SearchFiltersType;
+      const currentArray = updatedFilters[filterKey] as string[];
       
-      if (Array.isArray(updatedFilters[filterKey])) {
-        if (filterKey === 'disciplines') {
-          updatedFilters.disciplines = updatedFilters.disciplines.filter(item => item !== value) as Discipline[];
-        } 
-        else if (filterKey === 'levels') {
-          updatedFilters.levels = updatedFilters.levels.filter(item => item !== value) as CompetitionLevel[];
-        }
-        else if (filterKey === 'types') {
-          updatedFilters.types = updatedFilters.types.filter(item => item !== value) as CompetitionType[];
-        }
-        else if (filterKey === 'branches') {
-          updatedFilters.branches = updatedFilters.branches.filter(item => item !== value) as CompetitionBranch[];
-        }
-        else if (filterKey === 'regions' || filterKey === 'districts') {
-          updatedFilters[filterKey] = updatedFilters[filterKey].filter(item => item !== value) as string[];
-        }
+      if (Array.isArray(currentArray)) {
+        updatedFilters[filterKey] = currentArray.filter(item => item !== value) as any;
       }
     }
     
@@ -275,47 +264,51 @@ const Search = () => {
         </div>
         
         <div className="flex flex-col md:flex-row gap-6 w-full max-w-full">
-          <div className="relative flex">
-            <div className={`relative ${sidebarOpen || isMobile ? 'w-full md:w-80 flex-shrink-0' : 'w-0 overflow-hidden'}`} ref={filterRef}>
-              {sidebarOpen && (
-                <div ref={filterContentRef} className="mb-4 relative">
-                  <SearchFilters 
-                    filters={filters} 
-                    onFilterChange={handleFilterChange} 
-                    hasLocation={false}
-                    hideSearchInput={true}
-                    showMapToggle={true}
-                  />
-                </div>
-              )}
-            </div>
-            
-            {!isMobile && (
-              <Button 
-                size="icon" 
-                variant="outline"
-                onClick={toggleSidebar}
-                className={`h-12 w-6 rounded-l-none rounded-r-lg border-l-0 shadow-md z-10 bg-background flex-shrink-0 ${sidebarOpen ? 'relative -ml-1' : ''}`}
-                aria-label={sidebarOpen ? "Dölj filterpanel" : "Visa filterpanel"}
-              >
-                {sidebarOpen ? (
-                  <ChevronLeft className="h-4 w-4" />
-                ) : (
-                  <>
-                    <ChevronRight className="h-4 w-4" />
-                    {hasActiveFilters && (
-                      <Badge 
-                        variant="secondary"
-                        className="absolute -top-2 -right-2 h-5 min-w-5 flex items-center justify-center p-0 text-xs"
-                      >
-                        {filters.disciplines.length + filters.districts.length + typesArray.length + branchesArray.length + (filters.dateRange ? 1 : 0)}
-                      </Badge>
-                    )}
-                  </>
+          <div className={`relative ${sidebarOpen || isMobile ? 'w-full md:w-80 flex-shrink-0' : 'w-0'}`} ref={filterRef}>
+            {sidebarOpen && (
+              <div ref={filterContentRef} className="mb-4 relative">
+                <SearchFilters 
+                  filters={filters} 
+                  onFilterChange={handleFilterChange} 
+                  hasLocation={false}
+                  hideSearchInput={true}
+                  showMapToggle={true}
+                />
+                
+                {!isMobile && (
+                  <Button 
+                    size="icon" 
+                    variant="outline"
+                    onClick={toggleSidebar}
+                    className="absolute -right-4 top-1/2 transform -translate-y-1/2 h-8 w-8 rounded-full border shadow-md z-10 bg-background"
+                    aria-label="Dölj filterpanel"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
                 )}
-              </Button>
+              </div>
             )}
           </div>
+          
+          {!sidebarOpen && !isMobile && (
+            <Button 
+              size="icon" 
+              variant="outline"
+              onClick={toggleSidebar}
+              className="w-8 h-16 flex items-center justify-center rounded-r-lg rounded-l-none border-l-0 shadow-md bg-background"
+              aria-label="Visa filterpanel"
+            >
+              <Filter className="h-4 w-4" />
+              {hasActiveFilters && (
+                <Badge 
+                  variant="secondary"
+                  className="absolute -top-2 -right-2 h-5 min-w-5 flex items-center justify-center p-0 text-xs"
+                >
+                  {filters.disciplines.length + filters.districts.length + typesArray.length + branchesArray.length + (filters.dateRange ? 1 : 0)}
+                </Badge>
+              )}
+            </Button>
+          )}
           
           <div className="flex-1">
             <div className="bg-card rounded-lg border p-4 mb-6">
