@@ -1,8 +1,10 @@
+
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SearchFilters from "@/components/SearchFilters";
+import FilterBadges from "@/components/search/FilterBadges";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType } from "@/types";
@@ -194,6 +196,29 @@ const Search = () => {
     });
   };
 
+  const handleRemoveFilter = (filterType: string, value?: string) => {
+    const updatedFilters = {...filters};
+    
+    if (filterType === "dateRange") {
+      updatedFilters.dateRange = undefined;
+    } else if (value) {
+      // TypeScript type assertion to handle the array properties
+      const filterKey = filterType as keyof SearchFiltersType;
+      const currentArray = updatedFilters[filterKey] as string[];
+      
+      if (Array.isArray(currentArray)) {
+        updatedFilters[filterKey] = currentArray.filter(item => item !== value) as any;
+      }
+    }
+    
+    setFilters(updatedFilters);
+    
+    toast({
+      title: `Filter borttaget`,
+      description: value ? `"${value}" har tagits bort från filtren` : "Filtret har tagits bort"
+    });
+  };
+
   const toggleSidebar = () => {
     if (!isMobile) {
       setSidebarOpen(!sidebarOpen);
@@ -324,6 +349,12 @@ const Search = () => {
                 </div>
               </div>
             </div>
+            
+            <FilterBadges 
+              filters={filters} 
+              onRemoveFilter={handleRemoveFilter} 
+              onClearAllFilters={handleClearAllFilters} 
+            />
             
             {filteredCompetitions.length > 0 ? (
               <div className="space-y-6">
