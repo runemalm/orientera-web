@@ -7,7 +7,7 @@ import FilterBadges from "@/components/search/FilterBadges";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
 import { SearchFilters as SearchFiltersType, Discipline, CompetitionType, CompetitionBranch, CompetitionLevel } from "@/types";
-import { Filter, Trash2, MapPin, CalendarDays, List, Star, ChevronLeft, ChevronRight } from "lucide-react";
+import { Filter, Trash2, MapPin, CalendarDays, List, Star, ChevronLeft, ChevronRight, PanelLeftOpen, PanelLeftClose } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import CompetitionMapView from "@/components/CompetitionMapView";
@@ -307,7 +307,11 @@ const Search = () => {
                         className="h-9 w-9"
                         aria-label={sidebarOpen ? "Dölj filterpanel" : "Visa filterpanel"}
                       >
-                        <Filter className="h-4 w-4" />
+                        {sidebarOpen ? (
+                          <PanelLeftClose className="h-4 w-4" />
+                        ) : (
+                          <PanelLeftOpen className="h-4 w-4" />
+                        )}
                         {!sidebarOpen && hasActiveFilters && (
                           <Badge 
                             variant="secondary"
