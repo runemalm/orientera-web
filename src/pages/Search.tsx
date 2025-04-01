@@ -236,13 +236,6 @@ const Search = () => {
     }
   };
 
-  const toggleMapVisibility = () => {
-    setFilters(prev => ({
-      ...prev,
-      showMap: !prev.showMap
-    }));
-  };
-
   const handleViewChange = (value: string) => {
     if (value === 'list' || value === 'wall' || value === 'favorites') {
       setViewType(value as ViewType);
@@ -284,6 +277,7 @@ const Search = () => {
                     onFilterChange={handleFilterChange} 
                     hasLocation={false}
                     hideSearchInput={true}
+                    showMapToggle={true}
                   />
                 </div>
               )}
@@ -324,20 +318,6 @@ const Search = () => {
                         )}
                       </Button>
                     )}
-                    
-                    <div className="flex items-center space-x-2">
-                      <Switch
-                        id="map-toggle"
-                        checked={filters.showMap}
-                        onCheckedChange={toggleMapVisibility}
-                      />
-                      <label
-                        htmlFor="map-toggle"
-                        className="text-sm font-medium cursor-pointer"
-                      >
-                        Visa karta
-                      </label>
-                    </div>
                   </div>
                   
                   <div className="flex items-center">

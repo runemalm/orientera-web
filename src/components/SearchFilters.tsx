@@ -1,4 +1,3 @@
-
 import { FilterIcon, X, SearchIcon, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
