@@ -3,10 +3,11 @@ import { useLocation } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SearchFilters from "@/components/SearchFilters";
+import FilterBadges from "@/components/search/FilterBadges";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
-import { SearchFilters as SearchFiltersType } from "@/types";
-import { Filter, Trash2, MapPin, CalendarDays, List, Star } from "lucide-react";
+import { SearchFilters as SearchFiltersType, Discipline, CompetitionType, CompetitionBranch, CompetitionLevel } from "@/types";
+import { Filter, Trash2, MapPin, CalendarDays, List, Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import CompetitionMapView from "@/components/CompetitionMapView";
@@ -194,6 +195,41 @@ const Search = () => {
     });
   };
 
+  const handleRemoveFilter = (filterType: string, value?: string) => {
+    const updatedFilters = {...filters};
+    
+    if (filterType === "dateRange") {
+      updatedFilters.dateRange = undefined;
+    } else if (value) {
+      const filterKey = filterType as keyof SearchFiltersType;
+      
+      if (Array.isArray(updatedFilters[filterKey])) {
+        if (filterKey === 'disciplines') {
+          updatedFilters.disciplines = updatedFilters.disciplines.filter(item => item !== value) as Discipline[];
+        } 
+        else if (filterKey === 'levels') {
+          updatedFilters.levels = updatedFilters.levels.filter(item => item !== value) as CompetitionLevel[];
+        }
+        else if (filterKey === 'types') {
+          updatedFilters.types = updatedFilters.types.filter(item => item !== value) as CompetitionType[];
+        }
+        else if (filterKey === 'branches') {
+          updatedFilters.branches = updatedFilters.branches.filter(item => item !== value) as CompetitionBranch[];
+        }
+        else if (filterKey === 'regions' || filterKey === 'districts') {
+          updatedFilters[filterKey] = updatedFilters[filterKey].filter(item => item !== value) as string[];
+        }
+      }
+    }
+    
+    setFilters(updatedFilters);
+    
+    toast({
+      title: `Filter borttaget`,
+      description: value ? `"${value}" har tagits bort från filtren` : "Filtret har tagits bort"
+    });
+  };
+
   const toggleSidebar = () => {
     if (!isMobile) {
       setSidebarOpen(!sidebarOpen);
@@ -239,19 +275,47 @@ const Search = () => {
         </div>
         
         <div className="flex flex-col md:flex-row gap-6 w-full max-w-full">
-          {(sidebarOpen || isMobile) && (
-            <div className="w-full md:w-80 flex-shrink-0" ref={filterRef}>
-              <div ref={filterContentRef} className="mb-4">
-                <SearchFilters 
-                  filters={filters} 
-                  onFilterChange={handleFilterChange} 
-                  hasLocation={false}
-                  hideSearchInput={true}
-                  showMapToggle={true}
-                />
-              </div>
+          <div className="relative flex">
+            <div className={`relative ${sidebarOpen || isMobile ? 'w-full md:w-80 flex-shrink-0' : 'w-0 overflow-hidden'}`} ref={filterRef}>
+              {sidebarOpen && (
+                <div ref={filterContentRef} className="mb-4 relative">
+                  <SearchFilters 
+                    filters={filters} 
+                    onFilterChange={handleFilterChange} 
+                    hasLocation={false}
+                    hideSearchInput={true}
+                    showMapToggle={true}
+                  />
+                </div>
+              )}
             </div>
-          )}
+            
+            {!isMobile && (
+              <Button 
+                size="icon" 
+                variant="outline"
+                onClick={toggleSidebar}
+                className={`h-12 w-6 rounded-l-none rounded-r-lg border-l-0 shadow-md z-10 bg-background flex-shrink-0 ${sidebarOpen ? 'relative -ml-1' : ''}`}
+                aria-label={sidebarOpen ? "Dölj filterpanel" : "Visa filterpanel"}
+              >
+                {sidebarOpen ? (
+                  <ChevronLeft className="h-4 w-4" />
+                ) : (
+                  <>
+                    <ChevronRight className="h-4 w-4" />
+                    {hasActiveFilters && (
+                      <Badge 
+                        variant="secondary"
+                        className="absolute -top-2 -right-2 h-5 min-w-5 flex items-center justify-center p-0 text-xs"
+                      >
+                        {filters.disciplines.length + filters.districts.length + typesArray.length + branchesArray.length + (filters.dateRange ? 1 : 0)}
+                      </Badge>
+                    )}
+                  </>
+                )}
+              </Button>
+            )}
+          </div>
           
           <div className="flex-1">
             <div className="bg-card rounded-lg border p-4 mb-6">
@@ -267,36 +331,6 @@ const Search = () => {
                 </div>
                 
                 <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    {!isMobile && (
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              variant={sidebarOpen ? "default" : "outline"}
-                              size="icon"
-                              onClick={toggleSidebar}
-                              className="h-9 w-9 relative"
-                            >
-                              <Filter className="h-4 w-4" />
-                              {hasActiveFilters && !sidebarOpen && (
-                                <Badge 
-                                  variant="secondary"
-                                  className="absolute -top-2 -right-2 h-5 min-w-5 flex items-center justify-center p-0 text-xs"
-                                >
-                                  {filters.disciplines.length + filters.districts.length + typesArray.length + branchesArray.length + (filters.dateRange ? 1 : 0)}
-                                </Badge>
-                              )}
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent side="bottom">
-                            {sidebarOpen ? "Dölj filterpanel" : "Visa filterpanel"}
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    )}
-                  </div>
-                  
                   <div className="flex items-center">
                     <Tabs 
                       value={viewType} 
@@ -322,6 +356,12 @@ const Search = () => {
                 </div>
               </div>
             </div>
+            
+            <FilterBadges 
+              filters={filters} 
+              onRemoveFilter={handleRemoveFilter} 
+              onClearAllFilters={handleClearAllFilters} 
+            />
             
             {filteredCompetitions.length > 0 ? (
               <div className="space-y-6">
