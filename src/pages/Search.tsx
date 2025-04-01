@@ -207,6 +207,7 @@ const Search = () => {
       const currentArray = updatedFilters[filterKey] as string[];
       
       if (Array.isArray(currentArray)) {
+        // Use a type assertion to ensure TypeScript understands the result type
         updatedFilters[filterKey] = currentArray.filter(item => item !== value) as any;
       }
     }
