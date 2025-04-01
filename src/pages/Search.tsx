@@ -6,7 +6,7 @@ import SearchFilters from "@/components/SearchFilters";
 import FilterBadges from "@/components/search/FilterBadges";
 import { competitions } from "@/data/competitions";
 import { filterCompetitions } from "@/lib/utils";
-import { SearchFilters as SearchFiltersType } from "@/types";
+import { SearchFilters as SearchFiltersType, Discipline, CompetitionType, CompetitionBranch, CompetitionLevel } from "@/types";
 import { Filter, Trash2, MapPin, CalendarDays, List, Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -204,12 +204,21 @@ const Search = () => {
       const filterKey = filterType as keyof SearchFiltersType;
       
       if (Array.isArray(updatedFilters[filterKey])) {
-        const arrayType = filterKey === 'disciplines' ? 'Discipline[]' :
-                         filterKey === 'types' ? 'CompetitionType[]' :
-                         filterKey === 'branches' ? 'CompetitionBranch[]' : 'string[]';
-                         
-        updatedFilters[filterKey] = (updatedFilters[filterKey] as string[])
-          .filter(item => item !== value) as any;
+        if (filterKey === 'disciplines') {
+          updatedFilters.disciplines = updatedFilters.disciplines.filter(item => item !== value) as Discipline[];
+        } 
+        else if (filterKey === 'levels') {
+          updatedFilters.levels = updatedFilters.levels.filter(item => item !== value) as CompetitionLevel[];
+        }
+        else if (filterKey === 'types') {
+          updatedFilters.types = updatedFilters.types.filter(item => item !== value) as CompetitionType[];
+        }
+        else if (filterKey === 'branches') {
+          updatedFilters.branches = updatedFilters.branches.filter(item => item !== value) as CompetitionBranch[];
+        }
+        else if (filterKey === 'regions' || filterKey === 'districts') {
+          updatedFilters[filterKey] = updatedFilters[filterKey].filter(item => item !== value) as string[];
+        }
       }
     }
     
