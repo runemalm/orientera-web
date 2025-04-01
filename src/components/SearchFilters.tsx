@@ -1,3 +1,4 @@
+
 import { FilterIcon, X, SearchIcon, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
@@ -11,6 +12,8 @@ import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { useIsMobile, useBreakpoint } from "@/hooks/use-mobile";
+import { Switch } from "@/components/ui/switch";
+import { MapPin } from "lucide-react";
 
 const disciplines: Discipline[] = ['Sprint', 'Medel', 'Lång', 'Natt', 'Stafett', 'Ultralång'];
 const competitionTypes: CompetitionType[] = ['Värdetävlingar', 'Nationella tävlingar', 'Distriktstävlingar', 'Närtävlingar', 'Veckans bana'];
@@ -21,13 +24,15 @@ interface SearchFiltersProps {
   onFilterChange: (filters: SearchFiltersType) => void;
   hasLocation: boolean;
   hideSearchInput?: boolean;
+  showMapToggle?: boolean;
 }
 
 const SearchFiltersComponent = ({ 
   filters, 
   onFilterChange, 
   hasLocation,
-  hideSearchInput = false
+  hideSearchInput = false,
+  showMapToggle = false
 }: SearchFiltersProps) => {
   const { toast } = useToast();
   const [searchValue, setSearchValue] = useState("");
@@ -100,6 +105,13 @@ const SearchFiltersComponent = ({
   const handleSearchSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     onFilterChange({ ...filters, searchQuery: searchValue });
+  };
+
+  const handleToggleMap = () => {
+    onFilterChange({
+      ...filters,
+      showMap: !filters.showMap
+    });
   };
 
   const handleClearAllFilters = () => {
@@ -198,6 +210,19 @@ const SearchFiltersComponent = ({
           </div>
           <button type="submit" className="sr-only">Sök</button>
         </form>
+      )}
+
+      {showMapToggle && (
+        <div className="mb-4 flex items-center justify-between rounded-md border p-3">
+          <div className="flex items-center gap-2">
+            <MapPin className="h-4 w-4" />
+            <span className="text-sm font-medium">Visa karta</span>
+          </div>
+          <Switch
+            checked={filters.showMap}
+            onCheckedChange={handleToggleMap}
+          />
+        </div>
       )}
 
       <div className="space-y-2">

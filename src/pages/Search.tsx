@@ -247,6 +247,7 @@ const Search = () => {
                   onFilterChange={handleFilterChange} 
                   hasLocation={false}
                   hideSearchInput={true}
+                  showMapToggle={true}
                 />
               </div>
             </div>
@@ -294,24 +295,6 @@ const Search = () => {
                         </Tooltip>
                       </TooltipProvider>
                     )}
-                    
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            variant={filters.showMap ? "default" : "outline"}
-                            size="icon"
-                            onClick={toggleMapVisibility}
-                            className="h-9 w-9 relative"
-                          >
-                            <MapPin className="h-4 w-4" />
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent side="bottom">
-                          {filters.showMap ? "Dölj karta" : "Visa karta"}
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
                   </div>
                   
                   <div className="flex items-center">
